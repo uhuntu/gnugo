@@ -3,6 +3,10 @@ INCLUDE_DIRECTORIES(${GNUGo_SOURCE_DIR}/engine)
 INCLUDE_DIRECTORIES(${GNUGo_SOURCE_DIR}/sgf)
 INCLUDE_DIRECTORIES(${GNUGo_SOURCE_DIR}/utils)
 
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
 ########### mkpat program ###############
 
 SET(mkpat_SRCS
@@ -73,7 +77,7 @@ SET(extract_fuseki_SRCS
 ADD_EXECUTABLE(extract_fuseki ${extract_fuseki_SRCS})
 
 TARGET_LINK_LIBRARIES(extract_fuseki engine patterns
-                      engine patterns sgf utils)
+                      engine patterns sgf utils m)
 
 
 ########### next target ###############

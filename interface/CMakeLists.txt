@@ -2,6 +2,10 @@ INCLUDE_DIRECTORIES(${GNUGo_SOURCE_DIR}/engine)
 INCLUDE_DIRECTORIES(${GNUGo_SOURCE_DIR}/sgf)
 INCLUDE_DIRECTORIES(${GNUGo_SOURCE_DIR}/utils)
 
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
 ########### gnugo executable ###############
 
 SET(gnugo_SRCS
