@@ -26,7 +26,7 @@
 
 @sp 1
 @page
-@title{GNU Go 3.8}
+@title GNU Go 3.8
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
 2008, 2009, 2010 and 2011 @uref{http://www.fsf.org,Free Software
