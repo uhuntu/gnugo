@@ -1,0 +1,7 @@
+{
+    "terminal.integrated.scrollback": 100000,
+    "files.associations": {
+        "*.cp": "c",
+        "hash.h": "c"
+    }
+}

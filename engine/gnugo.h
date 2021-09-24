@@ -98,18 +98,18 @@ float gnugo_estimate_score(float *upper, float *lower);
 
 
 typedef struct {
-  int handicap;
-  int to_move;		/* whose move it currently is */
-  SGFTree game_record;	/* Game record in sgf format. */
-  int computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
+    int handicap;
+    int to_move;		/* whose move it currently is */
+    SGFTree game_record;	/* Game record in sgf format. */
+    int computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
 } Gameinfo;
 
 void gameinfo_clear(Gameinfo *ginfo);
 void gameinfo_print(Gameinfo *ginfo);
 int gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
-			      const char *untilstr, int orientation);
+                              const char *untilstr, int orientation);
 int gameinfo_play_sgftree(Gameinfo *gameinfo, SGFTree *tree,
-			  const char *untilstr);
+                          const char *untilstr);
 
 
 /* ================================================================ */
@@ -236,8 +236,8 @@ extern int mandated_aa_depth;
 extern int mandated_owl_distrust_depth;
 extern int mandated_owl_branch_depth;
 extern int mandated_owl_reading_depth;
-extern int mandated_owl_node_limit; 
-extern int mandated_semeai_node_limit; 
+extern int mandated_owl_node_limit;
+extern int mandated_semeai_node_limit;
 
 extern int autolevel_on;
 

@@ -57,29 +57,29 @@ static Hash_data routine_hash[NUM_CACHE_ROUTINES];
 static void
 keyhash_init(void)
 {
-  static int is_initialized = 0;
-  
-  if (!is_initialized) {
-    
-    INIT_ZOBRIST_ARRAY(target1_hash);
-    INIT_ZOBRIST_ARRAY(target2_hash);
-    INIT_ZOBRIST_ARRAY(routine_hash);
-    
-    is_initialized = 1;
-  }
+    static int is_initialized = 0;
+
+    if (!is_initialized) {
+
+        INIT_ZOBRIST_ARRAY(target1_hash);
+        INIT_ZOBRIST_ARRAY(target2_hash);
+        INIT_ZOBRIST_ARRAY(routine_hash);
+
+        is_initialized = 1;
+    }
 }
 
 static void
 calculate_hashval_for_tt(Hash_data *hashdata, int routine, int target1,
-			 int target2, Hash_data *extra_hash)
-{ 
-  *hashdata = board_hash;                /* from globals.c */
-  hashdata_xor(*hashdata, routine_hash[routine]);
-  hashdata_xor(*hashdata, target1_hash[target1]);
-  if (target2 != NO_MOVE)
-    hashdata_xor(*hashdata, target2_hash[target2]);
-  if (extra_hash)
-    hashdata_xor(*hashdata, *extra_hash);
+                         int target2, Hash_data *extra_hash)
+{
+    *hashdata = board_hash;                /* from globals.c */
+    hashdata_xor(*hashdata, routine_hash[routine]);
+    hashdata_xor(*hashdata, target1_hash[target1]);
+    if (target2 != NO_MOVE)
+        hashdata_xor(*hashdata, target2_hash[target2]);
+    if (extra_hash)
+        hashdata_xor(*hashdata, *extra_hash);
 }
 
 
@@ -91,27 +91,27 @@ calculate_hashval_for_tt(Hash_data *hashdata, int routine, int target1,
 static void
 tt_init(Transposition_table *table, int memsize)
 {
-  int num_entries;
- 
-  /* Make sure the hash system is initialized. */
-  hash_init();
-  keyhash_init();
+    int num_entries;
 
-  if (memsize > 0)
-    num_entries = memsize / sizeof(table->entries[0]);
-  else
-    num_entries = DEFAULT_NUMBER_OF_CACHE_ENTRIES;
+    /* Make sure the hash system is initialized. */
+    hash_init();
+    keyhash_init();
 
-  table->num_entries = num_entries;
-  table->entries     = malloc(num_entries * sizeof(table->entries[0]));
+    if (memsize > 0)
+        num_entries = memsize / sizeof(table->entries[0]);
+    else
+        num_entries = DEFAULT_NUMBER_OF_CACHE_ENTRIES;
 
-  if (table->entries == NULL) {
-    perror("Couldn't allocate memory for transposition table. \n");
-    exit(1);
-  }
+    table->num_entries = num_entries;
+    table->entries     = malloc(num_entries * sizeof(table->entries[0]));
 
-  table->is_clean = 0;
-  tt_clear(table);
+    if (table->entries == NULL) {
+        perror("Couldn't allocate memory for transposition table. \n");
+        exit(1);
+    }
+
+    table->is_clean = 0;
+    tt_clear(table);
 }
 
 
@@ -120,19 +120,19 @@ tt_init(Transposition_table *table, int memsize)
 static void
 tt_clear(Transposition_table *table)
 {
-  if (!table->is_clean) {
-    memset(table->entries, 0, table->num_entries * sizeof(table->entries[0]));
-    table->is_clean = 1;
-  }
+    if (!table->is_clean) {
+        memset(table->entries, 0, table->num_entries * sizeof(table->entries[0]));
+        table->is_clean = 1;
+    }
 }
- 
- 
+
+
 /* Free the transposition table. */
 
 void
 tt_free(Transposition_table *table)
 {
-  free(table->entries);
+    free(table->entries);
 }
 
 
@@ -142,52 +142,52 @@ tt_free(Transposition_table *table)
  *     can be used for move ordering.
  *   2 if found and depth is enough so that the result can be trusted.
  */
- 
+
 int
-tt_get(Transposition_table *table, 
-       enum routine_id routine, 
+tt_get(Transposition_table *table,
+       enum routine_id routine,
        int target1, int target2, int remaining_depth,
        Hash_data *extra_hash,
        int *value1, int *value2, int *move)
 {
-  Hash_data hashval;
-  Hashentry *entry;
-  Hashnode *node;
- 
-  /* Sanity check. */
-  if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
-    return 0;
+    Hash_data hashval;
+    Hashentry *entry;
+    Hashnode *node;
 
-  /* Get the combined hash value. */
-  calculate_hashval_for_tt(&hashval, routine, target1, target2, extra_hash);
+    /* Sanity check. */
+    if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
+        return 0;
 
-  /* Get the correct entry and node. */
-  entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
-  if (hashdata_is_equal(hashval, entry->deepest.key))
-    node = &entry->deepest;
-  else if (hashdata_is_equal(hashval, entry->newest.key))
-    node = &entry->newest;
-  else
-    return 0;
+    /* Get the combined hash value. */
+    calculate_hashval_for_tt(&hashval, routine, target1, target2, extra_hash);
 
-  stats.read_result_hits++;
+    /* Get the correct entry and node. */
+    entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
+    if (hashdata_is_equal(hashval, entry->deepest.key))
+        node = &entry->deepest;
+    else if (hashdata_is_equal(hashval, entry->newest.key))
+        node = &entry->newest;
+    else
+        return 0;
 
-  /* Return data.  Only set the result if remaining depth in the table
-   * is big enough to be trusted.  The move can always be used for move
-   * ordering if nothing else.
-   */
-  if (move)
-    *move = hn_get_move(node->data);
-  if (remaining_depth <= (int) hn_get_remaining_depth(node->data)) {
-    if (value1)
-      *value1 = hn_get_value1(node->data);
-    if (value2)
-      *value2 = hn_get_value2(node->data);
-    stats.trusted_read_result_hits++;
-    return 2;
-  }
+    stats.read_result_hits++;
 
-  return 1;
+    /* Return data.  Only set the result if remaining depth in the table
+     * is big enough to be trusted.  The move can always be used for move
+     * ordering if nothing else.
+     */
+    if (move)
+        *move = hn_get_move(node->data);
+    if (remaining_depth <= (int) hn_get_remaining_depth(node->data)) {
+        if (value1)
+            *value1 = hn_get_value1(node->data);
+        if (value2)
+            *value2 = hn_get_value2(node->data);
+        stats.trusted_read_result_hits++;
+        return 2;
+    }
+
+    return 1;
 }
 
 
@@ -196,85 +196,85 @@ tt_get(Transposition_table *table,
 
 void
 tt_update(Transposition_table *table,
-	  enum routine_id routine, int target1, int target2,
-	  int remaining_depth, Hash_data *extra_hash, 
-	  int value1, int value2, int move)
+          enum routine_id routine, int target1, int target2,
+          int remaining_depth, Hash_data *extra_hash,
+          int value1, int value2, int move)
 {
-  Hash_data hashval;
-  Hashentry *entry;
-  Hashnode *deepest;
-  Hashnode *newest;
-  unsigned int data;
-  /* Get routine costs definitions from liberty.h. */
-  static const int routine_costs[] = { ROUTINE_COSTS };
-  gg_assert(routine_costs[NUM_CACHE_ROUTINES] == -1);
+    Hash_data hashval;
+    Hashentry *entry;
+    Hashnode *deepest;
+    Hashnode *newest;
+    unsigned int data;
+    /* Get routine costs definitions from liberty.h. */
+    static const int routine_costs[] = { ROUTINE_COSTS };
+    gg_assert(routine_costs[NUM_CACHE_ROUTINES] == -1);
 
-  /* Sanity check. */
-  if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
-    return;
+    /* Sanity check. */
+    if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
+        return;
 
-  /* Get the combined hash value. */
-  calculate_hashval_for_tt(&hashval, routine, target1, target2, extra_hash);
+    /* Get the combined hash value. */
+    calculate_hashval_for_tt(&hashval, routine, target1, target2, extra_hash);
 
-  data = hn_create_data(remaining_depth, value1, value2, move,
-      		        routine_costs[routine]);
+    data = hn_create_data(remaining_depth, value1, value2, move,
+                          routine_costs[routine]);
 
-  /* Get the entry and nodes. */ 
-  entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
-  deepest = &entry->deepest;
-  newest  = &entry->newest;
- 
-  /* See if we found an already existing node. */
-  if (hashdata_is_equal(hashval, deepest->key)
-      && remaining_depth >= (int) hn_get_remaining_depth(deepest->data)) {
+    /* Get the entry and nodes. */
+    entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
+    deepest = &entry->deepest;
+    newest  = &entry->newest;
 
-    /* Found deepest */
-    deepest->data = data;
+    /* See if we found an already existing node. */
+    if (hashdata_is_equal(hashval, deepest->key)
+            && remaining_depth >= (int) hn_get_remaining_depth(deepest->data)) {
 
-  }
-  else if (hashdata_is_equal(hashval, newest->key)
-           && remaining_depth >= (int) hn_get_remaining_depth(newest->data)) {
+        /* Found deepest */
+        deepest->data = data;
 
-    /* Found newest */
-    newest->data = data;
+    }
+    else if (hashdata_is_equal(hashval, newest->key)
+             && remaining_depth >= (int) hn_get_remaining_depth(newest->data)) {
 
-    /* If newest has become deeper than deepest, then switch them. */
-    if (hn_get_remaining_depth(newest->data)
-	> hn_get_remaining_depth(deepest->data)) {
-      Hashnode temp;
+        /* Found newest */
+        newest->data = data;
 
-      temp = *deepest;
-      *deepest = *newest;
-      *newest = temp;
+        /* If newest has become deeper than deepest, then switch them. */
+        if (hn_get_remaining_depth(newest->data)
+                > hn_get_remaining_depth(deepest->data)) {
+            Hashnode temp;
+
+            temp = *deepest;
+            *deepest = *newest;
+            *newest = temp;
+        }
+
+    }
+    else if (hn_get_total_cost(data) > hn_get_total_cost(deepest->data)) {
+        if (hn_get_total_cost(newest->data) < hn_get_total_cost(deepest->data))
+            *newest = *deepest;
+        deepest->key  = hashval;
+        deepest->data = data;
+    }
+    else {
+        /* Replace newest. */
+        newest->key  = hashval;
+        newest->data = data;
     }
 
-  }
-  else if (hn_get_total_cost(data) > hn_get_total_cost(deepest->data)) {
-    if (hn_get_total_cost(newest->data) < hn_get_total_cost(deepest->data))
-      *newest = *deepest;
-    deepest->key  = hashval;
-    deepest->data = data;
-  } 
-  else {
-    /* Replace newest. */
-    newest->key  = hashval;
-    newest->data = data;
-  }
-
-  stats.read_result_entered++;
-  table->is_clean = 0;
+    stats.read_result_entered++;
+    table->is_clean = 0;
 }
 
 
 static const char *routine_names[] = {
-  ROUTINE_NAMES
+    ROUTINE_NAMES
 };
 
 /* Convert a routine as used in the cache table to a string. */
 const char *
 routine_id_to_string(enum routine_id routine)
 {
-  return routine_names[(int) routine];
+    return routine_names[(int) routine];
 }
 
 
@@ -286,7 +286,7 @@ routine_id_to_string(enum routine_id routine)
 void
 reading_cache_init(int bytes)
 {
-  tt_init(&ttable, bytes);
+    tt_init(&ttable, bytes);
 }
 
 
@@ -294,13 +294,13 @@ reading_cache_init(int bytes)
 void
 reading_cache_clear()
 {
-  tt_clear(&ttable);
+    tt_clear(&ttable);
 }
 
 float
 reading_cache_default_size()
 {
-  return DEFAULT_NUMBER_OF_CACHE_ENTRIES * sizeof(Hashentry) / 1024.0 / 1024.0;
+    return DEFAULT_NUMBER_OF_CACHE_ENTRIES * sizeof(Hashentry) / 1024.0 / 1024.0;
 }
 
 
@@ -310,28 +310,28 @@ reading_cache_default_size()
 
 void
 sgf_trace(const char *func, int str, int move, int result,
-	  const char *message)
+          const char *message)
 {
-  char buf[100];
+    char buf[100];
 
-  sprintf(buf, "%s %c%d: ", func, J(str) + 'A' + (J(str) >= 8),
-	  board_size - I(str));
-  
-  if (result == 0)
-    sprintf(buf + strlen(buf), "0");
-  else if (ON_BOARD(move))
-    sprintf(buf + strlen(buf), "%s %c%d", result_to_string(result), 
-	    J(move) + 'A' + (J(move) >= 8),
-	    board_size - I(move));
-  else if (is_pass(move))
-    sprintf(buf + strlen(buf), "%s PASS", result_to_string(result));
-  else
-    sprintf(buf + strlen(buf), "%s [%d]", result_to_string(result), move);
+    sprintf(buf, "%s %c%d: ", func, J(str) + 'A' + (J(str) >= 8),
+            board_size - I(str));
 
-  if (message)
-    sprintf(buf + strlen(buf), " (%s)", message);
-  
-  sgftreeAddComment(sgf_dumptree, buf);
+    if (result == 0)
+        sprintf(buf + strlen(buf), "0");
+    else if (ON_BOARD(move))
+        sprintf(buf + strlen(buf), "%s %c%d", result_to_string(result),
+                J(move) + 'A' + (J(move) >= 8),
+                board_size - I(move));
+    else if (is_pass(move))
+        sprintf(buf + strlen(buf), "%s PASS", result_to_string(result));
+    else
+        sprintf(buf + strlen(buf), "%s [%d]", result_to_string(result), move);
+
+    if (message)
+        sprintf(buf + strlen(buf), " (%s)", message);
+
+    sgftreeAddComment(sgf_dumptree, buf);
 }
 
 /* Write two group reading (connection) trace data to an SGF file.
@@ -339,28 +339,28 @@ sgf_trace(const char *func, int str, int move, int result,
  */
 
 void
-sgf_trace2(const char *func, int str1, int str2, int move, 
+sgf_trace2(const char *func, int str1, int str2, int move,
            const char *result, const char *message)
 {
-  char buf[100];
+    char buf[100];
 
-  sprintf(buf, "%s %c%d %c%d: ", func,
-	  J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
-	  J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
-  
-  if (ON_BOARD(move))
-    sprintf(buf + strlen(buf), "%s %c%d", result,
-	    J(move) + 'A' + (J(move) >= 8),
-	    board_size - I(move));
-  else if (is_pass(move))
-    sprintf(buf + strlen(buf), "%s PASS", result);
-  else
-    sprintf(buf + strlen(buf), "%s [%d]", result, move);
+    sprintf(buf, "%s %c%d %c%d: ", func,
+            J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
+            J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
 
-  if (message)
-    sprintf(buf + strlen(buf), " (%s)", message);
-  
-  sgftreeAddComment(sgf_dumptree, buf);
+    if (ON_BOARD(move))
+        sprintf(buf + strlen(buf), "%s %c%d", result,
+                J(move) + 'A' + (J(move) >= 8),
+                board_size - I(move));
+    else if (is_pass(move))
+        sprintf(buf + strlen(buf), "%s PASS", result);
+    else
+        sprintf(buf + strlen(buf), "%s [%d]", result, move);
+
+    if (message)
+        sprintf(buf + strlen(buf), " (%s)", message);
+
+    sgftreeAddComment(sgf_dumptree, buf);
 }
 
 /* Write semeai reading trace data to an SGF file. Normally called
@@ -368,31 +368,31 @@ sgf_trace2(const char *func, int str1, int str2, int move,
  */
 
 void
-sgf_trace_semeai(const char *func, int str1, int str2, int move, 
-		 int result1, int result2, const char *message)
+sgf_trace_semeai(const char *func, int str1, int str2, int move,
+                 int result1, int result2, const char *message)
 {
-  char buf[100];
+    char buf[100];
 
-  sprintf(buf, "%s %c%d %c%d: ", func,
-	  J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
-	  J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
-  
-  if (ON_BOARD(move))
-    sprintf(buf + strlen(buf), "%s %s %c%d",
-	    result_to_string(result1), result_to_string(result2),
-	    J(move) + 'A' + (J(move) >= 8), board_size - I(move));
-  else if (is_pass(move))
-    sprintf(buf + strlen(buf), "%s %s PASS",
-	    result_to_string(result1), result_to_string(result2));
-  else
-    sprintf(buf + strlen(buf), "%s %s [%d]",
-	    result_to_string(result1), result_to_string(result2),
-	    move);
+    sprintf(buf, "%s %c%d %c%d: ", func,
+            J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
+            J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
 
-  if (message)
-    sprintf(buf + strlen(buf), " (%s)", message);
-  
-  sgftreeAddComment(sgf_dumptree, buf);
+    if (ON_BOARD(move))
+        sprintf(buf + strlen(buf), "%s %s %c%d",
+                result_to_string(result1), result_to_string(result2),
+                J(move) + 'A' + (J(move) >= 8), board_size - I(move));
+    else if (is_pass(move))
+        sprintf(buf + strlen(buf), "%s %s PASS",
+                result_to_string(result1), result_to_string(result2));
+    else
+        sprintf(buf + strlen(buf), "%s %s [%d]",
+                result_to_string(result1), result_to_string(result2),
+                move);
+
+    if (message)
+        sprintf(buf + strlen(buf), " (%s)", message);
+
+    sgftreeAddComment(sgf_dumptree, buf);
 }
 
 /*

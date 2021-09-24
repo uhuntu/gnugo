@@ -29,46 +29,46 @@
 
 #include "sgftree.h"
 
-/* 
+/*
  * Return the integer X move.
  */
 
 int
 get_moveX(SGFProperty *property, int boardsize)
 {
-  int i;
-  if (strlen(property->value) < 2)
-    return -1;
+    int i;
+    if (strlen(property->value) < 2)
+        return -1;
 
-  i = toupper((int) property->value[1]) - 'A';
-  if (i >= boardsize)
-    return -1;
+    i = toupper((int) property->value[1]) - 'A';
+    if (i >= boardsize)
+        return -1;
 
-  return i;
+    return i;
 }
 
-/* 
+/*
  * Return the integer Y move.
  */
 
 int
 get_moveY(SGFProperty *property, int boardsize)
 {
-  int j;
-  if (strlen(property->value) < 2)
-    return -1;
+    int j;
+    if (strlen(property->value) < 2)
+        return -1;
 
-  j = toupper((int) property->value[0]) - 'A';
-  if (j >= boardsize)
-    return -1;
+    j = toupper((int) property->value[0]) - 'A';
+    if (j >= boardsize)
+        return -1;
 
-  return j;
+    return j;
 }
 
 
 /* Fills (*i, *j) from the property value, in GNU Go co-ords.
  * Note that GNU Go uses different conventions from sgf for
- * co-ordinates been called. 
+ * co-ordinates been called.
  *
  * Returns 1 for a move, 0 for a pass.
  */
@@ -76,50 +76,50 @@ get_moveY(SGFProperty *property, int boardsize)
 int
 get_moveXY(SGFProperty *property, int *i, int *j, int boardsize)
 {
-  *i = get_moveX(property, boardsize);
-  *j = get_moveY(property, boardsize);
-  
-  if (*i == -1 && *j == -1)
-    return 0;
+    *i = get_moveX(property, boardsize);
+    *j = get_moveY(property, boardsize);
 
-  return 1;
+    if (*i == -1 && *j == -1)
+        return 0;
+
+    return 1;
 }
 
 
-/* 
+/*
  * Debugging function to print properties as they are traversed.
  */
 
 int
 show_sgf_properties(SGFNode *node)
 {
-  SGFProperty *sgf_prop;
-  int propcount;
+    SGFProperty *sgf_prop;
+    int propcount;
 
-  propcount = 0;
+    propcount = 0;
 
-  printf("P: ");
-  if (!node->props) {
-    printf("None\n");
-    return propcount;
-  }
-  else {
-    sgf_prop = node->props;
-    while (sgf_prop) {
-      printf("%c%c ", sgf_prop->name & 0x00FF, (sgf_prop->name & 0xFF00)>>8);
-      sgf_prop = sgf_prop->next;
-      propcount++;
+    printf("P: ");
+    if (!node->props) {
+        printf("None\n");
+        return propcount;
+    }
+    else {
+        sgf_prop = node->props;
+        while (sgf_prop) {
+            printf("%c%c ", sgf_prop->name & 0x00FF, (sgf_prop->name & 0xFF00)>>8);
+            sgf_prop = sgf_prop->next;
+            propcount++;
+        }
+
+        printf("(%d) ", propcount);
+        if (node->next)
+            printf("n");
+        if (node->child)
+            printf("c");
+        printf("\n");
     }
 
-    printf("(%d) ", propcount);
-    if (node->next)
-      printf("n");
-    if (node->child)
-      printf("c");
-    printf("\n");
-  }
-
-  return propcount;
+    return propcount;
 }
 
 
@@ -130,19 +130,19 @@ show_sgf_properties(SGFNode *node)
 int
 show_sgf_tree(SGFNode *node)
 {
-  int n = 0; /* number of nodes */
-  
-  n++;
-  show_sgf_properties(node);
+    int n = 0; /* number of nodes */
 
-  /* must search depth first- siblings are equal! */
-  if (node->child)
-    n += show_sgf_tree(node->child);
+    n++;
+    show_sgf_properties(node);
 
-  if (node->next)
-    n += show_sgf_tree(node->next);
-  
-  return n;
+    /* must search depth first- siblings are equal! */
+    if (node->child)
+        n += show_sgf_tree(node->child);
+
+    if (node->next)
+        n += show_sgf_tree(node->next);
+
+    return n;
 }
 
 
@@ -153,34 +153,34 @@ show_sgf_tree(SGFNode *node)
 int
 is_markup_node(SGFNode *node)
 {
-  SGFProperty *sgf_prop;
-  
-  /* If the node has no properties, there's nothing to do.
-     This should have been checked by the caller, but it can't hurt. */
-  if (!node->props)
-    return 0;
+    SGFProperty *sgf_prop;
 
-  sgf_prop = node->props;
-  while (sgf_prop) {
-    switch (sgf_prop->name) {
-    case SGFCR: 
-    case SGFSQ: /* Square */
-    case SGFTR: /* Triangle */
-    case SGFMA: /* Mark */
-    case SGFBM: /* bad move */
-    case SGFDO: /* doubtful move */
-    case SGFIT: /* interesting move */
-    case SGFTE: /* good move */
-      return 1;
-      break;
-    default:
-      break;
+    /* If the node has no properties, there's nothing to do.
+       This should have been checked by the caller, but it can't hurt. */
+    if (!node->props)
+        return 0;
+
+    sgf_prop = node->props;
+    while (sgf_prop) {
+        switch (sgf_prop->name) {
+        case SGFCR:
+        case SGFSQ: /* Square */
+        case SGFTR: /* Triangle */
+        case SGFMA: /* Mark */
+        case SGFBM: /* bad move */
+        case SGFDO: /* doubtful move */
+        case SGFIT: /* interesting move */
+        case SGFTE: /* good move */
+            return 1;
+            break;
+        default:
+            break;
+        }
+        sgf_prop = sgf_prop->next;
     }
-    sgf_prop = sgf_prop->next;
-  }
 
-  /* No markup property found. */
-  return 0;
+    /* No markup property found. */
+    return 0;
 }
 
 
@@ -191,27 +191,27 @@ is_markup_node(SGFNode *node)
 int
 is_move_node(SGFNode *node)
 {
-  SGFProperty *sgf_prop;
-  
-  /* If the node has no properties, there's nothing to do.
-     This should have been checked by the caller, but it can't hurt. */
-  if (!node->props)
-    return 0;
+    SGFProperty *sgf_prop;
 
-  sgf_prop = node->props;
-  while (sgf_prop) {
-    switch (sgf_prop->name) {
-    case SGFB: 
-    case SGFW: 
-      return 1;
-      break;
-    default:
-      break;
+    /* If the node has no properties, there's nothing to do.
+       This should have been checked by the caller, but it can't hurt. */
+    if (!node->props)
+        return 0;
+
+    sgf_prop = node->props;
+    while (sgf_prop) {
+        switch (sgf_prop->name) {
+        case SGFB:
+        case SGFW:
+            return 1;
+            break;
+        default:
+            break;
+        }
+        sgf_prop = sgf_prop->next;
     }
-    sgf_prop = sgf_prop->next;
-  }
 
-  return 0;
+    return 0;
 }
 
 
@@ -222,28 +222,28 @@ is_move_node(SGFNode *node)
 int
 is_pass_node(SGFNode *node, int boardsize)
 {
-  SGFProperty *sgf_prop;
-  int i, j;
-  
-  /* If the node has no properties, there's nothing to do.
-     This should have been checked by the caller, but it can't hurt. */
-  if (!node->props)
-    return 0;
+    SGFProperty *sgf_prop;
+    int i, j;
 
-  sgf_prop = node->props;
-  while (sgf_prop) {
-    switch (sgf_prop->name) {
-    case SGFB: 
-    case SGFW: 
-      return !get_moveXY(sgf_prop, &i, &j, boardsize);
-      break;
-    default:
-      break;
+    /* If the node has no properties, there's nothing to do.
+       This should have been checked by the caller, but it can't hurt. */
+    if (!node->props)
+        return 0;
+
+    sgf_prop = node->props;
+    while (sgf_prop) {
+        switch (sgf_prop->name) {
+        case SGFB:
+        case SGFW:
+            return !get_moveXY(sgf_prop, &i, &j, boardsize);
+            break;
+        default:
+            break;
+        }
+        sgf_prop = sgf_prop->next;
     }
-    sgf_prop = sgf_prop->next;
-  }
 
-  return 0;
+    return 0;
 }
 
 
@@ -254,29 +254,29 @@ is_pass_node(SGFNode *node, int boardsize)
 int
 find_move(SGFNode *node)
 {
-  SGFProperty *sgf_prop;
-  
-  /* If the node has no properties, there's nothing to do.
-     This should have been checked by the caller, but it can't hurt. */
-  if (!node->props)
-    return 0;
+    SGFProperty *sgf_prop;
 
-  sgf_prop = node->props;
-  while (sgf_prop) {
-    switch (sgf_prop->name) {
-    case SGFB: 
-      return BLACK;
-      break;
-    case SGFW: 
-      return WHITE;
-      break;
-    default:
-      break;
+    /* If the node has no properties, there's nothing to do.
+       This should have been checked by the caller, but it can't hurt. */
+    if (!node->props)
+        return 0;
+
+    sgf_prop = node->props;
+    while (sgf_prop) {
+        switch (sgf_prop->name) {
+        case SGFB:
+            return BLACK;
+            break;
+        case SGFW:
+            return WHITE;
+            break;
+        default:
+            break;
+        }
+        sgf_prop = sgf_prop->next;
     }
-    sgf_prop = sgf_prop->next;
-  }
 
-  return EMPTY;
+    return EMPTY;
 }
 
 

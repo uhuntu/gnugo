@@ -15,7 +15,7 @@
                    by David Fotland
  * Permission granted to use this code for any
  * commercial or noncommercial purposes as long as this
- * copyright notice is not removed. 
+ * copyright notice is not removed.
  * This code was written for Borland C++ 4.0J
 *******************************************************/
 /*
@@ -35,7 +35,7 @@
  * Data types
  **********************************************************************/
 typedef enum  {
-  gmp_nothing, gmp_move, gmp_pass, gmp_reset, gmp_newGame, gmp_undo, gmp_err
+    gmp_nothing, gmp_move, gmp_pass, gmp_reset, gmp_newGame, gmp_undo, gmp_err
 } GmpResult;
 
 
@@ -64,8 +64,8 @@ extern void  gmp_destroy(Gmp *ge);
  *   set to -1, and you can start the game.
  */
 extern void  gmp_startGame(Gmp *ge, int boardsize, int handicap,
-			   float komi, int chineseRules, int iAmWhite,
-			   int simplified);
+                           float komi, int chineseRules, int iAmWhite,
+                           int simplified);
 
 /*
  * Pretty self-explanatory set of routines.  For sendMove, (0,0) is the
@@ -85,7 +85,7 @@ extern void  gmp_sendUndo(Gmp *ge, int numUndos);
  * If you get a move, "out1" will be the X and "out2" will be the y.
  */
 extern GmpResult  gmp_check(Gmp *ge, int sleepy,
-			    int *out1, int *out2, const char  **error);
+                            int *out1, int *out2, const char  **error);
 
 
 /*

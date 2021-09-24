@@ -65,27 +65,27 @@
 void *
 xalloc(unsigned int size)
 {
-  void *pt = malloc(size);
+    void *pt = malloc(size);
 
-  if (!pt) {
-    fprintf(stderr, "xalloc: Out of memory!\n");
-    exit(EXIT_FAILURE);
-  }
+    if (!pt) {
+        fprintf(stderr, "xalloc: Out of memory!\n");
+        exit(EXIT_FAILURE);
+    }
 
-  memset(pt, 0, (unsigned long) size);
-  return pt;
+    memset(pt, 0, (unsigned long) size);
+    return pt;
 }
 
 void *
 xrealloc(void *pt, unsigned int size)
 {
-  void *ptnew = realloc(pt, size);
+    void *ptnew = realloc(pt, size);
 
-  if (!ptnew) {
-    fprintf(stderr, "xrealloc: Out of memory!\n");
-    exit(EXIT_FAILURE);
-  }
-  return ptnew;
+    if (!ptnew) {
+        fprintf(stderr, "xrealloc: Out of memory!\n");
+        exit(EXIT_FAILURE);
+    }
+    return ptnew;
 }
 
 
@@ -101,13 +101,13 @@ xrealloc(void *pt, unsigned int size)
 SGFNode *
 sgfNewNode()
 {
-  SGFNode *newnode;
-  newnode = xalloc(sizeof(SGFNode));
-  newnode->next = NULL;
-  newnode->props = NULL;
-  newnode->parent = NULL;
-  newnode->child = NULL;
-  return newnode;
+    SGFNode *newnode;
+    newnode = xalloc(sizeof(SGFNode));
+    newnode->next = NULL;
+    newnode->props = NULL;
+    newnode->parent = NULL;
+    newnode->child = NULL;
+    return newnode;
 }
 
 /*
@@ -117,12 +117,12 @@ sgfNewNode()
 void
 sgfFreeNode(SGFNode *node)
 {
-  if (node == NULL)
-    return;
-  sgfFreeNode(node->next);
-  sgfFreeNode(node->child);
-  sgfFreeProperty(node->props);
-  free(node);
+    if (node == NULL)
+        return;
+    sgfFreeNode(node->next);
+    sgfFreeNode(node->child);
+    sgfFreeProperty(node->props);
+    free(node);
 }
 
 
@@ -133,13 +133,13 @@ sgfFreeNode(SGFNode *node)
 void
 sgfAddProperty(SGFNode *node, const char *name, const char *value)
 {
-  SGFProperty *prop = node->props;
+    SGFProperty *prop = node->props;
 
-  if (prop)
-    while (prop->next)
-      prop = prop->next;
+    if (prop)
+        while (prop->next)
+            prop = prop->next;
 
-  sgfMkProperty(name, value, node, prop);
+    sgfMkProperty(name, value, node, prop);
 }
 
 
@@ -150,10 +150,10 @@ sgfAddProperty(SGFNode *node, const char *name, const char *value)
 void
 sgfAddPropertyInt(SGFNode *node, const char *name, long val)
 {
-  char buffer[10];
+    char buffer[10];
 
-  gg_snprintf(buffer, 10, "%ld", val);
-  sgfAddProperty(node, name, buffer);
+    gg_snprintf(buffer, 10, "%ld", val);
+    sgfAddProperty(node, name, buffer);
 }
 
 
@@ -164,10 +164,10 @@ sgfAddPropertyInt(SGFNode *node, const char *name, long val)
 void
 sgfAddPropertyFloat(SGFNode *node, const char *name, float val)
 {
-  char buffer[10];
+    char buffer[10];
 
-  gg_snprintf(buffer, 10, "%3.1f", val);
-  sgfAddProperty(node, name, buffer);
+    gg_snprintf(buffer, 10, "%3.1f", val);
+    sgfAddProperty(node, name, buffer);
 }
 
 
@@ -178,16 +178,16 @@ sgfAddPropertyFloat(SGFNode *node, const char *name, float val)
 int
 sgfGetIntProperty(SGFNode *node, const char *name, int *value)
 {
-  SGFProperty *prop;
-  short nam = name[0] | name[1] << 8;
+    SGFProperty *prop;
+    short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop = prop->next)
-    if (prop->name == nam) {
-      *value = atoi(prop->value);
-      return 1;
-    }
+    for (prop = node->props; prop; prop = prop->next)
+        if (prop->name == nam) {
+            *value = atoi(prop->value);
+            return 1;
+        }
 
-  return 0;
+    return 0;
 }
 
 
@@ -198,17 +198,17 @@ sgfGetIntProperty(SGFNode *node, const char *name, int *value)
 int
 sgfGetFloatProperty(SGFNode *node, const char *name, float *value)
 {
-  SGFProperty *prop;
-  short nam = name[0] | name[1] << 8;
+    SGFProperty *prop;
+    short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop = prop->next)
-    if (prop->name == nam) {
-      *value = (float) atof(prop->value);
-      /* MS-C warns of loss of data (double to float) */
-      return 1;
-    }
+    for (prop = node->props; prop; prop = prop->next)
+        if (prop->name == nam) {
+            *value = (float) atof(prop->value);
+            /* MS-C warns of loss of data (double to float) */
+            return 1;
+        }
 
-  return 0;
+    return 0;
 }
 
 
@@ -219,16 +219,16 @@ sgfGetFloatProperty(SGFNode *node, const char *name, float *value)
 int
 sgfGetCharProperty(SGFNode *node, const char *name, char **value)
 {
-  SGFProperty *prop;
-  short nam = name[0] | name[1] << 8;
+    SGFProperty *prop;
+    short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop = prop->next)
-    if (prop->name == nam) {
-      *value = prop->value;
-      return 1;
-    }
+    for (prop = node->props; prop; prop = prop->next)
+        if (prop->name == nam) {
+            *value = prop->value;
+            return 1;
+        }
 
-  return 0;
+    return 0;
 }
 
 
@@ -239,14 +239,14 @@ sgfGetCharProperty(SGFNode *node, const char *name, char **value)
 static int
 sgfHasProperty(SGFNode *node, const char *name)
 {
-  SGFProperty *prop;
-  short nam = name[0] | name[1] << 8;
+    SGFProperty *prop;
+    short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop = prop->next)
-    if (prop->name == nam)
-      return 1;
+    for (prop = node->props; prop; prop = prop->next)
+        if (prop->name == nam)
+            return 1;
 
-  return 0;
+    return 0;
 }
 
 
@@ -258,43 +258,43 @@ sgfHasProperty(SGFNode *node, const char *name)
 void
 sgfOverwriteProperty(SGFNode *node, const char *name, const char *text)
 {
-  SGFProperty *prop;
-  short nam = name[0] | name[1] << 8;
+    SGFProperty *prop;
+    short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop = prop->next)
-    if (prop->name == nam) {
-      prop->value = xrealloc(prop->value, strlen(text)+1);
-      strcpy(prop->value, text);
-      return;
-    }
+    for (prop = node->props; prop; prop = prop->next)
+        if (prop->name == nam) {
+            prop->value = xrealloc(prop->value, strlen(text)+1);
+            strcpy(prop->value, text);
+            return;
+        }
 
-  sgfAddProperty(node, name, text);
+    sgfAddProperty(node, name, text);
 }
 
 
 /*
- * Overwrite an int property in an SGF node with val or create a new 
+ * Overwrite an int property in an SGF node with val or create a new
  * one if it does not exist.
  */
 
 void
 sgfOverwritePropertyInt(SGFNode *node, const char *name, int val)
 {
-  SGFProperty *prop;
-  short nam = name[0] | name[1] << 8;
+    SGFProperty *prop;
+    short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop = prop->next)
-    if (prop->name == nam) {
-      prop->value = xrealloc(prop->value, 12);
-      gg_snprintf(prop->value, 12, "%d", val);
-      return;
-   }
+    for (prop = node->props; prop; prop = prop->next)
+        if (prop->name == nam) {
+            prop->value = xrealloc(prop->value, 12);
+            gg_snprintf(prop->value, 12, "%d", val);
+            return;
+        }
 
-  sgfAddPropertyInt(node, name, val);
+    sgfAddPropertyInt(node, name, val);
 }
 
 
-/* 
+/*
  * Overwrite a float property in the gametree with val or create
  * a new one if it does not exist.
  */
@@ -302,17 +302,17 @@ sgfOverwritePropertyInt(SGFNode *node, const char *name, int val)
 void
 sgfOverwritePropertyFloat(SGFNode *node, const char *name, float val)
 {
-  SGFProperty *prop;
-  short nam = name[0] | name[1] << 8;
+    SGFProperty *prop;
+    short nam = name[0] | name[1] << 8;
 
-  for (prop = node->props; prop; prop = prop->next)
-    if (prop->name == nam) {
-      prop->value = xrealloc(prop->value, 15);
-      gg_snprintf(prop->value, 15, "%3.1f", val);
-      return;
-    }
+    for (prop = node->props; prop; prop = prop->next)
+        if (prop->name == nam) {
+            prop->value = xrealloc(prop->value, 15);
+            gg_snprintf(prop->value, 15, "%3.1f", val);
+            return;
+        }
 
-  sgfAddPropertyFloat(node, name, val);
+    sgfAddPropertyFloat(node, name, val);
 }
 
 
@@ -323,20 +323,20 @@ sgfOverwritePropertyFloat(SGFNode *node, const char *name, float val)
 SGFNode *
 sgfPrev(SGFNode *node)
 {
-  SGFNode *q;
-  SGFNode *prev;
+    SGFNode *q;
+    SGFNode *prev;
 
-  if (!node->parent)
-    return NULL;
+    if (!node->parent)
+        return NULL;
 
-  q = node->parent->child;
-  prev = NULL;
-  while (q && q != node) {
-    prev = q;
-    q = q->next;
-  }
+    q = node->parent->child;
+    prev = NULL;
+    while (q && q != node) {
+        prev = q;
+        q = q->next;
+    }
 
-  return prev;
+    return prev;
 }
 
 
@@ -347,10 +347,10 @@ sgfPrev(SGFNode *node)
 SGFNode *
 sgfRoot(SGFNode *node)
 {
-  while (node->parent)
-    node = node->parent;
+    while (node->parent)
+        node = node->parent;
 
-  return node;
+    return node;
 }
 
 
@@ -364,22 +364,22 @@ sgfRoot(SGFNode *node)
  */
 static SGFProperty *
 do_sgf_make_property(short sgf_name,  const char *value,
-		     SGFNode *node, SGFProperty *last)
+                     SGFNode *node, SGFProperty *last)
 {
-  SGFProperty *prop;
+    SGFProperty *prop;
 
-  prop = (SGFProperty *) xalloc(sizeof(SGFProperty));
-  prop->name = sgf_name;
-  prop->value = xalloc(strlen(value) + 1);
-  strcpy(prop->value, value);
-  prop->next = NULL;
+    prop = (SGFProperty *) xalloc(sizeof(SGFProperty));
+    prop->name = sgf_name;
+    prop->value = xalloc(strlen(value) + 1);
+    strcpy(prop->value, value);
+    prop->next = NULL;
 
-  if (last == NULL)
-    node->props = prop;
-  else
-    last->next = prop;
+    if (last == NULL)
+        node->props = prop;
+    else
+        last->next = prop;
 
-  return prop;
+    return prop;
 }
 
 
@@ -388,56 +388,56 @@ do_sgf_make_property(short sgf_name,  const char *value,
  */
 SGFProperty *
 sgfMkProperty(const char *name, const  char *value,
-	      SGFNode *node, SGFProperty *last)
+              SGFNode *node, SGFProperty *last)
 {
-  static const short properties_allowing_ranges[12] = {
-    /* Board setup properties. */
-    SGFAB, SGFAW, SGFAE,
+    static const short properties_allowing_ranges[12] = {
+        /* Board setup properties. */
+        SGFAB, SGFAW, SGFAE,
 
-    /* Markup properties. */
-    SGFCR, SGFMA, SGFSQ, SGFTR, SGFDD, SGFSL,
+        /* Markup properties. */
+        SGFCR, SGFMA, SGFSQ, SGFTR, SGFDD, SGFSL,
 
-    /* Miscellaneous properties. */
-    SGFVW,
+        /* Miscellaneous properties. */
+        SGFVW,
 
-    /* Go-specific properties. */
-    SGFTB, SGFTW
-  };
+        /* Go-specific properties. */
+        SGFTB, SGFTW
+    };
 
-  int k;
-  short sgf_name;
+    int k;
+    short sgf_name;
 
-  if (strlen(name) == 1)
-    sgf_name = name[0] | (short) (' ' << 8);
-  else
-    sgf_name = name[0] | name[1] << 8;
+    if (strlen(name) == 1)
+        sgf_name = name[0] | (short) (' ' << 8);
+    else
+        sgf_name = name[0] | name[1] << 8;
 
-  for (k = 0; k < 12; k++) {
-    if (properties_allowing_ranges[k] == sgf_name)
-      break;
-  }
-
-  if (k < 12
-      && strlen(value) == 5
-      && value[2] == ':') {
-    char x1 = value[0];
-    char y1 = value[1];
-    char x2 = value[3];
-    char y2 = value[4];
-    char new_value[] = "xy";
-
-    if (x1 <= x2 && y1 <= y2) {
-      for (new_value[0] = x1; new_value[0] <= x2; new_value[0]++) {
-	for (new_value[1] = y1; new_value[1] <= y2; new_value[1]++)
-	  last = do_sgf_make_property(sgf_name, new_value, node, last);
-      }
-
-      return last;
+    for (k = 0; k < 12; k++) {
+        if (properties_allowing_ranges[k] == sgf_name)
+            break;
     }
-  }
 
-  /* Not a range property. */
-  return do_sgf_make_property(sgf_name, value, node, last);
+    if (k < 12
+            && strlen(value) == 5
+            && value[2] == ':') {
+        char x1 = value[0];
+        char y1 = value[1];
+        char x2 = value[3];
+        char y2 = value[4];
+        char new_value[] = "xy";
+
+        if (x1 <= x2 && y1 <= y2) {
+            for (new_value[0] = x1; new_value[0] <= x2; new_value[0]++) {
+                for (new_value[1] = y1; new_value[1] <= y2; new_value[1]++)
+                    last = do_sgf_make_property(sgf_name, new_value, node, last);
+            }
+
+            return last;
+        }
+    }
+
+    /* Not a range property. */
+    return do_sgf_make_property(sgf_name, value, node, last);
 }
 
 
@@ -449,11 +449,11 @@ sgfMkProperty(const char *name, const  char *value,
 void
 sgfFreeProperty(SGFProperty *prop)
 {
-  if (prop == NULL)
-    return;
-  sgfFreeProperty(prop->next);
-  free(prop->value);
-  free(prop);
+    if (prop == NULL)
+        return;
+    sgfFreeProperty(prop->next);
+    free(prop->value);
+    free(prop);
 }
 
 
@@ -470,12 +470,12 @@ sgfFreeProperty(SGFProperty *prop)
 SGFNode *
 sgfAddStone(SGFNode *node, int color, int movex, int movey)
 {
-  char move[3];
+    char move[3];
 
-  sprintf(move, "%c%c", movey + 'a', movex + 'a');
-  sgfAddProperty(node, (color == BLACK) ? "AB" : "AW", move);
+    sprintf(move, "%c%c", movey + 'a', movex + 'a');
+    sgfAddProperty(node, (color == BLACK) ? "AB" : "AW", move);
 
-  return node;
+    return node;
 }
 
 
@@ -486,26 +486,26 @@ sgfAddStone(SGFNode *node, int color, int movex, int movey)
 SGFNode *
 sgfAddPlay(SGFNode *node, int who, int movex, int movey)
 {
-  char move[3];
-  SGFNode *new;
-  
-  /* a pass move? */
-  if (movex == -1 && movey == -1)
-    move[0] = 0;
-  else
-    sprintf(move, "%c%c", movey + 'a', movex + 'a');
+    char move[3];
+    SGFNode *new;
 
-  if (node->child)
-    new = sgfStartVariantFirst(node->child);
-  else {
-    new = sgfNewNode();
-    node->child = new;
-    new->parent = node;
-  }
-  
-  sgfAddProperty(new, (who == BLACK) ? "B" : "W", move);
+    /* a pass move? */
+    if (movex == -1 && movey == -1)
+        move[0] = 0;
+    else
+        sprintf(move, "%c%c", movey + 'a', movex + 'a');
 
-  return new;
+    if (node->child)
+        new = sgfStartVariantFirst(node->child);
+    else {
+        new = sgfNewNode();
+        node->child = new;
+        new->parent = node;
+    }
+
+    sgfAddProperty(new, (who == BLACK) ? "B" : "W", move);
+
+    return new;
 }
 
 
@@ -517,19 +517,19 @@ sgfAddPlay(SGFNode *node, int who, int movex, int movey)
 SGFNode *
 sgfAddPlayLast(SGFNode *node, int who, int movex, int movey)
 {
-  char move[3];
-  SGFNode *new;
+    char move[3];
+    SGFNode *new;
 
-  /* a pass move? */
-  if (movex == -1 && movey == -1)
-    move[0] = 0;
-  else
-    sprintf(move, "%c%c", movey + 'a', movex + 'a');
+    /* a pass move? */
+    if (movex == -1 && movey == -1)
+        move[0] = 0;
+    else
+        sprintf(move, "%c%c", movey + 'a', movex + 'a');
 
-  new = sgfAddChild(node);
-  sgfAddProperty(new, (who == BLACK) ? "B" : "W", move);
+    new = sgfAddChild(node);
+    sgfAddProperty(new, (who == BLACK) ? "B" : "W", move);
 
-  return new;
+    return new;
 }
 
 
@@ -553,9 +553,9 @@ sgfCreateHeaderNode(int boardsize, float komi, int handicap)
 SGFNode *
 sgfAddComment(SGFNode *node, const char *comment)
 {
-  sgfAddProperty(node, "C ", comment);
+    sgfAddProperty(node, "C ", comment);
 
-  return node;
+    return node;
 }
 
 
@@ -566,13 +566,13 @@ sgfAddComment(SGFNode *node, const char *comment)
 SGFNode *
 sgfBoardText(SGFNode *node, int i, int j, const char *text)
 {
-  void *str = xalloc(strlen(text) + 3);
+    void *str = xalloc(strlen(text) + 3);
 
-  sprintf(str, "%c%c:%s", j+'a', i+'a', text);
-  sgfAddProperty(node, "LB", str);
-  free(str);
+    sprintf(str, "%c%c:%s", j+'a', i+'a', text);
+    sgfAddProperty(node, "LB", str);
+    free(str);
 
-  return node;
+    return node;
 }
 
 
@@ -583,12 +583,12 @@ sgfBoardText(SGFNode *node, int i, int j, const char *text)
 SGFNode *
 sgfBoardChar(SGFNode *node, int i, int j, char c)
 {
-  char text[2] = "";
+    char text[2] = "";
 
-  text[0] = c;
-  text[1] = 0;
+    text[0] = c;
+    text[1] = 0;
 
-  return sgfBoardText(node, i, j, text);
+    return sgfBoardText(node, i, j, text);
 }
 
 
@@ -599,12 +599,12 @@ sgfBoardChar(SGFNode *node, int i, int j, char c)
 SGFNode *
 sgfBoardNumber(SGFNode *node, int i, int j, int number)
 {
-  char text[10];
+    char text[10];
 
-  gg_snprintf(text, 10, "%c%c:%i", j+'a', i+'a', number);
-  sgfAddProperty(node, "LB", text);
+    gg_snprintf(text, 10, "%c%c:%i", j+'a', i+'a', number);
+    sgfAddProperty(node, "LB", text);
 
-  return node;
+    return node;
 }
 
 
@@ -615,12 +615,12 @@ sgfBoardNumber(SGFNode *node, int i, int j, int number)
 SGFNode *
 sgfTriangle(SGFNode *node, int i, int j)
 {
-  char text[3];
+    char text[3];
 
-  gg_snprintf(text, 3, "%c%c", j+'a', i+'a');
-  sgfAddProperty(node, "TR", text);
+    gg_snprintf(text, 3, "%c%c", j+'a', i+'a');
+    sgfAddProperty(node, "TR", text);
 
-  return node;
+    return node;
 }
 
 
@@ -631,13 +631,13 @@ sgfTriangle(SGFNode *node, int i, int j)
 SGFNode *
 sgfLabel(SGFNode *node, const char *label, int i, int j)
 {
-  /* allows 12 chars labels - more than enough */
-  char text[16];
+    /* allows 12 chars labels - more than enough */
+    char text[16];
 
-  gg_snprintf(text, 16, "%c%c:%s", j+'a', i+'a', label);
-  sgfAddProperty(node, "LB", text);
+    gg_snprintf(text, 16, "%c%c:%s", j+'a', i+'a', label);
+    sgfAddProperty(node, "LB", text);
 
-  return node;
+    return node;
 }
 
 
@@ -648,12 +648,12 @@ sgfLabel(SGFNode *node, const char *label, int i, int j)
 SGFNode *
 sgfLabelInt(SGFNode *node, int num, int i, int j)
 {
-  char text[16];
+    char text[16];
 
-  gg_snprintf(text, 16, "%c%c:%d", j+'a', i+'a', num);
-  sgfAddProperty(node, "LB", text);
+    gg_snprintf(text, 16, "%c%c:%d", j+'a', i+'a', num);
+    sgfAddProperty(node, "LB", text);
 
-  return node;
+    return node;
 }
 
 
@@ -664,12 +664,12 @@ sgfLabelInt(SGFNode *node, int num, int i, int j)
 SGFNode *
 sgfCircle(SGFNode *node, int i, int j)
 {
-  char text[3];
+    char text[3];
 
-  gg_snprintf(text, 3, "%c%c", j+'a', i+'a');
-  sgfAddProperty(node, "CR", text);
+    gg_snprintf(text, 3, "%c%c", j+'a', i+'a');
+    sgfAddProperty(node, "CR", text);
 
-  return node;
+    return node;
 }
 
 
@@ -680,7 +680,7 @@ sgfCircle(SGFNode *node, int i, int j)
 SGFNode *
 sgfSquare(SGFNode *node, int i, int j)
 {
-  return sgfMark(node, i, j);   /* cgoban 1.9.5 does not understand SQ */
+    return sgfMark(node, i, j);   /* cgoban 1.9.5 does not understand SQ */
 }
 
 
@@ -691,12 +691,12 @@ sgfSquare(SGFNode *node, int i, int j)
 SGFNode *
 sgfMark(SGFNode *node, int i, int j)
 {
-  char text[3];
+    char text[3];
 
-  gg_snprintf(text, 3, "%c%c", j+'a', i+'a');
-  sgfAddProperty(node, "MA", text);
+    gg_snprintf(text, 3, "%c%c", j+'a', i+'a');
+    sgfAddProperty(node, "MA", text);
 
-  return node;
+    return node;
 }
 
 
@@ -707,15 +707,15 @@ sgfMark(SGFNode *node, int i, int j)
 SGFNode *
 sgfStartVariant(SGFNode *node)
 {
-  assert(node);
-  assert(node->parent);
+    assert(node);
+    assert(node->parent);
 
-  while (node->next)
-    node = node->next;
-  node->next = sgfNewNode();
-  node->next->parent = node->parent;
+    while (node->next)
+        node = node->next;
+    node->next = sgfNewNode();
+    node->next->parent = node->parent;
 
-  return node->next;
+    return node->next;
 }
 
 
@@ -726,18 +726,18 @@ sgfStartVariant(SGFNode *node)
 SGFNode *
 sgfStartVariantFirst(SGFNode *node)
 {
-  SGFNode *old_first_child = node;
-  SGFNode *new_first_child = sgfNewNode();
+    SGFNode *old_first_child = node;
+    SGFNode *new_first_child = sgfNewNode();
 
-  assert(node);
-  assert(node->parent);
+    assert(node);
+    assert(node->parent);
 
-  new_first_child->next = old_first_child;
-  new_first_child->parent = old_first_child->parent;
+    new_first_child->next = old_first_child;
+    new_first_child->parent = old_first_child->parent;
 
-  new_first_child->parent->child = new_first_child;
+    new_first_child->parent->child = new_first_child;
 
-  return new_first_child;
+    return new_first_child;
 }
 
 
@@ -749,21 +749,21 @@ sgfStartVariantFirst(SGFNode *node)
 SGFNode *
 sgfAddChild(SGFNode *node)
 {
-  SGFNode *new_node = sgfNewNode();
-  assert(node);
+    SGFNode *new_node = sgfNewNode();
+    assert(node);
 
-  new_node->parent = node;
-  
-  if (!node->child)
-    node->child = new_node;
-  else {
-    node = node->child;
-    while (node->next)
-      node = node->next;
-    node->next = new_node;
-  }
+    new_node->parent = node;
 
-  return new_node;
+    if (!node->child)
+        node->child = new_node;
+    else {
+        node = node->child;
+        while (node->next)
+            node = node->next;
+        node->next = new_node;
+    }
+
+    return new_node;
 }
 
 
@@ -774,78 +774,78 @@ sgfAddChild(SGFNode *node)
 void
 sgfWriteResult(SGFNode *node, float score, int overwrite)
 {
-  char text[8];
-  char winner;
-  float s;
-  int dummy;
+    char text[8];
+    char winner;
+    float s;
+    int dummy;
 
-  /* If not writing to the SGF file, skip everything and return now. */
-  if (!node)
-    return;
+    /* If not writing to the SGF file, skip everything and return now. */
+    if (!node)
+        return;
 
-  /* If not overwriting and there already is a result property, return. */
-  if (!overwrite)
-    if (sgfGetIntProperty(node, "RE", &dummy))
-      return;
+    /* If not overwriting and there already is a result property, return. */
+    if (!overwrite)
+        if (sgfGetIntProperty(node, "RE", &dummy))
+            return;
 
-  if (score > 0.0) {
-    winner = 'W';
-    s = score;
-  }
-  else if (score < 0.0) {
-    winner = 'B';
-    s = -score;
-  }
-  else {
-    winner = '0';
-    s = 0;
-  }
+    if (score > 0.0) {
+        winner = 'W';
+        s = score;
+    }
+    else if (score < 0.0) {
+        winner = 'B';
+        s = -score;
+    }
+    else {
+        winner = '0';
+        s = 0;
+    }
 
-  if (winner == '0')
-    gg_snprintf(text, 8, "0");
-  else if (score < 1000.0 && score > -1000.0)
-    gg_snprintf(text, 8, "%c+%3.1f", winner, s);
-  else
-    gg_snprintf(text, 8, "%c+%c", winner, 'R');
-  sgfOverwriteProperty(node, "RE", text);
+    if (winner == '0')
+        gg_snprintf(text, 8, "0");
+    else if (score < 1000.0 && score > -1000.0)
+        gg_snprintf(text, 8, "%c+%3.1f", winner, s);
+    else
+        gg_snprintf(text, 8, "%c+%c", winner, 'R');
+    sgfOverwriteProperty(node, "RE", text);
 }
 
 
 static void
 sgf_write_header_reduced(SGFNode *root, int overwrite)
 {
-  time_t curtime = time(NULL);
-  struct tm *loctime = localtime(&curtime);
-  char str[128];
-  int dummy;
+    time_t curtime = time(NULL);
+    struct tm *loctime = localtime(&curtime);
+    char str[128];
+    int dummy;
 
-  gg_snprintf(str, 128, "%4.4i-%2.2i-%2.2i",
-	      loctime->tm_year+1900, loctime->tm_mon+1, loctime->tm_mday);
-  if (overwrite || !sgfGetIntProperty(root, "DT", &dummy))
-    sgfOverwriteProperty(root, "DT", str);
-  if (overwrite || !sgfGetIntProperty(root, "AP", &dummy))
-    sgfOverwriteProperty(root, "AP", "GNU Go:"VERSION);
-  sgfOverwriteProperty(root, "FF", "4");
+    gg_snprintf(str, 128, "%4.4i-%2.2i-%2.2i",
+                loctime->tm_year+1900, loctime->tm_mon+1, loctime->tm_mday);
+    if (overwrite || !sgfGetIntProperty(root, "DT", &dummy))
+        sgfOverwriteProperty(root, "DT", str);
+    if (overwrite || !sgfGetIntProperty(root, "AP", &dummy))
+        sgfOverwriteProperty(root, "AP", "GNU Go:"VERSION);
+    sgfOverwriteProperty(root, "FF", "4");
 }
 
 
 void
 sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
-		 int handicap, int level, int rules)
+                 int handicap, int level, int rules)
 {
-  char str[128];
-  int dummy;
+    char str[128];
+    int dummy;
 
-  gg_snprintf(str, 128, "GNU Go %s Random Seed %d level %d", 
-	      VERSION, seed, level);
-  if (overwrite || !sgfGetIntProperty(root, "GN", &dummy))
-    sgfOverwriteProperty(root, "GN", str);
-  if (overwrite || !sgfGetIntProperty(root, "RU", &dummy))
-    sgfOverwriteProperty(root, "RU", rules ? "Chinese" : "Japanese");
-  sgfOverwritePropertyFloat(root, "KM", komi);
-  sgfOverwritePropertyInt(root, "HA", handicap);
+    gg_snprintf(str, 128, "GNU Go %s Random Seed %d level %d",
+                VERSION, seed, level);
+    if (overwrite || !sgfGetIntProperty(root, "GN", &dummy))
+        sgfOverwriteProperty(root, "GN", str);
+    if (overwrite || !sgfGetIntProperty(root, "RU", &dummy))
+        sgfOverwriteProperty(root, "RU", rules ? "Chinese" : "Japanese");
+    sgfOverwritePropertyFloat(root, "KM", komi);
+    sgfOverwritePropertyInt(root, "HA", handicap);
 
-  sgf_write_header_reduced(root, overwrite);
+    sgf_write_header_reduced(root, overwrite);
 }
 
 
@@ -875,10 +875,10 @@ sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
  *   1) There is never a need for backtracking
  *   2) The only recursion is on gametree.
  *   3) Tokens are only one character
- * 
+ *
  * We will use a global state to keep track of the remaining input
- * and a global char variable, `lookahead' to hold the next token.  
- * The function `nexttoken' skips whitespace and fills lookahead with 
+ * and a global char variable, `lookahead' to hold the next token.
+ * The function `nexttoken' skips whitespace and fills lookahead with
  * the new token.
  */
 
@@ -911,28 +911,28 @@ static int lookahead;
 static void
 parse_error(const char *msg, int arg)
 {
-  fprintf(stderr, msg, arg);
-  fprintf(stderr, "\n");
-  exit(EXIT_FAILURE);
+    fprintf(stderr, msg, arg);
+    fprintf(stderr, "\n");
+    exit(EXIT_FAILURE);
 }
 
 
 static void
 nexttoken()
 {
-  do
-    lookahead = sgf_getch();
-  while (isspace(lookahead));
+    do
+        lookahead = sgf_getch();
+    while (isspace(lookahead));
 }
 
 
 static void
 match(int expected)
 {
-  if (lookahead != expected)
-    parse_error("expected: %c", expected);
-  else
-    nexttoken();
+    if (lookahead != expected)
+        parse_error("expected: %c", expected);
+    else
+        nexttoken();
 }
 
 /* ---------------------------------------------------------------- */
@@ -943,139 +943,139 @@ match(int expected)
 static void
 propident(char *buffer, int size)
 {
-  if (lookahead == EOF || !isupper(lookahead)) 
-    parse_error("Expected an upper case letter.", 0);
-  
-  while (lookahead != EOF && isalpha(lookahead)) {
-    if (isupper(lookahead) && size > 1) {
-      *buffer++ = lookahead;
-      size--;
+    if (lookahead == EOF || !isupper(lookahead))
+        parse_error("Expected an upper case letter.", 0);
+
+    while (lookahead != EOF && isalpha(lookahead)) {
+        if (isupper(lookahead) && size > 1) {
+            *buffer++ = lookahead;
+            size--;
+        }
+        nexttoken();
     }
-    nexttoken();
-  }
-  *buffer = '\0';
+    *buffer = '\0';
 }
 
 
 static void
 propvalue(char *buffer, int size)
 {
-  char *p = buffer;
+    char *p = buffer;
 
-  match('[');
-  while (lookahead != ']' && lookahead != EOF) {
-    if (lookahead == '\\') {
-      lookahead = sgf_getch();
-      /* Follow the FF4 definition of backslash */
-      if (lookahead == '\r') {
-	lookahead = sgf_getch();
-	if (lookahead == '\n') 
-	  lookahead = sgf_getch();
-      }
-      else if (lookahead == '\n') {
-	lookahead = sgf_getch();
-	if (lookahead == '\r') 
-	  lookahead = sgf_getch();
-      }
+    match('[');
+    while (lookahead != ']' && lookahead != EOF) {
+        if (lookahead == '\\') {
+            lookahead = sgf_getch();
+            /* Follow the FF4 definition of backslash */
+            if (lookahead == '\r') {
+                lookahead = sgf_getch();
+                if (lookahead == '\n')
+                    lookahead = sgf_getch();
+            }
+            else if (lookahead == '\n') {
+                lookahead = sgf_getch();
+                if (lookahead == '\r')
+                    lookahead = sgf_getch();
+            }
+        }
+        if (size > 1) {
+            *p++ = lookahead;
+            size--;
+        }
+        lookahead = sgf_getch();
     }
-    if (size > 1) {
-      *p++ = lookahead;
-      size--;
-    }
-    lookahead = sgf_getch();
-  }
-  match(']');
-  
-  /* Remove trailing whitespace. The double cast below is needed
-   * because "char" may be represented as a signed char, in which case
-   * characters between 128 and 255 would be negative and a direct
-   * cast to int would cause a negative value to be passed to isspace,
-   * possibly causing an assertion failure.
-   */
-  --p;
-  while (p > buffer && isspace((int) (unsigned char) *p))
+    match(']');
+
+    /* Remove trailing whitespace. The double cast below is needed
+     * because "char" may be represented as a signed char, in which case
+     * characters between 128 and 255 would be negative and a direct
+     * cast to int would cause a negative value to be passed to isspace,
+     * possibly causing an assertion failure.
+     */
     --p;
-  *++p = '\0';
+    while (p > buffer && isspace((int) (unsigned char) *p))
+        --p;
+    *++p = '\0';
 }
 
 
 static SGFProperty *
 property(SGFNode *n, SGFProperty *last)
 {
-  char name[3];
-  char buffer[4000];
+    char name[3];
+    char buffer[4000];
 
-  propident(name, sizeof(name));
-  do {
-    propvalue(buffer, sizeof(buffer));
-    last = sgfMkProperty(name, buffer, n, last);
-  } while (lookahead == '[');
-  return last;
+    propident(name, sizeof(name));
+    do {
+        propvalue(buffer, sizeof(buffer));
+        last = sgfMkProperty(name, buffer, n, last);
+    } while (lookahead == '[');
+    return last;
 }
 
 
 static void
 node(SGFNode *n)
 {
-  SGFProperty *last = NULL;
-  match(';');
-  while (lookahead != EOF && isupper(lookahead))
-    last = property(n, last);
+    SGFProperty *last = NULL;
+    match(';');
+    while (lookahead != EOF && isupper(lookahead))
+        last = property(n, last);
 }
 
 
 static SGFNode *
 sequence(SGFNode *n)
 {
-  node(n);
-  while (lookahead == ';') {
-    SGFNode *new = sgfNewNode();
-    new->parent = n;
-    n->child = new;
-    n = new;
     node(n);
-  }
-  return n;
+    while (lookahead == ';') {
+        SGFNode *new = sgfNewNode();
+        new->parent = n;
+        n->child = new;
+        n = new;
+        node(n);
+    }
+    return n;
 }
 
 
 static void
-gametree(SGFNode **p, SGFNode *parent, int mode) 
+gametree(SGFNode **p, SGFNode *parent, int mode)
 {
-  if (mode == STRICT_SGF)
-    match('(');
-  else
-    for (;;) {
-      if (lookahead == EOF) {
-	parse_error("Empty file?", 0);
-	break;
-      }
-      if (lookahead == '(') {
-	while (lookahead == '(')
-	  nexttoken();
-	if (lookahead == ';')
-	  break;
-      }
-      nexttoken();
-    }
-
-  /* The head is parsed */
-  {
-    SGFNode *head = sgfNewNode();
-    SGFNode *last;
-
-    head->parent = parent;
-    *p = head;
-
-    last = sequence(head);
-    p = &last->child;
-    while (lookahead == '(') {
-      gametree(p, last, STRICT_SGF);
-      p = &((*p)->next);
-    }
     if (mode == STRICT_SGF)
-      match(')');
-  }
+        match('(');
+    else
+        for (;;) {
+            if (lookahead == EOF) {
+                parse_error("Empty file?", 0);
+                break;
+            }
+            if (lookahead == '(') {
+                while (lookahead == '(')
+                    nexttoken();
+                if (lookahead == ';')
+                    break;
+            }
+            nexttoken();
+        }
+
+    /* The head is parsed */
+    {
+        SGFNode *head = sgfNewNode();
+        SGFNode *last;
+
+        head->parent = parent;
+        *p = head;
+
+        last = sequence(head);
+        p = &last->child;
+        while (lookahead == '(') {
+            gametree(p, last, STRICT_SGF);
+            p = &((*p)->next);
+        }
+        if (mode == STRICT_SGF)
+            match(')');
+    }
 }
 
 
@@ -1085,100 +1085,100 @@ gametree(SGFNode **p, SGFNode *parent, int mode)
  */
 
 static void
-gametreefuseki(SGFNode **p, SGFNode *parent, int mode, 
-	       int moves_per_game, int i)
+gametreefuseki(SGFNode **p, SGFNode *parent, int mode,
+               int moves_per_game, int i)
 {
-  if (mode == STRICT_SGF)
-    match('(');
-  else
-    for (;;) {
-      if (lookahead == EOF) {
-	parse_error("Empty file?", 0);
-	break;
-      }
-      if (lookahead == '(') {
-	while (lookahead == '(')
-	  nexttoken();
-	if (lookahead == ';')
-	  break;
-      }
-      nexttoken();
-    }
-  
-  /* The head is parsed */
-  {
-
-    SGFNode *head = sgfNewNode();
-    SGFNode *last;
-    head->parent = parent;
-    *p = head;
-    
-    last = sequence(head);
-    p = &last->child;
-    while (lookahead == '(') {
-      if (last->props 
-	  && (last->props->name == SGFB || last->props->name == SGFW))
-	i++;
-      /* break after number_of_moves moves in SGF file */
-      if (i >= moves_per_game) { 
-	last->child = NULL;
-	last->next = NULL;
-	break;
-      }
-      else {
-	gametreefuseki(p, last, mode, moves_per_game, i);
-	p = &((*p)->next);
-      }
-    }
     if (mode == STRICT_SGF)
-      match(')');
-  }
+        match('(');
+    else
+        for (;;) {
+            if (lookahead == EOF) {
+                parse_error("Empty file?", 0);
+                break;
+            }
+            if (lookahead == '(') {
+                while (lookahead == '(')
+                    nexttoken();
+                if (lookahead == ';')
+                    break;
+            }
+            nexttoken();
+        }
+
+    /* The head is parsed */
+    {
+
+        SGFNode *head = sgfNewNode();
+        SGFNode *last;
+        head->parent = parent;
+        *p = head;
+
+        last = sequence(head);
+        p = &last->child;
+        while (lookahead == '(') {
+            if (last->props
+                    && (last->props->name == SGFB || last->props->name == SGFW))
+                i++;
+            /* break after number_of_moves moves in SGF file */
+            if (i >= moves_per_game) {
+                last->child = NULL;
+                last->next = NULL;
+                break;
+            }
+            else {
+                gametreefuseki(p, last, mode, moves_per_game, i);
+                p = &((*p)->next);
+            }
+        }
+        if (mode == STRICT_SGF)
+            match(')');
+    }
 }
 
 SGFNode *
 readsgffilefuseki(const char *filename, int moves_per_game)
 {
-  SGFNode *root;
-  int tmpi = 0;
+    SGFNode *root;
+    int tmpi = 0;
 
-  if (strcmp(filename, "-") == 0)
-    sgffile = stdin;
-  else
-    sgffile = fopen(filename, "r");
+    if (strcmp(filename, "-") == 0)
+        sgffile = stdin;
+    else
+        sgffile = fopen(filename, "r");
 
-  if (!sgffile)
-    return NULL;
+    if (!sgffile)
+        return NULL;
 
 
-  nexttoken();
-  gametreefuseki(&root, NULL, LAX_SGF, moves_per_game, 0);
+    nexttoken();
+    gametreefuseki(&root, NULL, LAX_SGF, moves_per_game, 0);
 
-  fclose(sgffile);
+    fclose(sgffile);
 
-  if (sgferr) {
-    fprintf(stderr, "Parse error: %s at position %d\n", sgferr, sgferrpos);
-    sgfFreeNode(root);
-    return NULL;
-  }
+    if (sgferr) {
+        fprintf(stderr, "Parse error: %s at position %d\n", sgferr, sgferrpos);
+        sgfFreeNode(root);
+        return NULL;
+    }
 
-  /* perform some simple checks on the file */
-  if (!sgfGetIntProperty(root, "GM", &tmpi)) {
-    if (VERBOSE_WARNINGS)
-      fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
-  }
-  else if (tmpi != 1) {
-    fprintf(stderr, "SGF file might be for game other than go: %d\n", tmpi);
-    fprintf(stderr, "Trying to load anyway.\n");
-  }
+    /* perform some simple checks on the file */
+    if (!sgfGetIntProperty(root, "GM", &tmpi)) {
+        if (VERBOSE_WARNINGS)
+            fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
+    }
+    else if (tmpi != 1) {
+        fprintf(stderr, "SGF file might be for game other than go: %d\n", tmpi);
+        fprintf(stderr, "Trying to load anyway.\n");
+    }
 
-  if (!sgfGetIntProperty(root, "FF", &tmpi)) {
-    if (VERBOSE_WARNINGS)
-      fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
-  }
-  else if ((tmpi < 3 || tmpi > 4) && VERBOSE_WARNINGS)
-    fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
+    if (!sgfGetIntProperty(root, "FF", &tmpi)) {
+        if (VERBOSE_WARNINGS)
+            fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
+    }
+    else if ((tmpi < 3 || tmpi > 4) && VERBOSE_WARNINGS)
+        fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
 
-  return root;
+    return root;
 }
 
 
@@ -1194,48 +1194,48 @@ readsgffilefuseki(const char *filename, int moves_per_game)
 SGFNode *
 readsgffile(const char *filename)
 {
-  SGFNode *root;
-  int tmpi = 0;
+    SGFNode *root;
+    int tmpi = 0;
 
-  if (strcmp(filename, "-") == 0)
-    sgffile = stdin;
-  else
-    sgffile = fopen(filename, "r");
+    if (strcmp(filename, "-") == 0)
+        sgffile = stdin;
+    else
+        sgffile = fopen(filename, "r");
 
-  if (!sgffile)
-    return NULL;
+    if (!sgffile)
+        return NULL;
 
 
-  nexttoken();
-  gametree(&root, NULL, LAX_SGF);
+    nexttoken();
+    gametree(&root, NULL, LAX_SGF);
 
-  if (sgffile != stdin)
-    fclose(sgffile);
+    if (sgffile != stdin)
+        fclose(sgffile);
 
-  if (sgferr) {
-    fprintf(stderr, "Parse error: %s at position %d\n", sgferr, sgferrpos);
-    sgfFreeNode(root);
-    return NULL;
-  }
+    if (sgferr) {
+        fprintf(stderr, "Parse error: %s at position %d\n", sgferr, sgferrpos);
+        sgfFreeNode(root);
+        return NULL;
+    }
 
-  /* perform some simple checks on the file */
-  if (!sgfGetIntProperty(root, "GM", &tmpi)) {
-    if (VERBOSE_WARNINGS)
-      fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
-  }
-  else if (tmpi != 1) {
-    fprintf(stderr, "SGF file might be for game other than go: %d\n", tmpi);
-    fprintf(stderr, "Trying to load anyway.\n");
-  }
+    /* perform some simple checks on the file */
+    if (!sgfGetIntProperty(root, "GM", &tmpi)) {
+        if (VERBOSE_WARNINGS)
+            fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
+    }
+    else if (tmpi != 1) {
+        fprintf(stderr, "SGF file might be for game other than go: %d\n", tmpi);
+        fprintf(stderr, "Trying to load anyway.\n");
+    }
 
-  if (!sgfGetIntProperty(root, "FF", &tmpi)) {
-    if (VERBOSE_WARNINGS)
-      fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
-  }
-  else if ((tmpi < 3 || tmpi > 4) && VERBOSE_WARNINGS)
-    fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
+    if (!sgfGetIntProperty(root, "FF", &tmpi)) {
+        if (VERBOSE_WARNINGS)
+            fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
+    }
+    else if ((tmpi < 3 || tmpi > 4) && VERBOSE_WARNINGS)
+        fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
 
-  return root;
+    return root;
 }
 
 
@@ -1252,33 +1252,33 @@ static int sgf_column = 0;
 static void
 sgf_putc(int c, FILE *file)
 {
-  if (c == '\n' && sgf_column == 0)
-    return;
+    if (c == '\n' && sgf_column == 0)
+        return;
 
-  fputc(c, file);
+    fputc(c, file);
 
-  if (c == '\n')
-    sgf_column = 0;
-  else
-    sgf_column++;
+    if (c == '\n')
+        sgf_column = 0;
+    else
+        sgf_column++;
 
-  if (c == ']' && sgf_column > 60) {
-    fputc('\n', file);
-    sgf_column = 0;
-  }
+    if (c == ']' && sgf_column > 60) {
+        fputc('\n', file);
+        sgf_column = 0;
+    }
 }
 
 static void
 sgf_puts(const char *s, FILE *file)
 {
-  for (; *s; s++) {
-    if (*s == '[' || *s == ']' || *s == '\\') {
-      fputc('\\', file);
-      sgf_column++;
+    for (; *s; s++) {
+        if (*s == '[' || *s == ']' || *s == '\\') {
+            fputc('\\', file);
+            sgf_column++;
+        }
+        fputc((int) *s, file);
+        sgf_column++;
     }
-    fputc((int) *s, file);
-    sgf_column++;
-  }
 }
 
 /* Print all properties with the given name in a node to file and mark
@@ -1300,42 +1300,42 @@ sgf_puts(const char *s, FILE *file)
 static void
 sgf_print_name(FILE *file, short name)
 {
-  sgf_putc(name & 0xff, file);
-  if (name >> 8 != ' ')
-    sgf_putc(name >> 8, file);
+    sgf_putc(name & 0xff, file);
+    if (name >> 8 != ' ')
+        sgf_putc(name >> 8, file);
 }
 
 static void
 sgf_print_property(FILE *file, SGFNode *node, short name, int is_comment)
 {
-  int n = 0;
-  SGFProperty *prop;
+    int n = 0;
+    SGFProperty *prop;
 
-  for (prop = node->props; prop; prop = prop->next) {
-    if (prop->name == name) {
-      prop->name |= 0x20;  /* Indicate already printed. */
-      if (n == 0) {
-	sgf_print_name(file, name);
-	sgf_putc('[', file);
-      }
-      else if (is_comment)
-	sgf_putc('\n', file);
-      else {
-	sgf_putc(']', file);
-	sgf_putc('[', file);
-      }
-      
-      sgf_puts(prop->value, file);
-      n++;
+    for (prop = node->props; prop; prop = prop->next) {
+        if (prop->name == name) {
+            prop->name |= 0x20;  /* Indicate already printed. */
+            if (n == 0) {
+                sgf_print_name(file, name);
+                sgf_putc('[', file);
+            }
+            else if (is_comment)
+                sgf_putc('\n', file);
+            else {
+                sgf_putc(']', file);
+                sgf_putc('[', file);
+            }
+
+            sgf_puts(prop->value, file);
+            n++;
+        }
     }
-  }
 
-  if (n > 0)
-    sgf_putc(']', file);
+    if (n > 0)
+        sgf_putc(']', file);
 
-  /* Add a newline after certain properties. */
-  if (name == SGFAB || name == SGFAW || name == SGFAE || (is_comment && n > 1))
-    sgf_putc('\n', file);
+    /* Add a newline after certain properties. */
+    if (name == SGFAB || name == SGFAW || name == SGFAE || (is_comment && n > 1))
+        sgf_putc('\n', file);
 }
 
 /*
@@ -1345,24 +1345,24 @@ sgf_print_property(FILE *file, SGFNode *node, short name, int is_comment)
 static void
 sgfPrintRemainingProperties(FILE *file, SGFNode *node)
 {
-  SGFProperty *prop;
+    SGFProperty *prop;
 
-  for (prop = node->props; prop; prop = prop->next)
-    if (!(prop->name & 0x20))
-      sgf_print_property(file, node, prop->name, 0);
+    for (prop = node->props; prop; prop = prop->next)
+        if (!(prop->name & 0x20))
+            sgf_print_property(file, node, prop->name, 0);
 }
 
 
 /*
- * Print the property values of NAME at node N and mark it as printed. 
+ * Print the property values of NAME at node N and mark it as printed.
  */
 
 static void
 sgfPrintCharProperty(FILE *file, SGFNode *node, const char *name)
 {
-  short nam = name[0] | name[1] << 8;
-  
-  sgf_print_property(file, node, nam, 0);
+    short nam = name[0] | name[1] << 8;
+
+    sgf_print_property(file, node, nam, 0);
 }
 
 
@@ -1376,61 +1376,61 @@ sgfPrintCharProperty(FILE *file, SGFNode *node, const char *name)
 static void
 sgfPrintCommentProperty(FILE *file, SGFNode *node, const char *name)
 {
-  short nam = name[0] | name[1] << 8;
-  
-  sgf_print_property(file, node, nam, 1);
+    short nam = name[0] | name[1] << 8;
+
+    sgf_print_property(file, node, nam, 1);
 }
 
 
 static void
 unparse_node(FILE *file, SGFNode *node)
 {
-  sgf_putc(';', file);
-  sgfPrintCharProperty(file, node, "B ");
-  sgfPrintCharProperty(file, node, "W ");
-  sgfPrintCommentProperty(file, node, "N ");
-  sgfPrintCommentProperty(file, node, "C ");
-  sgfPrintRemainingProperties(file, node);
+    sgf_putc(';', file);
+    sgfPrintCharProperty(file, node, "B ");
+    sgfPrintCharProperty(file, node, "W ");
+    sgfPrintCommentProperty(file, node, "N ");
+    sgfPrintCommentProperty(file, node, "C ");
+    sgfPrintRemainingProperties(file, node);
 }
 
 
 static void
 unparse_root(FILE *file, SGFNode *node)
 {
-  sgf_putc(';', file);
-  
-  if (sgfHasProperty(node, "GM"))
-    sgfPrintCharProperty(file, node, "GM");
-  else {
-    fputs("GM[1]", file);
-    sgf_column += 5;
-  }
-  
-  sgfPrintCharProperty(file, node, "FF");
-  sgf_putc('\n', file);
+    sgf_putc(';', file);
 
-  sgfPrintCharProperty(file, node, "SZ");
-  sgf_putc('\n', file);
-  
-  sgfPrintCharProperty(file, node, "GN");
-  sgf_putc('\n', file);
-  
-  sgfPrintCharProperty(file, node, "DT");
-  sgf_putc('\n', file);
-  
-  sgfPrintCommentProperty(file, node, "PB");
-  sgfPrintCommentProperty(file, node, "BR");
-  sgf_putc('\n', file);
-  
-  sgfPrintCommentProperty(file, node, "PW");
-  sgfPrintCommentProperty(file, node, "WR");
-  sgf_putc('\n', file);
-  
-  sgfPrintCommentProperty(file, node, "N ");
-  sgfPrintCommentProperty(file, node, "C ");
-  sgfPrintRemainingProperties(file, node);
+    if (sgfHasProperty(node, "GM"))
+        sgfPrintCharProperty(file, node, "GM");
+    else {
+        fputs("GM[1]", file);
+        sgf_column += 5;
+    }
 
-  sgf_putc('\n', file);
+    sgfPrintCharProperty(file, node, "FF");
+    sgf_putc('\n', file);
+
+    sgfPrintCharProperty(file, node, "SZ");
+    sgf_putc('\n', file);
+
+    sgfPrintCharProperty(file, node, "GN");
+    sgf_putc('\n', file);
+
+    sgfPrintCharProperty(file, node, "DT");
+    sgf_putc('\n', file);
+
+    sgfPrintCommentProperty(file, node, "PB");
+    sgfPrintCommentProperty(file, node, "BR");
+    sgf_putc('\n', file);
+
+    sgfPrintCommentProperty(file, node, "PW");
+    sgfPrintCommentProperty(file, node, "WR");
+    sgf_putc('\n', file);
+
+    sgfPrintCommentProperty(file, node, "N ");
+    sgfPrintCommentProperty(file, node, "C ");
+    sgfPrintRemainingProperties(file, node);
+
+    sgf_putc('\n', file);
 }
 
 
@@ -1442,27 +1442,27 @@ unparse_root(FILE *file, SGFNode *node)
 static void
 unparse_game(FILE *file, SGFNode *node, int root)
 {
-  if (!root)
-    sgf_putc('\n', file);
-  sgf_putc('(', file);
-  if (root)
-    unparse_root(file, node);
-  else
-    unparse_node(file, node);
+    if (!root)
+        sgf_putc('\n', file);
+    sgf_putc('(', file);
+    if (root)
+        unparse_root(file, node);
+    else
+        unparse_node(file, node);
 
-  node = node->child;
-  while (node != NULL && node->next == NULL) {
-    unparse_node(file, node);
     node = node->child;
-  } 
+    while (node != NULL && node->next == NULL) {
+        unparse_node(file, node);
+        node = node->child;
+    }
 
-  while (node != NULL) {
-    unparse_game(file, node, 0);
-    node = node->next;
-  }
-  sgf_putc(')', file);
-  if (root)
-    sgf_putc('\n', file);
+    while (node != NULL) {
+        unparse_game(file, node, 0);
+        node = node->next;
+    }
+    sgf_putc(')', file);
+    if (root)
+        sgf_putc('\n', file);
 }
 
 /* Printed properties are marked by adding the 0x20 bit to the
@@ -1473,10 +1473,10 @@ unparse_game(FILE *file, SGFNode *node, int root)
 static void
 restore_property(SGFProperty *prop)
 {
-  if (prop) {
-    restore_property(prop->next);
-    prop->name &= ~0x20;
-  }
+    if (prop) {
+        restore_property(prop->next);
+        prop->name &= ~0x20;
+    }
 }
 
 /* When called with the tree root, recurses to all properties in the
@@ -1485,11 +1485,11 @@ restore_property(SGFProperty *prop)
 static void
 restore_node(SGFNode *node)
 {
-  if (node) {
-    restore_property(node->props);
-    restore_node(node->child);
-    restore_node(node->next);
-  }
+    if (node) {
+        restore_property(node->props);
+        restore_node(node->child);
+        restore_node(node->next);
+    }
 }
 
 
@@ -1500,31 +1500,31 @@ restore_node(SGFNode *node)
 int
 writesgf(SGFNode *root, const char *filename)
 {
-  FILE *outfile;
+    FILE *outfile;
 
-  if (strcmp(filename, "-") == 0) 
-    outfile = stdout;
-  else
-    outfile = fopen(filename, "w");
+    if (strcmp(filename, "-") == 0)
+        outfile = stdout;
+    else
+        outfile = fopen(filename, "w");
 
-  if (!outfile) {
-    fprintf(stderr, "Can not open %s\n", filename);
-    return 0;
-  }
+    if (!outfile) {
+        fprintf(stderr, "Can not open %s\n", filename);
+        return 0;
+    }
 
-  sgf_write_header_reduced(root, 0);
+    sgf_write_header_reduced(root, 0);
 
-  sgf_column = 0;
-  unparse_game(outfile, root, 1);
-  if (outfile != stdout)
-    fclose(outfile);
-  
-  /* Remove "printed" marks so that the tree can be written multiple
-   * times.
-   */
-  restore_node(root);
-  
-  return 1;
+    sgf_column = 0;
+    unparse_game(outfile, root, 1);
+    if (outfile != stdout)
+        fclose(outfile);
+
+    /* Remove "printed" marks so that the tree can be written multiple
+     * times.
+     */
+    restore_node(root);
+
+    return 1;
 }
 
 
@@ -1532,23 +1532,23 @@ writesgf(SGFNode *root, const char *filename)
 int
 main()
 {
-  static char buffer[25000];
-  static char output[25000];
-  SGFNode *game;
+    static char buffer[25000];
+    static char output[25000];
+    SGFNode *game;
 
-  sgffile = stdin;
+    sgffile = stdin;
 
-  nexttoken();
-  gametree(&game, LAX_SGF);
-  if (sgferr) {
-    fprintf(stderr, "Parse error:");
-    fprintf(stderr, sgferr, sgferrarg);
-    fprintf(stderr, " at position %d\n", sgferrpos);
-  }
-  else {
-    unparse_game(stdin, game, 1);
-    write(1, output, outputp - output);
-  }
+    nexttoken();
+    gametree(&game, LAX_SGF);
+    if (sgferr) {
+        fprintf(stderr, "Parse error:");
+        fprintf(stderr, sgferr, sgferrarg);
+        fprintf(stderr, " at position %d\n", sgferrpos);
+    }
+    else {
+        unparse_game(stdin, game, 1);
+        write(1, output, outputp - output);
+    }
 }
 #endif
 

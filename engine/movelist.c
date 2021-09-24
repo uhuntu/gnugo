@@ -39,15 +39,15 @@ static void swap_points_and_codes(int points[], int codes[], int m, int n);
 int
 movelist_move_known(int move, int max_points, int points[], int codes[])
 {
-  int k;
+    int k;
 
-  for (k = 0; k < max_points; k++) {
-    if (codes[k] == 0)
-      return 0;
-    if (points[k] == move)
-      return codes[k];
-  }
-  return 0;
+    for (k = 0; k < max_points; k++) {
+        if (codes[k] == 0)
+            return 0;
+        if (points[k] == move)
+            return codes[k];
+    }
+    return 0;
 }
 
 
@@ -59,31 +59,31 @@ movelist_move_known(int move, int max_points, int points[], int codes[])
 
 void
 movelist_change_point(int move, int code, int max_points,
-		      int points[], int codes[])
+                      int points[], int codes[])
 {
-  int k;
+    int k;
 
-  /* First see if we already know about this point. */
-  for (k = 0; k < max_points; k++)
-    if (points[k] == move)
-      break;
+    /* First see if we already know about this point. */
+    for (k = 0; k < max_points; k++)
+        if (points[k] == move)
+            break;
 
-  /* Yes, we do. */
-  if (k < max_points) {
-    if (codes[k] <= code)
-      return; /* Old news. */
+    /* Yes, we do. */
+    if (k < max_points) {
+        if (codes[k] <= code)
+            return; /* Old news. */
 
-    codes[k] = code;
-    movelist_sort_points(max_points, points, codes);
-    return;
-  }
+        codes[k] = code;
+        movelist_sort_points(max_points, points, codes);
+        return;
+    }
 
-  /* This tactical point is new to us. */
-  if (code > codes[max_points - 1]) {
-    points[max_points - 1] = move;
-    codes[max_points - 1] = code;
-    movelist_sort_points(max_points, points, codes);
-  }
+    /* This tactical point is new to us. */
+    if (code > codes[max_points - 1]) {
+        points[max_points - 1] = move;
+        codes[max_points - 1] = code;
+        movelist_sort_points(max_points, points, codes);
+    }
 }
 
 
@@ -98,39 +98,39 @@ movelist_change_point(int move, int code, int max_points,
 static void
 movelist_sort_points(int max_points, int points[], int codes[])
 {
-  int start = 0;
-  int end = max_points - 1;
-  int new_start;
-  int new_end;
-  int k;
-  
-  while (start < end) {
-    new_start = end;
-    for (k = end; k > start; k--)
-      if (codes[k] > codes[k-1]) {
-	swap_points_and_codes(points, codes, k, k-1);
-	new_start = k;
-      }
-    start = new_start;
-    new_end = start;
-    for (k = start; k < end - 1; k++)
-      if (codes[k] < codes[k+1]) {
-	swap_points_and_codes(points, codes, k, k+1);
-	new_end = k;
-      }
-    end = new_end;
-  }
+    int start = 0;
+    int end = max_points - 1;
+    int new_start;
+    int new_end;
+    int k;
+
+    while (start < end) {
+        new_start = end;
+        for (k = end; k > start; k--)
+            if (codes[k] > codes[k-1]) {
+                swap_points_and_codes(points, codes, k, k-1);
+                new_start = k;
+            }
+        start = new_start;
+        new_end = start;
+        for (k = start; k < end - 1; k++)
+            if (codes[k] < codes[k+1]) {
+                swap_points_and_codes(points, codes, k, k+1);
+                new_end = k;
+            }
+        end = new_end;
+    }
 }
 
 static void
 swap_points_and_codes(int points[], int codes[], int m, int n)
 {
-  int tmp = points[m];
-  points[m] = points[n];
-  points[n] = tmp;
-  tmp = codes[m];
-  codes[m] = codes[n];
-  codes[n] = tmp;
+    int tmp = points[m];
+    points[m] = points[n];
+    points[n] = tmp;
+    tmp = codes[m];
+    codes[m] = codes[n];
+    codes[n] = tmp;
 }
 
 

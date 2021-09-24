@@ -30,7 +30,7 @@
 #include "winsocket.h"
 
 
-/* The cosmic style uses more influence than the defaults attenuation 
+/* The cosmic style uses more influence than the defaults attenuation
  * coefficients !
  * The "TERR_.."-values are used in the influence computations used
  * for territory evaluation. (initial_influence with dragons_known,
@@ -63,46 +63,46 @@
 /* Maximum number of regions allowed between territory, moyo, and area.
  * FIXME: This number is vastly exaggerated. Should be possible to
  * come up with a much better upper bound.
- */ 
+ */
 #define MAX_REGIONS (3*MAX_BOARD*MAX_BOARD + 1)
 
 #define MAX_INTRUSIONS (2 * MAX_BOARD * MAX_BOARD)
 
 struct intrusion_data
 {
-  int source_pos; 	/* Stone from which intrusion originates.*/
-  int strength_pos;     /* Position of the intrusion influence soure. */
-  float strength;
-  float attenuation;
+    int source_pos; 	/* Stone from which intrusion originates.*/
+    int strength_pos;     /* Position of the intrusion influence soure. */
+    float strength;
+    float attenuation;
 };
 
 struct influence_data
 {
-  signed char safe[BOARDMAX];
+    signed char safe[BOARDMAX];
 
-  float white_influence[BOARDMAX]; 	/* Accumulated influence. */
-  float black_influence[BOARDMAX]; 	/* Accumulated influence. */
-  float white_strength[BOARDMAX];  	/* Strength of influence source. */
-  float black_strength[BOARDMAX];  	/* Strength of influence source. */
-  float white_attenuation[BOARDMAX]; 
-  float black_attenuation[BOARDMAX];
-  float white_permeability[BOARDMAX];
-  float black_permeability[BOARDMAX];
+    float white_influence[BOARDMAX]; 	/* Accumulated influence. */
+    float black_influence[BOARDMAX]; 	/* Accumulated influence. */
+    float white_strength[BOARDMAX];  	/* Strength of influence source. */
+    float black_strength[BOARDMAX];  	/* Strength of influence source. */
+    float white_attenuation[BOARDMAX];
+    float black_attenuation[BOARDMAX];
+    float white_permeability[BOARDMAX];
+    float black_permeability[BOARDMAX];
 
-  int is_territorial_influence; /* 0 only if computing escape_influence.*/
+    int is_territorial_influence; /* 0 only if computing escape_influence.*/
 
-  float territory_value[BOARDMAX];
-  int non_territory[BOARDMAX];
-  int captured;
+    float territory_value[BOARDMAX];
+    int non_territory[BOARDMAX];
+    int captured;
 
-  int color_to_move; /* Which color is in turn to move. */
-  
-  int queue[MAX_BOARD * MAX_BOARD];     /* Points receiving influence. */
+    int color_to_move; /* Which color is in turn to move. */
 
-  int intrusion_counter;
-  struct intrusion_data intrusions[MAX_INTRUSIONS];
+    int queue[MAX_BOARD * MAX_BOARD];     /* Points receiving influence. */
 
-  int id;
+    int intrusion_counter;
+    struct intrusion_data intrusions[MAX_INTRUSIONS];
+
+    int id;
 };
 
 /* Typedef for pointer to either of the functions whose_territory(),
@@ -120,9 +120,9 @@ typedef int (*owner_function_ptr)(const struct influence_data *q, int pos);
 /* cosmic_importance is a number between 0.0 and 1.0 ;
  * when cosmic_importance is 0.0, the default influence
  * values are used; when cosmic_importance is 1.0, GNU Go
- * will try to play an influence-oriented fuseki by 
+ * will try to play an influence-oriented fuseki by
  * over-estimatingthe potential territory values of moyos.
- * In the current implementation, cosmic_importance decreases 
+ * In the current implementation, cosmic_importance decreases
  * slowly for 19*19 games from 1.0 at move 4 to 0.0 at move 120.
  */
 float cosmic_importance;
@@ -131,9 +131,9 @@ float cosmic_importance;
 /* Used in the whose_moyo() function */
 struct moyo_determination_data
 {
-  float influence_balance;
-  float my_influence_minimum;
-  float opp_influence_maximum;
+    float influence_balance;
+    float my_influence_minimum;
+    float opp_influence_maximum;
 };
 
 

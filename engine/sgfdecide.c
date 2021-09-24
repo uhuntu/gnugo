@@ -34,7 +34,7 @@
 #include "sgftree.h"
 
 
-/* 
+/*
  * decide_string tries to attack and defend the string at (pos),
  * and then writes the number of variations considered in the attack
  * and defence to the sgf file.
@@ -43,76 +43,76 @@
 void
 decide_string(int pos)
 {
-  int aa, dd;
-  int acode, dcode;
-  SGFTree tree;
-  
-  if (board[pos] == EMPTY) {
-    fprintf(stderr, "gnugo: --decide-string called on an empty vertex\n");
-    return;
-  }
+    int aa, dd;
+    int acode, dcode;
+    SGFTree tree;
 
-  if (*outfilename)
-    sgffile_begindump(&tree);
-
-  /* Prepare pattern matcher and reading code. */
-  reset_engine();
-
-  count_variations = 1;
-  acode = attack(pos, &aa);
-  if (acode) {
-    if (acode == WIN)
-      gprintf("%1m can be attacked at %1m (%d variations)\n", 
-	      pos, aa, count_variations);
-    else if (acode == KO_A)
-	gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n", 
-	      pos, aa, count_variations);
-    else if (acode == KO_B)
-	gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
-		pos, aa, count_variations);
-
-    if (debug & DEBUG_READING_PERFORMANCE) {
-      gprintf("Reading shadow: \n");
-      draw_reading_shadow();
+    if (board[pos] == EMPTY) {
+        fprintf(stderr, "gnugo: --decide-string called on an empty vertex\n");
+        return;
     }
+
+    if (*outfilename)
+        sgffile_begindump(&tree);
+
+    /* Prepare pattern matcher and reading code. */
+    reset_engine();
 
     count_variations = 1;
-    dcode = find_defense(pos, &dd);
-    if (dcode) {
-      if (dcode == WIN)
-	gprintf("%1m can be defended at %1m (%d variations)\n", 
-		pos, dd, count_variations);
-      else if (dcode == KO_A)
-	gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n", 
-		pos, dd, count_variations);
-      else if (dcode == KO_B)
-	gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n", 
-		pos, dd, count_variations);
+    acode = attack(pos, &aa);
+    if (acode) {
+        if (acode == WIN)
+            gprintf("%1m can be attacked at %1m (%d variations)\n",
+                    pos, aa, count_variations);
+        else if (acode == KO_A)
+            gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n",
+                    pos, aa, count_variations);
+        else if (acode == KO_B)
+            gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n",
+                    pos, aa, count_variations);
+
+        if (debug & DEBUG_READING_PERFORMANCE) {
+            gprintf("Reading shadow: \n");
+            draw_reading_shadow();
+        }
+
+        count_variations = 1;
+        dcode = find_defense(pos, &dd);
+        if (dcode) {
+            if (dcode == WIN)
+                gprintf("%1m can be defended at %1m (%d variations)\n",
+                        pos, dd, count_variations);
+            else if (dcode == KO_A)
+                gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n",
+                        pos, dd, count_variations);
+            else if (dcode == KO_B)
+                gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n",
+                        pos, dd, count_variations);
+        }
+        else
+            gprintf("%1m cannot be defended (%d variations)\n",
+                    pos, count_variations);
+        if (debug & DEBUG_READING_PERFORMANCE) {
+            gprintf("Reading shadow: \n");
+            draw_reading_shadow();
+        }
+
     }
-    else
-      gprintf("%1m cannot be defended (%d variations)\n", 
-	      pos, count_variations);
-    if (debug & DEBUG_READING_PERFORMANCE) {
-      gprintf("Reading shadow: \n");
-      draw_reading_shadow();
+    else {
+        gprintf("%1m cannot be attacked (%d variations)\n",
+                pos, count_variations);
+        if (debug & DEBUG_READING_PERFORMANCE) {
+            gprintf("Reading shadow: \n");
+            draw_reading_shadow();
+        }
     }
 
-  }
-  else {
-    gprintf("%1m cannot be attacked (%d variations)\n", 
-	    pos, count_variations);
-    if (debug & DEBUG_READING_PERFORMANCE) {
-      gprintf("Reading shadow: \n");
-      draw_reading_shadow();
-    }
-  }
-
-  sgffile_enddump(outfilename);
-  count_variations = 0;
+    sgffile_enddump(outfilename);
+    count_variations = 0;
 }
 
 
-/* 
+/*
  * decide_connection tries to connect and disconnect the strings at
  * (apos) and (bpos), and then writes the number of variations
  * considered in the attack and defence to the sgf file.
@@ -121,182 +121,182 @@ decide_string(int pos)
 void
 decide_connection(int apos, int bpos)
 {
-  int move;
-  int result;
-  SGFTree tree;
+    int move;
+    int result;
+    SGFTree tree;
 
-  ASSERT_ON_BOARD1(apos);
-  ASSERT_ON_BOARD1(bpos);
-  
-  if (board[apos] == EMPTY || board[bpos] == EMPTY) {
-    fprintf(stderr, "gnugo: --decide-connection called on an empty vertex\n");
-    return;
-  }
+    ASSERT_ON_BOARD1(apos);
+    ASSERT_ON_BOARD1(bpos);
 
-  if (board[apos] != board[bpos]) {
-    fprintf(stderr, "gnugo: --decide-connection called for strings of different colors\n");
-    return;
-  }
+    if (board[apos] == EMPTY || board[bpos] == EMPTY) {
+        fprintf(stderr, "gnugo: --decide-connection called on an empty vertex\n");
+        return;
+    }
 
-  if (*outfilename)
-    sgffile_begindump(&tree);
+    if (board[apos] != board[bpos]) {
+        fprintf(stderr, "gnugo: --decide-connection called for strings of different colors\n");
+        return;
+    }
 
-  /* Prepare pattern matcher and reading code. */
-  reset_engine();
+    if (*outfilename)
+        sgffile_begindump(&tree);
 
-  count_variations = 1;
-  result = string_connect(apos, bpos, &move);
-  if (result == WIN) {
-    if (move == NO_MOVE)
-      gprintf("%1m and %1m are connected as it stands (%d variations)\n", 
-	      apos, bpos, count_variations);
+    /* Prepare pattern matcher and reading code. */
+    reset_engine();
+
+    count_variations = 1;
+    result = string_connect(apos, bpos, &move);
+    if (result == WIN) {
+        if (move == NO_MOVE)
+            gprintf("%1m and %1m are connected as it stands (%d variations)\n",
+                    apos, bpos, count_variations);
+        else
+            gprintf("%1m and %1m can be connected at %1m (%d variations)\n",
+                    apos, bpos, move, count_variations);
+    }
+    else if (result == KO_A)
+        gprintf("%1m and %1m can be connected with ko (good) at %1m (%d variations)\n",
+                apos, bpos, move, count_variations);
+    else if (result == KO_B)
+        gprintf("%1m and %1m can be connected with ko (bad) at %1m (%d variations)\n",
+                apos, bpos, move, count_variations);
     else
-	gprintf("%1m and %1m can be connected at %1m (%d variations)\n", 
-		apos, bpos, move, count_variations);
-  }
-  else if (result == KO_A)
-    gprintf("%1m and %1m can be connected with ko (good) at %1m (%d variations)\n", 
-	    apos, bpos, move, count_variations);
-  else if (result == KO_B)
-    gprintf("%1m and %1m can be connected with ko (bad) at %1m (%d variations)\n", 
-	    apos, bpos, move, count_variations);
-  else
-    gprintf("%1m and %1m cannot be connected (%d variations)\n", 
-	    apos, bpos, count_variations);
-  
-  count_variations = 1;
-  result = disconnect(apos, bpos, &move);
-  if (result == WIN) {
-    if (move == NO_MOVE)
-      gprintf("%1m and %1m are disconnected as it stands (%d variations)\n", 
-	      apos, bpos, count_variations);
+        gprintf("%1m and %1m cannot be connected (%d variations)\n",
+                apos, bpos, count_variations);
+
+    count_variations = 1;
+    result = disconnect(apos, bpos, &move);
+    if (result == WIN) {
+        if (move == NO_MOVE)
+            gprintf("%1m and %1m are disconnected as it stands (%d variations)\n",
+                    apos, bpos, count_variations);
+        else
+            gprintf("%1m and %1m can be disconnected at %1m (%d variations)\n",
+                    apos, bpos, move, count_variations);
+    }
+    else if (result == KO_A)
+        gprintf("%1m and %1m can be disconnected with ko (good) at %1m (%d variations)\n",
+                apos, bpos, move, count_variations);
+    else if (result == KO_B)
+        gprintf("%1m and %1m can be disconnected with ko (bad) at %1m (%d variations)\n",
+                apos, bpos, move, count_variations);
     else
-	gprintf("%1m and %1m can be disconnected at %1m (%d variations)\n", 
-		apos, bpos, move, count_variations);
-  }
-  else if (result == KO_A)
-    gprintf("%1m and %1m can be disconnected with ko (good) at %1m (%d variations)\n", 
-	    apos, bpos, move, count_variations);
-  else if (result == KO_B)
-    gprintf("%1m and %1m can be disconnected with ko (bad) at %1m (%d variations)\n", 
-	    apos, bpos, move, count_variations);
-  else
-    gprintf("%1m and %1m cannot be disconnected (%d variations)\n", 
-	    apos, bpos, count_variations);
-  
-  sgffile_enddump(outfilename);
-  count_variations = 0;
+        gprintf("%1m and %1m cannot be disconnected (%d variations)\n",
+                apos, bpos, count_variations);
+
+    sgffile_enddump(outfilename);
+    count_variations = 0;
 }
 
 
-/* 
- * decide_owl (formerly called decide_dragon) tries to attack and defend 
- * the dragon at (pos), and then writes the number of variations considered 
+/*
+ * decide_owl (formerly called decide_dragon) tries to attack and defend
+ * the dragon at (pos), and then writes the number of variations considered
  * in the attack and defence to the sgf file.
  */
 
 void
 decide_owl(int pos)
 {
-  int move = NO_MOVE;
-  int acode, dcode;
-  SGFTree tree;
-  int result_certain;
-  int kworm;
+    int move = NO_MOVE;
+    int acode, dcode;
+    SGFTree tree;
+    int result_certain;
+    int kworm;
 
-  if (board[pos] == EMPTY) {
-    fprintf(stderr, "gnugo: --decide-dragon called on an empty vertex\n");
-    return;
-  }
-
-  /* Prepare pattern matcher and reading code. */
-  reset_engine();
-
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  gprintf("finished examine_position\n");
-
-  if (*outfilename)
-    sgffile_begindump(&tree);
-
-  count_variations = 1;
-  acode = owl_attack(pos, &move, &result_certain, &kworm);
-  if (acode) {
-    if (acode == WIN) {
-      if (move == NO_MOVE)
-	gprintf("%1m is dead as it stands", pos);
-      else
-	gprintf("%1m can be attacked at %1m (%d variations)", 
-		pos, move, count_variations);
+    if (board[pos] == EMPTY) {
+        fprintf(stderr, "gnugo: --decide-dragon called on an empty vertex\n");
+        return;
     }
-    else if (acode == KO_A)
-      gprintf("%1m can be attacked with ko (good) at %1m (%d variations)", 
-	      pos, move, count_variations);
-    else if (acode == KO_B)
-      gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)", 
-	      pos, move, count_variations);
-    else if (acode == GAIN)
-      gprintf("%1m can be attacked with gain (captures %1m) at %1m (%d variations)", 
-	      pos, kworm, move, count_variations);
-  }
-  else 
-    gprintf("%1m cannot be attacked (%d variations)", pos, count_variations);
-  
-  if (result_certain)
-    gprintf("\n");
-  else
-    gprintf(" result uncertain\n");
 
-  count_variations = 1;
-  dcode = owl_defend(pos, &move, &result_certain, &kworm);
+    /* Prepare pattern matcher and reading code. */
+    reset_engine();
 
-  if (dcode) {
-    if (dcode == WIN) {
-      if (move == NO_MOVE)
-	gprintf("%1m is alive as it stands", pos);
-      else 
-	gprintf("%1m can be defended at %1m (%d variations)", 
-		pos, move, count_variations);
+    silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+    gprintf("finished examine_position\n");
+
+    if (*outfilename)
+        sgffile_begindump(&tree);
+
+    count_variations = 1;
+    acode = owl_attack(pos, &move, &result_certain, &kworm);
+    if (acode) {
+        if (acode == WIN) {
+            if (move == NO_MOVE)
+                gprintf("%1m is dead as it stands", pos);
+            else
+                gprintf("%1m can be attacked at %1m (%d variations)",
+                        pos, move, count_variations);
+        }
+        else if (acode == KO_A)
+            gprintf("%1m can be attacked with ko (good) at %1m (%d variations)",
+                    pos, move, count_variations);
+        else if (acode == KO_B)
+            gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)",
+                    pos, move, count_variations);
+        else if (acode == GAIN)
+            gprintf("%1m can be attacked with gain (captures %1m) at %1m (%d variations)",
+                    pos, kworm, move, count_variations);
     }
-    else if (dcode == KO_A)
-      gprintf("%1m can be defended with ko (good) at %1m (%d variations)", 
-	      pos, move, count_variations);
-    else if (dcode == KO_B)
-      gprintf("%1m can be defended with ko (bad) at %1m (%d variations)", 
-	      pos, move, count_variations);
-    else if (dcode == LOSS)
-      gprintf("%1m can be defended with loss (loses %1m) at %1m (%d variations)", 
-	      pos, kworm, move, count_variations);
-  }
-  else
-    gprintf("%1m cannot be defended (%d variations)",
-	    pos, count_variations);
+    else
+        gprintf("%1m cannot be attacked (%d variations)", pos, count_variations);
 
-  if (result_certain)
-    gprintf("\n");
-  else
-    gprintf(" result uncertain\n");
-  
-  sgffile_enddump(outfilename);
-  count_variations = 0;
+    if (result_certain)
+        gprintf("\n");
+    else
+        gprintf(" result uncertain\n");
+
+    count_variations = 1;
+    dcode = owl_defend(pos, &move, &result_certain, &kworm);
+
+    if (dcode) {
+        if (dcode == WIN) {
+            if (move == NO_MOVE)
+                gprintf("%1m is alive as it stands", pos);
+            else
+                gprintf("%1m can be defended at %1m (%d variations)",
+                        pos, move, count_variations);
+        }
+        else if (dcode == KO_A)
+            gprintf("%1m can be defended with ko (good) at %1m (%d variations)",
+                    pos, move, count_variations);
+        else if (dcode == KO_B)
+            gprintf("%1m can be defended with ko (bad) at %1m (%d variations)",
+                    pos, move, count_variations);
+        else if (dcode == LOSS)
+            gprintf("%1m can be defended with loss (loses %1m) at %1m (%d variations)",
+                    pos, kworm, move, count_variations);
+    }
+    else
+        gprintf("%1m cannot be defended (%d variations)",
+                pos, count_variations);
+
+    if (result_certain)
+        gprintf("\n");
+    else
+        gprintf(" result uncertain\n");
+
+    sgffile_enddump(outfilename);
+    count_variations = 0;
 }
 
 
-/* 
+/*
  * decide_dragon_data prints the dragon data at (pos).
  */
 
 void
 decide_dragon_data(int pos)
 {
-  if (board[pos] == EMPTY) {
-    fprintf(stderr, "gnugo: --decide-dragon-data called on an empty vertex\n");
-    return;
-  }
-  reset_engine();
-  silent_examine_position(FULL_EXAMINE_DRAGONS);
+    if (board[pos] == EMPTY) {
+        fprintf(stderr, "gnugo: --decide-dragon-data called on an empty vertex\n");
+        return;
+    }
+    reset_engine();
+    silent_examine_position(FULL_EXAMINE_DRAGONS);
 
-  gprintf("Dragon at %1m:\n", pos);
-  report_dragon(stderr, pos);
+    gprintf("Dragon at %1m:\n", pos);
+    report_dragon(stderr, pos);
 }
 
 
@@ -307,51 +307,51 @@ decide_dragon_data(int pos)
 void
 decide_semeai(int apos, int bpos)
 {
-  SGFTree tree;
-  int resulta, resultb, move, result_certain;
-  int color = board[apos];
+    SGFTree tree;
+    int resulta, resultb, move, result_certain;
+    int color = board[apos];
 
-  if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
-    gprintf("gnugo: --decide-semeai called on invalid data\n");
-    return;
-  }
+    if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
+        gprintf("gnugo: --decide-semeai called on invalid data\n");
+        return;
+    }
 
-  /* Prepare pattern matcher and reading code. */
-  reset_engine();
+    /* Prepare pattern matcher and reading code. */
+    reset_engine();
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  gprintf("finished examine_position\n");
-  count_variations = 1;
+    silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+    gprintf("finished examine_position\n");
+    count_variations = 1;
 
-  if (*outfilename)
-    sgffile_begindump(&tree);
+    if (*outfilename)
+        sgffile_begindump(&tree);
 
-  gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
-	  apos, bpos, board[apos]);
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, &result_certain);
-  gprintf("Semeai defense of %1m: result %s %1m\n",
-	  apos, result_to_string(resulta), move);
-  gprintf("Semeai attack of %1m: result %s %1m\n",
-	  bpos, result_to_string(resultb), move);
-  gprintf("%d nodes%s\n\n", count_variations,
-	  result_certain ? "" : ", uncertain result");
-  
-  gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
-	  bpos, apos, board[bpos]);
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, &result_certain);
-  gprintf("Semeai defense of %1m: result %s %1m\n",
-	  bpos, result_to_string(resultb), move);
-  gprintf("Semeai attack of %1m: result %s %1m\n",
-	  apos, result_to_string(resulta), move);
-  gprintf("%d nodes%s\n", count_variations,
-	  result_certain ? "" : ", uncertain result");
+    gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
+            apos, bpos, board[apos]);
+    owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, &result_certain);
+    gprintf("Semeai defense of %1m: result %s %1m\n",
+            apos, result_to_string(resulta), move);
+    gprintf("Semeai attack of %1m: result %s %1m\n",
+            bpos, result_to_string(resultb), move);
+    gprintf("%d nodes%s\n\n", count_variations,
+            result_certain ? "" : ", uncertain result");
 
-  sgffile_enddump(outfilename);
-  count_variations = 0;
+    gprintf("Analyzing semeai between %1m and %1m, %C moves first\n",
+            bpos, apos, board[bpos]);
+    owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, &result_certain);
+    gprintf("Semeai defense of %1m: result %s %1m\n",
+            bpos, result_to_string(resultb), move);
+    gprintf("Semeai attack of %1m: result %s %1m\n",
+            apos, result_to_string(resulta), move);
+    gprintf("%d nodes%s\n", count_variations,
+            result_certain ? "" : ", uncertain result");
+
+    sgffile_enddump(outfilename);
+    count_variations = 0;
 }
 
 
-/* 
+/*
  * decide_position tries to attack and defend every dragon with
  * dragon.escape<6 and writes the variations to an sgf file.
  */
@@ -359,92 +359,92 @@ decide_semeai(int apos, int bpos)
 void
 decide_position()
 {
-  int pos;
-  int move = NO_MOVE;
-  int acode = 0, dcode = 0;
-  int kworm;
-  static const char *snames[] = {"dead", "alive", "critical", "unknown"};
-  SGFTree tree;
+    int pos;
+    int move = NO_MOVE;
+    int acode = 0, dcode = 0;
+    int kworm;
+    static const char *snames[] = {"dead", "alive", "critical", "unknown"};
+    SGFTree tree;
 
-  /* Prepare pattern matcher and reading code. */
-  reset_engine();
+    /* Prepare pattern matcher and reading code. */
+    reset_engine();
 
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
+    silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
-  if (*outfilename)
-    sgffile_begindump(&tree);
+    if (*outfilename)
+        sgffile_begindump(&tree);
 
-  count_variations = 1;
+    count_variations = 1;
 
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos)
-	|| dragon[pos].origin != pos
-	|| board[pos] == EMPTY
-	|| DRAGON2(pos).escape_route >= 6)
-      continue;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        if (!ON_BOARD(pos)
+                || dragon[pos].origin != pos
+                || board[pos] == EMPTY
+                || DRAGON2(pos).escape_route >= 6)
+            continue;
 
-    gprintf("\nanalyzing %1m\n", pos);
-    gprintf("status=%s, escape=%d\n", 
-	    snames[dragon[pos].crude_status], DRAGON2(pos).escape_route);
-    acode = owl_attack(pos, &move, NULL, &kworm);
-    if (acode) {
-      if (acode == WIN) {
-	if (move == NO_MOVE)
-	  gprintf("%1m is dead as it stands\n", pos);
-	else
-	  gprintf("%1m can be attacked at %1m (%d variations)\n", 
-		  pos, move, count_variations);
-      }
-      else if (acode == KO_A)
-	gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n", 
-		pos, move, count_variations);
-      else if (acode == KO_B)
-	gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
-		pos, move, count_variations);
-      else if (acode == GAIN)
-	gprintf("%1m can be attacked with gain (captures %1m) at %1m (%d variations)", 
-		pos, kworm, move, count_variations);
-      
-      count_variations = 1;
-      dcode = owl_defend(pos, &move, NULL, &kworm);
-      if (dcode) {
-	if (dcode == WIN) {
-	  if (move == NO_MOVE)
-	    gprintf("%1m is alive as it stands\n", pos);
-	  else 
-	    gprintf("%1m can be defended at %1m (%d variations)\n", 
-		    pos, move, count_variations);
-	}
-	else if (dcode == KO_A)
-	  gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n", 
-		  pos, move, count_variations);
-	else if (dcode == KO_B)
-	  gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n",
-		  pos, move, count_variations);
-	else if (dcode == LOSS)
-	  gprintf("%1m can be defended with loss (loses %1m) at %1m (%d variations)", 
-		  pos, kworm, move, count_variations);
-      }
-      else
-	gprintf("%1m cannot be defended (%d variations)\n", 
-		pos, count_variations);
+        gprintf("\nanalyzing %1m\n", pos);
+        gprintf("status=%s, escape=%d\n",
+                snames[dragon[pos].crude_status], DRAGON2(pos).escape_route);
+        acode = owl_attack(pos, &move, NULL, &kworm);
+        if (acode) {
+            if (acode == WIN) {
+                if (move == NO_MOVE)
+                    gprintf("%1m is dead as it stands\n", pos);
+                else
+                    gprintf("%1m can be attacked at %1m (%d variations)\n",
+                            pos, move, count_variations);
+            }
+            else if (acode == KO_A)
+                gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n",
+                        pos, move, count_variations);
+            else if (acode == KO_B)
+                gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n",
+                        pos, move, count_variations);
+            else if (acode == GAIN)
+                gprintf("%1m can be attacked with gain (captures %1m) at %1m (%d variations)",
+                        pos, kworm, move, count_variations);
+
+            count_variations = 1;
+            dcode = owl_defend(pos, &move, NULL, &kworm);
+            if (dcode) {
+                if (dcode == WIN) {
+                    if (move == NO_MOVE)
+                        gprintf("%1m is alive as it stands\n", pos);
+                    else
+                        gprintf("%1m can be defended at %1m (%d variations)\n",
+                                pos, move, count_variations);
+                }
+                else if (dcode == KO_A)
+                    gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n",
+                            pos, move, count_variations);
+                else if (dcode == KO_B)
+                    gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n",
+                            pos, move, count_variations);
+                else if (dcode == LOSS)
+                    gprintf("%1m can be defended with loss (loses %1m) at %1m (%d variations)",
+                            pos, kworm, move, count_variations);
+            }
+            else
+                gprintf("%1m cannot be defended (%d variations)\n",
+                        pos, count_variations);
+        }
+        else
+            gprintf("%1m cannot be attacked (%d variations)\n",
+                    pos, count_variations);
+
+        if (acode) {
+            if (dcode)
+                gprintf("status of %1m revised to CRITICAL\n", pos);
+            else
+                gprintf("status of %1m revised to DEAD\n", pos);
+        }
+        else
+            gprintf("status of %1m revised to ALIVE\n", pos);
     }
-    else 
-      gprintf("%1m cannot be attacked (%d variations)\n", 
-	      pos, count_variations);
-    
-    if (acode) {
-      if (dcode)
-	gprintf("status of %1m revised to CRITICAL\n", pos);
-      else
-	gprintf("status of %1m revised to DEAD\n", pos);
-    }
-    else
-      gprintf("status of %1m revised to ALIVE\n", pos);
-  }
-  
-  sgffile_enddump(outfilename);
-  count_variations = 0;
+
+    sgffile_enddump(outfilename);
+    count_variations = 0;
 }
 
 
@@ -456,59 +456,59 @@ decide_position()
 void
 decide_eye(int pos)
 {
-  int color;
-  struct eyevalue value;
-  int attack_point;
-  int defense_point;
-  int eyepos;
-  SGFTree tree;
+    int color;
+    struct eyevalue value;
+    int attack_point;
+    int defense_point;
+    int eyepos;
+    SGFTree tree;
 
-  reset_engine();
-  silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
-  
-  color = black_eye[pos].color;
-  if (!IS_STONE(color)) {
-    gprintf("The eye at %1m is not of a single color.\n", pos);
-    return;
-  }
+    reset_engine();
+    silent_examine_position(EXAMINE_DRAGONS_WITHOUT_OWL);
 
-  if (printboard)
-    showboard(0);
-
-  /* Enable sgf output. */
-  if (*outfilename)
-    sgffile_begindump(&tree);
-  count_variations = 1;
-  
-  if (black_eye[pos].color == BLACK) {
-    eyepos = black_eye[pos].origin;
-    compute_eyes(eyepos, &value, &attack_point, &defense_point,
-		 black_eye, half_eye, 0);
-    gprintf("Black eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
-    if (eye_move_urgency(&value) > 0) {
-      gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
-	      defense_point);
+    color = black_eye[pos].color;
+    if (!IS_STONE(color)) {
+        gprintf("The eye at %1m is not of a single color.\n", pos);
+        return;
     }
-  }
-  
-  if (white_eye[pos].color == WHITE) {
-    eyepos = white_eye[pos].origin;
-    compute_eyes(eyepos, &value, &attack_point, &defense_point,
-		 white_eye, half_eye, 0);
-    gprintf("White eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
-    if (eye_move_urgency(&value) > 0) {
-      gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
-	      defense_point);
+
+    if (printboard)
+        showboard(0);
+
+    /* Enable sgf output. */
+    if (*outfilename)
+        sgffile_begindump(&tree);
+    count_variations = 1;
+
+    if (black_eye[pos].color == BLACK) {
+        eyepos = black_eye[pos].origin;
+        compute_eyes(eyepos, &value, &attack_point, &defense_point,
+                     black_eye, half_eye, 0);
+        gprintf("Black eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
+        if (eye_move_urgency(&value) > 0) {
+            gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
+                    defense_point);
+        }
     }
-  }
-  
-  /* Finish sgf output. */
-  sgffile_enddump(outfilename);
-  count_variations = 0;
+
+    if (white_eye[pos].color == WHITE) {
+        eyepos = white_eye[pos].origin;
+        compute_eyes(eyepos, &value, &attack_point, &defense_point,
+                     white_eye, half_eye, 0);
+        gprintf("White eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
+        if (eye_move_urgency(&value) > 0) {
+            gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
+                    defense_point);
+        }
+    }
+
+    /* Finish sgf output. */
+    sgffile_enddump(outfilename);
+    count_variations = 0;
 }
 
 
-/* 
+/*
  * decide_combination tries to find a combination attack for (color) by
  * calling atari_atari().
  */
@@ -516,65 +516,65 @@ decide_eye(int pos)
 void
 decide_combination(int color)
 {
-  int attack_move;
-  signed char defense_moves[BOARDMAX];
-  SGFTree tree;
-  int first = 1;
-  int pos;
+    int attack_move;
+    signed char defense_moves[BOARDMAX];
+    SGFTree tree;
+    int first = 1;
+    int pos;
 
-  /* Prepare pattern matcher and reading code. */
-  reset_engine();
+    /* Prepare pattern matcher and reading code. */
+    reset_engine();
 
-  silent_examine_position(EXAMINE_ALL);
+    silent_examine_position(EXAMINE_ALL);
 
-  if (*outfilename)
-    sgffile_begindump(&tree);
-  count_variations = 1;
+    if (*outfilename)
+        sgffile_begindump(&tree);
+    count_variations = 1;
 
-  if (atari_atari(color, &attack_move, defense_moves, verbose)) {
-    gprintf("Combination attack for %C at %1m, defense at ", color,
-	    attack_move);
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (ON_BOARD(pos) && defense_moves[pos]) {
-	if (first)
-	  first = 0;
-	else
-	  gprintf(", ");
-	gprintf("%1m", pos);
-      }
+    if (atari_atari(color, &attack_move, defense_moves, verbose)) {
+        gprintf("Combination attack for %C at %1m, defense at ", color,
+                attack_move);
+        for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+            if (ON_BOARD(pos) && defense_moves[pos]) {
+                if (first)
+                    first = 0;
+                else
+                    gprintf(", ");
+                gprintf("%1m", pos);
+            }
+        }
+        gprintf("\n");
     }
-    gprintf("\n");
-  }
-  else
-    gprintf("No Combination attack for %C\n", color);
-  
-  sgffile_enddump(outfilename);
-  count_variations = 0;
+    else
+        gprintf("No Combination attack for %C\n", color);
+
+    sgffile_enddump(outfilename);
+    count_variations = 0;
 }
 
 
 void
 decide_surrounded(int pos)
 {
-  int surround_status;
+    int surround_status;
 
-  if (board[pos] == EMPTY) {
-    fprintf(stderr, "location must not be empty!\n");
-    return;
-  }
+    if (board[pos] == EMPTY) {
+        fprintf(stderr, "location must not be empty!\n");
+        return;
+    }
 
-  /* Prepare pattern matcher and reading code. */
-  reset_engine();
+    /* Prepare pattern matcher and reading code. */
+    reset_engine();
 
-  silent_examine_position(EXAMINE_ALL);
-  surround_status = compute_surroundings(pos, NO_MOVE, 1, NULL);
-  if (surround_status == 1)
-    gprintf("the dragon at %1m is SURROUNDED!\n", pos);
-  else if (surround_status == 2)
-    gprintf("the dragon at %1m is WEAKLY SURROUNDED!\n", pos);
-  else
-    gprintf("the dragon at %1m is not surrounded.\n", pos);
-}  
+    silent_examine_position(EXAMINE_ALL);
+    surround_status = compute_surroundings(pos, NO_MOVE, 1, NULL);
+    if (surround_status == 1)
+        gprintf("the dragon at %1m is SURROUNDED!\n", pos);
+    else if (surround_status == 2)
+        gprintf("the dragon at %1m is WEAKLY SURROUNDED!\n", pos);
+    else
+        gprintf("the dragon at %1m is not surrounded.\n", pos);
+}
 
 
 #if ORACLE
@@ -582,19 +582,19 @@ decide_surrounded(int pos)
 void
 decide_oracle(Gameinfo *gameinfo, char *infilename, char *untilstring)
 {
-  SGFTree tree;
+    SGFTree tree;
 
-  reset_engine();
-  if (*outfilename)
-    sgffile_begindump(&tree);
+    reset_engine();
+    if (*outfilename)
+        sgffile_begindump(&tree);
 
-  count_variations = 1;
-  summon_oracle();
-  oracle_loadsgf(infilename, untilstring);
-  consult_oracle(gameinfo->to_move);
-  sgffile_enddump(outfilename);
-  dismiss_oracle();
-  count_variations = 0;
+    count_variations = 1;
+    summon_oracle();
+    oracle_loadsgf(infilename, untilstring);
+    consult_oracle(gameinfo->to_move);
+    sgffile_enddump(outfilename);
+    dismiss_oracle();
+    count_variations = 0;
 }
 
 #endif

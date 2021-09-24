@@ -58,24 +58,24 @@ struct dragon_data2 *dragon2_func(int pos);
 
 /* Routine names used by persistent and non-persistent caching schemes. */
 enum routine_id {
-  OWL_ATTACK,
-  OWL_DEFEND,
-  SEMEAI,
-  FIND_DEFENSE,
-  ATTACK,
-  CONNECT,
-  DISCONNECT,
-  BREAK_IN,
-  BLOCK_OFF,
-  OWL_THREATEN_ATTACK,
-  OWL_THREATEN_DEFENSE,
-  OWL_DOES_DEFEND,
-  OWL_DOES_ATTACK,
-  OWL_CONNECTION_DEFENDS,
-  OWL_SUBSTANTIAL,
-  OWL_CONFIRM_SAFETY,
-  ANALYZE_SEMEAI,
-  NUM_CACHE_ROUTINES
+    OWL_ATTACK,
+    OWL_DEFEND,
+    SEMEAI,
+    FIND_DEFENSE,
+    ATTACK,
+    CONNECT,
+    DISCONNECT,
+    BREAK_IN,
+    BLOCK_OFF,
+    OWL_THREATEN_ATTACK,
+    OWL_THREATEN_DEFENSE,
+    OWL_DOES_DEFEND,
+    OWL_DOES_ATTACK,
+    OWL_CONNECTION_DEFENDS,
+    OWL_SUBSTANTIAL,
+    OWL_CONFIRM_SAFETY,
+    ANALYZE_SEMEAI,
+    NUM_CACHE_ROUTINES
 };
 
 #define ROUTINE_NAMES \
@@ -110,7 +110,7 @@ enum routine_id {
  */
 #define ROUTINE_COSTS \
   3, 3, 4, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, -1
-  
+
 
 const char *routine_id_to_string(enum routine_id routine);
 
@@ -120,23 +120,23 @@ const char *routine_id_to_string(enum routine_id routine);
  * final status computed by the aftermath code.
  */
 enum dragon_status {
-  DEAD,
-  ALIVE,
-  CRITICAL,
-  UNKNOWN,
-  UNCHECKED,
-  CAN_THREATEN_ATTACK,
-  CAN_THREATEN_DEFENSE, 
-  INESSENTIAL,
-  TACTICALLY_DEAD,
-  ALIVE_IN_SEKI,
-  STRONGLY_ALIVE,
-  INVINCIBLE,
-  INSUBSTANTIAL,
-  WHITE_TERRITORY,
-  BLACK_TERRITORY,
-  DAME,
-  NUM_DRAGON_STATUS
+    DEAD,
+    ALIVE,
+    CRITICAL,
+    UNKNOWN,
+    UNCHECKED,
+    CAN_THREATEN_ATTACK,
+    CAN_THREATEN_DEFENSE,
+    INESSENTIAL,
+    TACTICALLY_DEAD,
+    ALIVE_IN_SEKI,
+    STRONGLY_ALIVE,
+    INVINCIBLE,
+    INSUBSTANTIAL,
+    WHITE_TERRITORY,
+    BLACK_TERRITORY,
+    DAME,
+    NUM_DRAGON_STATUS
 };
 
 #define DRAGON_STATUS_NAMES \
@@ -174,25 +174,25 @@ struct movelist;
  * each match.
  */
 typedef void (*matchpat_callback_fn_ptr)(int anchor, int color,
-                                         struct pattern *, int rotation,
-                                         void *data);
+        struct pattern *, int rotation,
+        void *data);
 typedef void (*fullboard_matchpat_callback_fn_ptr)(int move,
-                                                   struct fullboard_pattern *,
-                                                   int rotation);
+        struct fullboard_pattern *,
+        int rotation);
 typedef void (*corner_matchpat_callback_fn_ptr)(int move, int color,
-						struct corner_pattern *pattern,
-						int trans,
-						int *stones, int num_stones);
+        struct corner_pattern *pattern,
+        int trans,
+        int *stones, int num_stones);
 void matchpat(matchpat_callback_fn_ptr callback, int color,
-	      struct pattern_db *pdb, void *callback_data,
-	      signed char goal[BOARDMAX]);
+              struct pattern_db *pdb, void *callback_data,
+              signed char goal[BOARDMAX]);
 void matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
-	      struct pattern_db *pdb, void *callback_data,
-	      signed char goal[BOARDMAX], int anchor_in_goal);
+                          struct pattern_db *pdb, void *callback_data,
+                          signed char goal[BOARDMAX], int anchor_in_goal);
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
-			int color, struct fullboard_pattern *pattern);
+                        int color, struct fullboard_pattern *pattern);
 void corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
-		     struct corner_db *database);
+                     struct corner_db *database);
 void dfa_match_init(void);
 
 void reading_cache_init(int bytes);
@@ -203,17 +203,17 @@ float reading_cache_default_size(void);
 int attack(int str, int *move);
 int find_defense(int str, int *move);
 int attack_and_defend(int str,
-		      int *attack_code, int *attack_point,
-		      int *defend_code, int *defense_point);
+                      int *attack_code, int *attack_point,
+                      int *defend_code, int *defense_point);
 int attack_either(int astr, int bstr);
 int defend_both(int astr, int bstr);
 int break_through(int apos, int bpos, int cpos);
 int attack_threats(int pos, int max_points, int moves[], int codes[]);
 
 int restricted_defend1(int str, int *move,
-		       int num_forbidden_moves, int *forbidden_moves);
+                       int num_forbidden_moves, int *forbidden_moves);
 int restricted_attack2(int str, int *move,
-		       int num_forbidden_moves, int *forbidden_moves);
+                       int num_forbidden_moves, int *forbidden_moves);
 
 int simple_ladder(int str, int *move);
 #define MOVE_ORDERING_PARAMETERS 67
@@ -226,50 +226,50 @@ void purge_persistent_caches(void);
 void clear_persistent_caches(void);
 
 int search_persistent_reading_cache(enum routine_id routine, int str,
-				    int *result, int *move);
+                                    int *result, int *move);
 void store_persistent_reading_cache(enum routine_id routine, int str,
-				    int result, int move, int nodes);
+                                    int result, int move, int nodes);
 void reading_hotspots(float values[BOARDMAX]);
 int search_persistent_connection_cache(enum routine_id routine,
-				       int str1, int str2,
-				       int *result, int *move);
+                                       int str1, int str2,
+                                       int *result, int *move);
 void store_persistent_connection_cache(enum routine_id routine,
-				       int str1, int str2,
-				       int result, int move,
-				       int tactical_nodes,
-				       signed char connection_shadow[BOARDMAX]);
+                                       int str1, int str2,
+                                       int result, int move,
+                                       int tactical_nodes,
+                                       signed char connection_shadow[BOARDMAX]);
 int search_persistent_breakin_cache(enum routine_id routine,
-				    int str, Hash_data *goal_hash,
-				    int breakin_node_limit,
-				    int *result, int *move);
+                                    int str, Hash_data *goal_hash,
+                                    int breakin_node_limit,
+                                    int *result, int *move);
 void store_persistent_breakin_cache(enum routine_id routine,
-				    int str, Hash_data *goal_hash,
-				    int result, int move,
-				    int tactical_nodes,
-				    int breakin_node_limit,
-				    signed char breakin_shadow[BOARDMAX]);
+                                    int str, Hash_data *goal_hash,
+                                    int result, int move,
+                                    int tactical_nodes,
+                                    int breakin_node_limit,
+                                    signed char breakin_shadow[BOARDMAX]);
 int search_persistent_owl_cache(enum routine_id routine,
-				int apos, int bpos, int cpos,
-				int *result, int *move, int *move2,
-				int *certain);
+                                int apos, int bpos, int cpos,
+                                int *result, int *move, int *move2,
+                                int *certain);
 void store_persistent_owl_cache(enum routine_id routine,
-				int apos, int bpos, int cpos,
-				int result, int move, int move2, int certain,
-				int tactical_nodes, signed char goal[BOARDMAX],
-				int goal_color);
+                                int apos, int bpos, int cpos,
+                                int result, int move, int move2, int certain,
+                                int tactical_nodes, signed char goal[BOARDMAX],
+                                int goal_color);
 void owl_hotspots(float values[BOARDMAX]);
 int search_persistent_semeai_cache(enum routine_id routine,
-			           int apos, int bpos, int cpos, int color,
-				   Hash_data *goal_hash,
-				   int *resulta, int *resultb,
-				   int *move, int *certain);
+                                   int apos, int bpos, int cpos, int color,
+                                   Hash_data *goal_hash,
+                                   int *resulta, int *resultb,
+                                   int *move, int *certain);
 void store_persistent_semeai_cache(enum routine_id routine,
-				   int apos, int bpos, int cpos, int color,
-				   Hash_data *goal_hash,
-				   int resulta, int resultb,
-				   int move, int certain, int tactical_nodes,
-				   signed char goala[BOARDMAX],
-				   signed char goalb[BOARDMAX]);
+                                   int apos, int bpos, int cpos, int color,
+                                   Hash_data *goal_hash,
+                                   int resulta, int resultb,
+                                   int move, int certain, int tactical_nodes,
+                                   signed char goala[BOARDMAX],
+                                   signed char goalb[BOARDMAX]);
 
 
 /* readconnect.c */
@@ -283,17 +283,17 @@ int block_off(int str1, const signed char goal[BOARDMAX], int *move);
 
 int obvious_false_eye(int pos, int color);
 void estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
-			      int appreciate_one_two_lunches);
+                              int appreciate_one_two_lunches);
 int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
 int confirm_safety(int move, int color, int *defense_point,
-		   signed char safe_stones[BOARDMAX]);
+                   signed char safe_stones[BOARDMAX]);
 int dragon_weak(int pos);
 float dragon_weakness(int pos, int ignore_dead_dragons);
 int size_of_biggest_critical_dragon(void);
 void change_dragon_status(int dr, enum dragon_status status);
 float blunder_size(int move, int color, int *defense_point,
-		   signed char safe_stones[BOARDMAX]);
+                   signed char safe_stones[BOARDMAX]);
 void set_depth_values(int level, int report_levels);
 void modify_depth_values(int n);
 void increase_depth_values(void);
@@ -306,14 +306,14 @@ int does_secure(int color, int move, int pos);
 void compute_new_dragons(int dragon_origins[BOARDMAX]);
 void join_dragons(int d1, int d2);
 int dragon_escape(signed char goal[BOARDMAX], int color,
-		  signed char escape_value[BOARDMAX]);
+                  signed char escape_value[BOARDMAX]);
 void compute_refined_dragon_weaknesses(void);
 void compute_strategic_sizes(void);
 
 struct eyevalue;
 void compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude);
 float crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
-			    float moyo_value, float escape_route);
+                            float moyo_value, float escape_route);
 
 int is_same_dragon(int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
@@ -323,7 +323,7 @@ int next_worm_in_dragon(int w);
 int lively_dragon_exists(int color);
 void compute_dragon_influence(void);
 void set_strength_data(int color, signed char safe_stones[BOARDMAX],
-		       float strength[BOARDMAX]);
+                       float strength[BOARDMAX]);
 void mark_inessential_stones(int color, signed char safe_stones[BOARDMAX]);
 
 void add_cut(int apos, int bpos, int move);
@@ -339,12 +339,12 @@ void find_connections(void);
 
 /* movelist.c */
 int movelist_move_known(int move, int max_points, int points[], int codes[]);
-void movelist_change_point(int move, int code, int max_points, 
-			   int points[], int codes[]);
+void movelist_change_point(int move, int code, int max_points,
+                           int points[], int codes[]);
 
 /* surround.c */
 int compute_surroundings(int pos, int apos, int showboard,
-			 int *surround_size);
+                         int *surround_size);
 int is_surrounded(int pos);
 int does_surround(int move, int dragon);
 void reset_surround_data(void);
@@ -393,9 +393,9 @@ void add_replacement_move(int from, int to, int color);
 #define ATTACK_STRING  1
 #define DEFEND_STRING  2
 void add_either_move(int pos, int reason1, int target1,
-		     int reason2, int target2);
+                     int reason2, int target2);
 void add_all_move(int pos, int reason1, int target1,
-		  int reason2, int target2);
+                  int reason2, int target2);
 
 int set_minimum_move_value(int pos, float value);
 void set_maximum_move_value(int pos, float value);
@@ -422,9 +422,9 @@ int get_defense_threats(int pos, int max_strings, int strings[]);
 void get_saved_worms(int pos, signed char saved[BOARDMAX]);
 void get_saved_dragons(int pos, signed char saved[BOARDMAX]);
 void mark_safe_stones(int color, int move_pos,
-		      const signed char saved_dragons[BOARDMAX],
-		      const signed char saved_worms[BOARDMAX],
-		      signed char safe_stones[BOARDMAX]);
+                      const signed char saved_dragons[BOARDMAX],
+                      const signed char saved_worms[BOARDMAX],
+                      signed char safe_stones[BOARDMAX]);
 
 
 int owl_lively(int pos);
@@ -443,23 +443,23 @@ void owl_reasons(int color);
 void unconditional_life(int unconditional_territory[BOARDMAX], int color);
 void clear_unconditionally_meaningless_moves(void);
 void find_unconditionally_meaningless_moves(int unconditional_territory[BOARDMAX],
-					    int color);
+        int color);
 int unconditionally_meaningless_move(int pos, int color,
-				     int *replacement_move);
+                                     int *replacement_move);
 void unconditional_move_reasons(int color);
 
 void find_superstring(int str, int *num_stones, int *stones);
 void find_superstring_conservative(int str, int *num_stones, int *stones);
 void find_superstring_liberties(int str, int *liberties, int *libs,
                                 int liberty_cap);
-void find_proper_superstring_liberties(int str, int *liberties, int *libs, 
+void find_proper_superstring_liberties(int str, int *liberties, int *libs,
                                        int liberty_cap);
 void find_superstring_stones_and_liberties(int str, int *num_stones,
-					   int *stones, int *liberties,
-					   int *libs, int liberty_cap);
+        int *stones, int *liberties,
+        int *libs, int liberty_cap);
 void superstring_chainlinks(int str, int *num_adj, int adj[MAXCHAIN],
                             int liberty_cap);
-void proper_superstring_chainlinks(int str, int *num_adj, 
+void proper_superstring_chainlinks(int str, int *num_adj,
                                    int adj[MAXCHAIN], int liberty_cap);
 
 int place_fixed_handicap(int handicap); /* place stones on board only */
@@ -478,24 +478,24 @@ void endgame_shapes(int color);
 
 void combinations(int color);
 int atari_atari(int color, int *attack_move,
-		signed char defense_moves[BOARDMAX],
-		int save_verbose);
+                signed char defense_moves[BOARDMAX],
+                int save_verbose);
 int atari_atari_confirm_safety(int color, int tpos, int *move, int minsize,
-			       const signed char saved_dragons[BOARDMAX],
-			       const signed char saved_worms[BOARDMAX]);
+                               const signed char saved_dragons[BOARDMAX],
+                               const signed char saved_worms[BOARDMAX]);
 
 int atari_atari_blunder_size(int color, int tpos,
-			     signed char defense_moves[BOARDMAX],
-			     const signed char safe_stones[BOARDMAX]);
+                             signed char defense_moves[BOARDMAX],
+                             const signed char safe_stones[BOARDMAX]);
 
 int review_move_reasons(int *move, float *value, int color,
-			float pure_threat_value, float our_score,
-			int allowed_moves[BOARDMAX],
-			int use_thrashing_dragon_heuristics);
+                        float pure_threat_value, float our_score,
+                        int allowed_moves[BOARDMAX],
+                        int use_thrashing_dragon_heuristics);
 void prepare_move_influence_debugging(int pos, int color);
 int fill_liberty(int *move, int color);
 int aftermath_genmove(int color, int do_capture_dead_stones,
-		      int allowed_moves[BOARDMAX]);
+                      int allowed_moves[BOARDMAX]);
 enum dragon_status aftermath_final_status(int color, int pos);
 
 int mc_get_size_of_pattern_values_table(void);
@@ -505,8 +505,8 @@ int choose_mc_patterns(char *name);
 void list_mc_patterns(void);
 
 void uct_genmove(int color, int *move, int *forbidden_moves,
-		 int *allowed_moves, int nodes, float *move_values,
-		 int *move_frequencies);
+                 int *allowed_moves, int nodes, float *move_values,
+                 int *move_frequencies);
 
 int owl_attack(int target, int *attack_point, int *certain, int *kworm);
 int owl_defend(int target, int *defense_point, int *certain, int *kworm);
@@ -517,14 +517,14 @@ int owl_confirm_safety(int move, int target, int *defense_point, int *kworm);
 int owl_does_attack(int move, int target, int *kworm);
 int owl_connection_defends(int move, int target1, int target2);
 int owl_substantial(int str);
-void owl_analyze_semeai(int apos, int bpos, 
-			int *resulta, int *resultb, int *semeai_move,
-			int *semeai_result_certain);
+void owl_analyze_semeai(int apos, int bpos,
+                        int *resulta, int *resultb, int *semeai_move,
+                        int *semeai_result_certain);
 void owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
-				   int *resulta, int *resultb,
-				   int *semeai_move,
-				   int *semeai_result_certain,
-				   int recompute_dragons);
+                                   int *resulta, int *resultb,
+                                   int *semeai_move,
+                                   int *semeai_result_certain,
+                                   int recompute_dragons);
 
 void set_limit_search(int value);
 void set_search_diamond(int pos);
@@ -556,7 +556,7 @@ int semeai_move_reason_known(int move, int dr);
 int does_attack(int move, int str);
 int does_defend(int move, int str);
 int double_atari(int move, int color, float *value,
-		 signed char safe_stones[BOARDMAX]);
+                 signed char safe_stones[BOARDMAX]);
 int playing_into_snapback(int move, int color);
 int play_attack_defend_n(int color, int do_attack, int num_moves, ...);
 int play_attack_defend2_n(int color, int do_attack, int num_moves, ...);
@@ -600,11 +600,11 @@ int test_symmetry_after_move(int move, int color, int strict);
 
 struct moyo_data
 {
-  int number; /* Number of moyos. */
-  int segmentation[BOARDMAX]; /* Numbers the moyos. */
-  int size[MAX_MOYOS];
-  int owner[MAX_MOYOS];
-  float territorial_value[MAX_MOYOS];
+    int number; /* Number of moyos. */
+    int segmentation[BOARDMAX]; /* Numbers the moyos. */
+    int size[MAX_MOYOS];
+    int owner[MAX_MOYOS];
+    float territorial_value[MAX_MOYOS];
 };
 
 /* We use a forward declaration of influence_data so that the rest
@@ -626,29 +626,29 @@ extern struct influence_data followup_influence;
 
 /* Influence functions. */
 void compute_influence(int color, const signed char safe_stones[BOARDMAX],
-		       const float strength[BOARDMAX],
-		       struct influence_data *q,
-		       int move, const char *trace_message);
+                       const float strength[BOARDMAX],
+                       struct influence_data *q,
+                       int move, const char *trace_message);
 void compute_followup_influence(const struct influence_data *base,
-			        struct influence_data *q, 
-		                int move, const char *trace_message);
+                                struct influence_data *q,
+                                int move, const char *trace_message);
 void compute_escape_influence(int color,
-			      const signed char safe_stones[BOARDMAX],
-			      const signed char goal[BOARDMAX],
-			      const float strength[BOARDMAX],
+                              const signed char safe_stones[BOARDMAX],
+                              const signed char goal[BOARDMAX],
+                              const float strength[BOARDMAX],
                               signed char escape_value[BOARDMAX]);
 
 float influence_delta_territory(const struct influence_data *base,
-	                        const struct influence_data *q, int color,
-				int move);
+                                const struct influence_data *q, int color,
+                                int move);
 int retrieve_delta_territory_cache(int pos, int color, float *move_value,
-			           float *followup_value,
-				   const struct influence_data *base,
-				   Hash_data safety_hash);
+                                   float *followup_value,
+                                   const struct influence_data *base,
+                                   Hash_data safety_hash);
 void store_delta_territory_cache(int pos, int color, float move_value,
-				 float followup_value,
-				 const struct influence_data *base,
-			         Hash_data safety_hash);
+                                 float followup_value,
+                                 const struct influence_data *base,
+                                 Hash_data safety_hash);
 
 int whose_territory(const struct influence_data *q, int pos);
 int whose_moyo(const struct influence_data *q, int pos);
@@ -656,19 +656,19 @@ int whose_moyo_restricted(const struct influence_data *q, int pos);
 int whose_area(const struct influence_data *q, int pos);
 float influence_territory(const struct influence_data *q, int pos, int color);
 void influence_get_territory_segmentation(struct influence_data *q,
-	       			          struct moyo_data *moyo);
+        struct moyo_data *moyo);
 void get_influence(const struct influence_data *q,
-		   float white_influence[BOARDMAX],
-		   float black_influence[BOARDMAX],
-		   float white_strength[BOARDMAX],
-		   float black_strength[BOARDMAX],
-		   float white_attenuation[BOARDMAX], 
-		   float black_attenuation[BOARDMAX],
-		   float white_permeability[BOARDMAX],
-		   float black_permeability[BOARDMAX],
-		   float territory_value[BOARDMAX],
-		   int influence_regions[BOARDMAX],
-		   int non_territory[BOARDMAX]);
+                   float white_influence[BOARDMAX],
+                   float black_influence[BOARDMAX],
+                   float white_strength[BOARDMAX],
+                   float black_strength[BOARDMAX],
+                   float white_attenuation[BOARDMAX],
+                   float black_attenuation[BOARDMAX],
+                   float white_permeability[BOARDMAX],
+                   float black_permeability[BOARDMAX],
+                   float territory_value[BOARDMAX],
+                   int influence_regions[BOARDMAX],
+                   int non_territory[BOARDMAX]);
 float influence_score(const struct influence_data *q, int chinese_rules);
 float game_status(int color);
 void influence_mark_non_territory(int pos, int color);
@@ -676,7 +676,7 @@ int influence_considered_lively(const struct influence_data *q, int pos);
 void influence_erase_territory(struct influence_data *q, int pos, int color);
 
 void break_territories(int color_to_move, struct influence_data *q,
-		       int store, int pos);
+                       int store, int pos);
 void clear_break_in_list(void);
 void break_in_move_reasons(int color);
 
@@ -689,8 +689,8 @@ int is_marginal_eye_space(int pos);
 int max_eye_value(int pos);
 void test_eyeshape(int eyesize, int *eye_vertices);
 int analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
-		     char *analyzed_eyegraph, int outer_liberties,
-		     int ko_threats);
+                     char *analyzed_eyegraph, int outer_liberties,
+                     int ko_threats);
 
 
 /* debugging support */
@@ -794,20 +794,20 @@ extern double total_time;
 
 
 struct eyevalue {
-  unsigned char a; /* number of eyes if attacker plays first twice */
-  unsigned char b; /* number of eyes if attacker plays first */
-  unsigned char c; /* number of eyes if defender plays first */
-  unsigned char d; /* number of eyes if defender plays first twice */
+    unsigned char a; /* number of eyes if attacker plays first twice */
+    unsigned char b; /* number of eyes if attacker plays first */
+    unsigned char c; /* number of eyes if defender plays first */
+    unsigned char d; /* number of eyes if defender plays first twice */
 };
 
 
 struct half_eye_data {
-  float value;          /* Topological eye value. */
-  unsigned char type;   /* HALF_EYE or FALSE_EYE; */
-  int num_attacks;      /* number of attacking points */
-  int attack_point[4];  /* the moves to attack a topological halfeye */
-  int num_defenses;     /* number of defending points */
-  int defense_point[4]; /* the moves to defend a topological halfeye */
+    float value;          /* Topological eye value. */
+    unsigned char type;   /* HALF_EYE or FALSE_EYE; */
+    int num_attacks;      /* number of attacking points */
+    int attack_point[4];  /* the moves to attack a topological halfeye */
+    int num_defenses;     /* number of defending points */
+    int defense_point[4]; /* the moves to defend a topological halfeye */
 };
 
 /* array of half-eye data */
@@ -820,40 +820,40 @@ extern struct half_eye_data half_eye[BOARDMAX];
 #define MAX_TACTICAL_POINTS 10
 
 struct worm_data {
-  int color;         /* its color */
-  int size;          /* its cardinality */
-  float effective_size; /* stones and surrounding spaces */
-  int origin;        /* the origin of the string. Two vertices are in */
-                     /* the same worm iff they have same origin. */
-  int liberties;     /* number of liberties */
-  int liberties2;    /* number of second order liberties */
-  int liberties3;    /* third order liberties (empty vertices at distance 3) */
-  int liberties4;    /* fourth order liberties */
-  int lunch;         /* if lunch != 0 then lunch points to a boundary */
-                     /* worm which can be captured easily. */
-  int cutstone;      /* 1=potential cutting stone; 2=cutting stone */
-  int cutstone2;     /* Number of potential cuts involving the worm. */
-  int genus;         /* number of connected components of the complement, less one */
-  int inessential;   /* 1=inessential worm */
-  int invincible;    /* 1=strongly unconditionally non-capturable */
-  enum dragon_status unconditional_status; /* ALIVE, DEAD, WHITE_TERRITORY,
+    int color;         /* its color */
+    int size;          /* its cardinality */
+    float effective_size; /* stones and surrounding spaces */
+    int origin;        /* the origin of the string. Two vertices are in */
+    /* the same worm iff they have same origin. */
+    int liberties;     /* number of liberties */
+    int liberties2;    /* number of second order liberties */
+    int liberties3;    /* third order liberties (empty vertices at distance 3) */
+    int liberties4;    /* fourth order liberties */
+    int lunch;         /* if lunch != 0 then lunch points to a boundary */
+    /* worm which can be captured easily. */
+    int cutstone;      /* 1=potential cutting stone; 2=cutting stone */
+    int cutstone2;     /* Number of potential cuts involving the worm. */
+    int genus;         /* number of connected components of the complement, less one */
+    int inessential;   /* 1=inessential worm */
+    int invincible;    /* 1=strongly unconditionally non-capturable */
+    enum dragon_status unconditional_status; /* ALIVE, DEAD, WHITE_TERRITORY,
 					      BLACK_TERRITORY, UNKNOWN */
 
-  /* The following arrays keeps track of up to MAX_TACTICAL_POINTS
-   * different attack, defense, attack threat, and defense threat
-   * points with corresponding result codes. (0 = loss, 1 = bad ko, 2
-   * = good ko, 3 = win). The arrays are guaranteed to be sorted with
-   * respect to the codes so that the first element contains the best
-   * result.
-   */
-  int attack_points[MAX_TACTICAL_POINTS];
-  int attack_codes[MAX_TACTICAL_POINTS];
-  int defense_points[MAX_TACTICAL_POINTS];
-  int defense_codes[MAX_TACTICAL_POINTS];
-  int attack_threat_points[MAX_TACTICAL_POINTS];
-  int attack_threat_codes[MAX_TACTICAL_POINTS]; 
-  int defense_threat_points[MAX_TACTICAL_POINTS];
-  int defense_threat_codes[MAX_TACTICAL_POINTS];
+    /* The following arrays keeps track of up to MAX_TACTICAL_POINTS
+     * different attack, defense, attack threat, and defense threat
+     * points with corresponding result codes. (0 = loss, 1 = bad ko, 2
+     * = good ko, 3 = win). The arrays are guaranteed to be sorted with
+     * respect to the codes so that the first element contains the best
+     * result.
+     */
+    int attack_points[MAX_TACTICAL_POINTS];
+    int attack_codes[MAX_TACTICAL_POINTS];
+    int defense_points[MAX_TACTICAL_POINTS];
+    int defense_codes[MAX_TACTICAL_POINTS];
+    int attack_threat_points[MAX_TACTICAL_POINTS];
+    int attack_threat_codes[MAX_TACTICAL_POINTS];
+    int defense_threat_points[MAX_TACTICAL_POINTS];
+    int defense_threat_codes[MAX_TACTICAL_POINTS];
 };
 
 extern struct worm_data worm[BOARDMAX];
@@ -867,8 +867,8 @@ int meaningless_white_moves[BOARDMAX];
 #define MAX_SURROUND 10
 
 struct surround_data {
-  int dragon_number;                  /* number of the (surrounded) beast */
-  signed char surround_map[BOARDMAX]; /* surround map                     */
+    int dragon_number;                  /* number of the (surrounded) beast */
+    signed char surround_map[BOARDMAX]; /* surround map                     */
 };
 
 extern struct surround_data surroundings[MAX_SURROUND];
@@ -879,14 +879,14 @@ extern int surround_pointer;
  */
 
 struct dragon_data {
-  int color;    /* its color                                                 */
-  int id;       /* the index into the dragon2 array                          */
-  int origin;   /* the origin of the dragon. Two vertices are in the same    */
-                /* dragon iff they have same origin.                         */
-  int size;     /* size of the dragon                                        */
-  float effective_size; /* stones and surrounding spaces                     */
-  enum dragon_status crude_status; /* (ALIVE, DEAD, UNKNOWN, CRITICAL)       */
-  enum dragon_status status;       /* best trusted status                    */
+    int color;    /* its color                                                 */
+    int id;       /* the index into the dragon2 array                          */
+    int origin;   /* the origin of the dragon. Two vertices are in the same    */
+    /* dragon iff they have same origin.                         */
+    int size;     /* size of the dragon                                        */
+    float effective_size; /* stones and surrounding spaces                     */
+    enum dragon_status crude_status; /* (ALIVE, DEAD, UNKNOWN, CRITICAL)       */
+    enum dragon_status status;       /* best trusted status                    */
 };
 
 extern struct dragon_data dragon[BOARDMAX];
@@ -898,47 +898,47 @@ extern struct dragon_data dragon[BOARDMAX];
 #define MAX_NEIGHBOR_DRAGONS 10
 
 struct dragon_data2 {
-  int origin;                         /* the origin of the dragon            */
-  int adjacent[MAX_NEIGHBOR_DRAGONS]; /* adjacent dragons                    */
-  int neighbors;                      /* number of adjacent dragons          */
-  int hostile_neighbors;              /* neighbors of opposite color         */
+    int origin;                         /* the origin of the dragon            */
+    int adjacent[MAX_NEIGHBOR_DRAGONS]; /* adjacent dragons                    */
+    int neighbors;                      /* number of adjacent dragons          */
+    int hostile_neighbors;              /* neighbors of opposite color         */
 
-  int moyo_size;		      /* size of surrounding influence moyo, */
-  float moyo_territorial_value;       /* ...and its territorial value        */
-  enum dragon_status safety;          /* a more detailed status estimate     */
-  float weakness;           /* a continuous estimate of the dragon's safety  */
-  float weakness_pre_owl;   /* dragon safety based on pre-owl computations   */
-  float strategic_size; /* An effective size including weakness of neighbors */
-  int escape_route;         /* a measurement of likelihood of escape         */
-  struct eyevalue genus;    /* the number of eyes (approximately)            */
-  int heye;     /* coordinates of a half eye                                 */
-  int lunch;    /* if lunch != 0 then lunch points to a boundary worm which  */
-                /* can be captured easily.                                   */
-  int surround_status;         /* Is it surrounded?                          */
-  int surround_size;           /* Size of the surrounding area               */
+    int moyo_size;		      /* size of surrounding influence moyo, */
+    float moyo_territorial_value;       /* ...and its territorial value        */
+    enum dragon_status safety;          /* a more detailed status estimate     */
+    float weakness;           /* a continuous estimate of the dragon's safety  */
+    float weakness_pre_owl;   /* dragon safety based on pre-owl computations   */
+    float strategic_size; /* An effective size including weakness of neighbors */
+    int escape_route;         /* a measurement of likelihood of escape         */
+    struct eyevalue genus;    /* the number of eyes (approximately)            */
+    int heye;     /* coordinates of a half eye                                 */
+    int lunch;    /* if lunch != 0 then lunch points to a boundary worm which  */
+    /* can be captured easily.                                   */
+    int surround_status;         /* Is it surrounded?                          */
+    int surround_size;           /* Size of the surrounding area               */
 
-  int semeais;         /* number of semeais in which the dragon is involved  */
-  int semeai_defense_code ;/* Result code for semeai defense.                */
-  int semeai_defense_point;/* Move found by semeai code to rescue dragon     */
-  int semeai_defense_certain;
-  int semeai_defense_target; /* The opponent dragon involved in the semeai   */
-  int semeai_attack_code ; /* Result code for semeai attack.                 */
-  int semeai_attack_point; /* Move found by semeai code to kill dragon       */
-  int semeai_attack_certain;
-  int semeai_attack_target; /* The opponent dragon involved in the semeai    */
-  enum dragon_status owl_threat_status; /* CAN_THREATEN_ATTACK/DEFENSE       */
-  enum dragon_status owl_status; /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
-  int owl_attack_point;    /* vital point for attack                         */
-  int owl_attack_code;     /* ko result code                                 */
-  int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
-  int owl_attack_node_count;
-  int owl_second_attack_point;/* if attacker gets both attack points, wins   */
-  int owl_defense_point;   /* vital point for defense                        */
-  int owl_defense_code;    /* ko result code                                 */
-  int owl_defense_certain; /* 0 if owl reading node limit is reached         */
-  int owl_second_defense_point;/* if defender gets both attack points, wins  */
-  int owl_attack_kworm;    /* only valid when owl_attack_code is GAIN        */
-  int owl_defense_kworm;   /* only valid when owl_defense_code is LOSS       */
+    int semeais;         /* number of semeais in which the dragon is involved  */
+    int semeai_defense_code ;/* Result code for semeai defense.                */
+    int semeai_defense_point;/* Move found by semeai code to rescue dragon     */
+    int semeai_defense_certain;
+    int semeai_defense_target; /* The opponent dragon involved in the semeai   */
+    int semeai_attack_code ; /* Result code for semeai attack.                 */
+    int semeai_attack_point; /* Move found by semeai code to kill dragon       */
+    int semeai_attack_certain;
+    int semeai_attack_target; /* The opponent dragon involved in the semeai    */
+    enum dragon_status owl_threat_status; /* CAN_THREATEN_ATTACK/DEFENSE       */
+    enum dragon_status owl_status; /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
+    int owl_attack_point;    /* vital point for attack                         */
+    int owl_attack_code;     /* ko result code                                 */
+    int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
+    int owl_attack_node_count;
+    int owl_second_attack_point;/* if attacker gets both attack points, wins   */
+    int owl_defense_point;   /* vital point for defense                        */
+    int owl_defense_code;    /* ko result code                                 */
+    int owl_defense_certain; /* 0 if owl reading node limit is reached         */
+    int owl_second_defense_point;/* if defender gets both attack points, wins  */
+    int owl_attack_kworm;    /* only valid when owl_attack_code is GAIN        */
+    int owl_defense_kworm;   /* only valid when owl_defense_code is LOSS       */
 };
 
 /* dragon2 is dynamically allocated */
@@ -970,40 +970,40 @@ extern float attack_dragon_weight;
 extern float followup_weight;
 
 struct aftermath_data {
-  int white_captured;
-  int black_captured;
-  int white_prisoners;
-  int black_prisoners;
-  int white_territory;
-  int black_territory;
-  int white_area;
-  int black_area;
-  int white_control[BOARDMAX];
-  int black_control[BOARDMAX];
-  enum dragon_status final_status[BOARDMAX];
+    int white_captured;
+    int black_captured;
+    int white_prisoners;
+    int black_prisoners;
+    int white_territory;
+    int black_territory;
+    int white_area;
+    int black_area;
+    int white_control[BOARDMAX];
+    int black_control[BOARDMAX];
+    enum dragon_status final_status[BOARDMAX];
 };
 
 #define MAX_EYE_ATTACKS 3
 
 struct eye_data {
-  int color;             /* BLACK, WHITE, or GRAY                     */
-  int esize;             /* size of the eyespace                      */
-  int msize;             /* number of marginal vertices               */
-  int origin;            /* The origin                                */
-  struct eyevalue value; /* Number of eyes.                           */
+    int color;             /* BLACK, WHITE, or GRAY                     */
+    int esize;             /* size of the eyespace                      */
+    int msize;             /* number of marginal vertices               */
+    int origin;            /* The origin                                */
+    struct eyevalue value; /* Number of eyes.                           */
 
-  /* The above fields are constant on the whole eyespace.             */
-  /* ---------------------------------------------------------------- */
-  /* The below fields are not.                                        */
+    /* The above fields are constant on the whole eyespace.             */
+    /* ---------------------------------------------------------------- */
+    /* The below fields are not.                                        */
 
-  unsigned char marginal;             /* This vertex is marginal               */
-  unsigned char neighbors;            /* number of neighbors in eyespace       */
-  unsigned char marginal_neighbors;   /* number of marginal neighbors          */
+    unsigned char marginal;             /* This vertex is marginal               */
+    unsigned char neighbors;            /* number of neighbors in eyespace       */
+    unsigned char marginal_neighbors;   /* number of marginal neighbors          */
 };
 
 struct vital_eye_points {
-  int attack_points[MAX_EYE_ATTACKS];
-  int defense_points[MAX_EYE_ATTACKS];
+    int attack_points[MAX_EYE_ATTACKS];
+    int defense_points[MAX_EYE_ATTACKS];
 };
 
 extern struct vital_eye_points black_vital_points[BOARDMAX];
@@ -1026,23 +1026,23 @@ void compute_eyes(int pos, struct eyevalue *value,
                   int *attack_point, int *defense_point,
                   struct eye_data eye[BOARDMAX],
                   struct half_eye_data heye[BOARDMAX],
-		  int add_moves);
+                  int add_moves);
 void compute_eyes_pessimistic(int pos, struct eyevalue *value,
                               int *pessimistic_min,
                               int *attack_point, int *defense_point,
                               struct eye_data eye[BOARDMAX],
                               struct half_eye_data heye[BOARDMAX],
-			      int eyefilling_points[BOARDMAX]);
+                              int eyefilling_points[BOARDMAX]);
 void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
 int find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
-		     int dragons[], int max_dragons);
+                     int dragons[], int max_dragons);
 void make_domains(struct eye_data b_eye[BOARDMAX],
                   struct eye_data w_eye[BOARDMAX],
-		  int owl_call);
+                  int owl_call);
 void partition_eyespaces(struct eye_data eye[BOARDMAX], int color);
 void find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
-			      struct half_eye_data heye[BOARDMAX],
-			      int find_mask[BOARDMAX]);
+                              struct half_eye_data heye[BOARDMAX],
+                              int find_mask[BOARDMAX]);
 
 void set_eyevalue(struct eyevalue *e, int a, int b, int c, int d);
 int min_eye_threat(struct eyevalue *e);
@@ -1050,7 +1050,7 @@ int min_eyes(struct eyevalue *e);
 int max_eyes(struct eyevalue *e);
 int max_eye_threat(struct eyevalue *e);
 void add_eyevalues(struct eyevalue *e1, struct eyevalue *e2,
-		   struct eyevalue *sum);
+                   struct eyevalue *sum);
 int eye_move_urgency(struct eyevalue *e);
 char *eyevalue_to_string(struct eyevalue *e);
 

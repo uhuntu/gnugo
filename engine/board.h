@@ -85,9 +85,9 @@ typedef unsigned char Intersection;
  */
 #define MAX_STRINGS (4 * MAX_BOARD * MAX_BOARD / 5)
 
-/* Per gf: Unconditional_life() can get very close to filling the 
- * entire board under certain circumstances. This was discussed in 
- * the list around August 21, 2001, in a thread with the subject 
+/* Per gf: Unconditional_life() can get very close to filling the
+ * entire board under certain circumstances. This was discussed in
+ * the list around August 21, 2001, in a thread with the subject
  * "gnugo bug logs".
  */
 #define MAXSTACK  MAX_BOARD * MAX_BOARD
@@ -111,14 +111,14 @@ typedef unsigned char Intersection;
 
 /* Colors and komaster states. */
 enum colors {
-  EMPTY,
-  WHITE,
-  BLACK,
-  GRAY,
-  GRAY_WHITE,
-  GRAY_BLACK,
-  WEAK_KO,
-  NUM_KOMASTER_STATES
+    EMPTY,
+    WHITE,
+    BLACK,
+    GRAY,
+    GRAY_WHITE,
+    GRAY_BLACK,
+    WEAK_KO,
+    NUM_KOMASTER_STATES
 };
 
 #define COLOR_NAMES \
@@ -202,21 +202,21 @@ extern int          move_history_pointer;
 extern float        komi;
 extern int          handicap;     /* used internally in chinese scoring */
 extern int          movenum;      /* movenumber - used for debug output */
-		    
+
 extern signed char  shadow[BOARDMAX];      /* reading tree shadow */
 
 enum suicide_rules {
-  FORBIDDEN,
-  ALLOWED,
-  ALL_ALLOWED
+    FORBIDDEN,
+    ALLOWED,
+    ALL_ALLOWED
 };
 extern enum suicide_rules suicide_rule;
 
 enum ko_rules {
-  SIMPLE,
-  NONE,
-  PSK,
-  SSK
+    SIMPLE,
+    NONE,
+    PSK,
+    SSK
 };
 extern enum ko_rules ko_rule;
 
@@ -228,25 +228,25 @@ extern SGFTree *sgf_dumptree;
 
 /* This struct holds the internal board state. */
 struct board_state {
-  int board_size;
+    int board_size;
 
-  Intersection board[BOARDSIZE];
-  int board_ko_pos;
-  int black_captured;
-  int white_captured;
+    Intersection board[BOARDSIZE];
+    int board_ko_pos;
+    int black_captured;
+    int white_captured;
 
-  Intersection initial_board[BOARDSIZE];
-  int initial_board_ko_pos;
-  int initial_white_captured;
-  int initial_black_captured;
-  int move_history_color[MAX_MOVE_HISTORY];
-  int move_history_pos[MAX_MOVE_HISTORY];
-  Hash_data move_history_hash[MAX_MOVE_HISTORY];
-  int move_history_pointer;
+    Intersection initial_board[BOARDSIZE];
+    int initial_board_ko_pos;
+    int initial_white_captured;
+    int initial_black_captured;
+    int move_history_color[MAX_MOVE_HISTORY];
+    int move_history_pos[MAX_MOVE_HISTORY];
+    Hash_data move_history_hash[MAX_MOVE_HISTORY];
+    int move_history_pointer;
 
-  float komi;
-  int handicap;
-  int move_number;
+    float komi;
+    int handicap;
+    int move_number;
 };
 
 /* This is increased by one anytime a move is (permanently) played or
@@ -283,8 +283,8 @@ int trymove(int pos, int color, const char *message, int str);
 int tryko(int pos, int color, const char *message);
 void popgo(void);
 int komaster_trymove(int pos, int color,
-		     const char *message, int str,
-		     int *is_conditional_ko, int consider_conditional_ko);
+                     const char *message, int str,
+                     int *is_conditional_ko, int consider_conditional_ko);
 int get_komaster(void);
 int get_kom_pos(void);
 
@@ -350,15 +350,15 @@ int send_two_return_one(int move, int color);
 
 /* Special function for reading.c */
 void incremental_order_moves(int move, int color, int string,
-			     int *number_edges, int *number_same_string,
-			     int *number_own, int *number_opponent,
-			     int *captured_stones, int *threatened_stones,
-			     int *saved_stones, int *number_open);
+                             int *number_edges, int *number_same_string,
+                             int *number_own, int *number_opponent,
+                             int *captured_stones, int *threatened_stones,
+                             int *saved_stones, int *number_open);
 
 /* Board caches initialization functions. */
 void clear_approxlib_cache(void);
 void clear_accuratelib_cache(void);
-  
+
 
 /* Is this point inside the board? */
 #if 0
@@ -405,11 +405,11 @@ void sgffile_enddump(const char *filename);
 
 /* Hashing and Caching statistics. */
 struct stats_data {
-  int nodes;                     /* Number of visited nodes while reading */
-  int read_result_entered;       /* Number of read results entered. */
-  int read_result_hits;          /* Number of hits of read results. */
-  int trusted_read_result_hits;  /* Number of hits of read results   */
-                                 /* with sufficient remaining depth. */
+    int nodes;                     /* Number of visited nodes while reading */
+    int read_result_entered;       /* Number of read results entered. */
+    int read_result_hits;          /* Number of hits of read results. */
+    int trusted_read_result_hits;  /* Number of hits of read results   */
+    /* with sufficient remaining depth. */
 };
 
 extern struct stats_data stats;
@@ -421,7 +421,7 @@ void vgprintf(FILE *outputfile, const char *fmt, va_list ap);
 void mprintf(const char *fmt, ...);
 void gfprintf(FILE *outfile, const char *fmt, ...);
 
-const char *color_to_string(int color); 
+const char *color_to_string(int color);
 const char *location_to_string(int pos);
 void location_to_buffer(int pos, char *buf);
 
@@ -442,9 +442,9 @@ void mark_goal_in_sgf(signed char goal[BOARDMAX]);
  */
 void abortgo(const char *file, int line, const char *msg, int pos)
 #ifdef __GNUC__
-	__attribute__ ((noreturn))
+__attribute__ ((noreturn))
 #endif
-	;
+;
 
 #ifdef GG_TURN_OFF_ASSERTS
 #define ASSERT2(x, i, j)

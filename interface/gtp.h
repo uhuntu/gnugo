@@ -64,15 +64,15 @@ typedef void (*gtp_transform_ptr)(int ai, int aj, int *bi, int *bj);
 
 /* Elements in the array of commands required by gtp_main_loop. */
 struct gtp_command {
-  const char *name;
-  gtp_fn_ptr function;
+    const char *name;
+    gtp_fn_ptr function;
 };
 
 void gtp_main_loop(struct gtp_command commands[],
-		   FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands);
+                   FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands);
 void gtp_internal_set_boardsize(int size);
 void gtp_set_vertex_transform_hooks(gtp_transform_ptr in,
-				    gtp_transform_ptr out);
+                                    gtp_transform_ptr out);
 void gtp_mprintf(const char *format, ...);
 void gtp_printf(const char *format, ...);
 void gtp_start_response(int status);

@@ -87,49 +87,49 @@
 #define HUGE_MOVE_VALUE 10.0*MAX_BOARD*MAX_BOARD
 
 struct move_reason {
-  int type;   /* e.g. attack, defend, or connect */
-  int what;   /* pointer into list of strings, list of pair of dragons,
+    int type;   /* e.g. attack, defend, or connect */
+    int what;   /* pointer into list of strings, list of pair of dragons,
 		 or similar */
-  int status; /* This is a bitmap to mark redundant or secondary
+    int status; /* This is a bitmap to mark redundant or secondary
                  move reasons. */
 };
 
 struct move_data {
-  float value;    /* total comparison value, computed at the very end */
-  float final_value; /* value after point redistribution. */
-  float additional_ko_value; /* Additional threat value if ko fight going on.*/
+    float value;    /* total comparison value, computed at the very end */
+    float final_value; /* value after point redistribution. */
+    float additional_ko_value; /* Additional threat value if ko fight going on.*/
 
-  float territorial_value; /* Value in terms of actual profit. */
-  float strategical_value; /* Value with respect to strength, weakness, and
+    float territorial_value; /* Value in terms of actual profit. */
+    float strategical_value; /* Value with respect to strength, weakness, and
 			      safety of all groups on the board. */
 
-  float maxpos_shape;      /* Maximal positive contribution to shape */
-  float maxneg_shape;      /* Maximal negative contribution to shape */
-  int numpos_shape;        /* Number of positive contributions to shape */
-  int numneg_shape;        /* Number of negative contributions to shape */
+    float maxpos_shape;      /* Maximal positive contribution to shape */
+    float maxneg_shape;      /* Maximal negative contribution to shape */
+    int numpos_shape;        /* Number of positive contributions to shape */
+    int numneg_shape;        /* Number of negative contributions to shape */
 
-  float followup_value;    /* Value of followup move (our sente). */
-  float influence_followup_value;  /* Followup value of move as reported by
+    float followup_value;    /* Value of followup move (our sente). */
+    float influence_followup_value;  /* Followup value of move as reported by
                                       experimental influence. */
-  float reverse_followup_value;	/* Value of opponents followup move
+    float reverse_followup_value;	/* Value of opponents followup move
 				   (reverse sente). */
-  float secondary_value;      /* Secondary move value. */
-  float min_value;            /* Minimum allowed value for the move. */
-  float max_value;            /* Maximum allowed value for the move. */
-  float min_territory;        /* Minimum territorial value. */
-  float max_territory;        /* Maximum territorial value. */
-  float randomness_scaling;   /* Increase to randomize this move. */
+    float secondary_value;      /* Secondary move value. */
+    float min_value;            /* Minimum allowed value for the move. */
+    float max_value;            /* Maximum allowed value for the move. */
+    float min_territory;        /* Minimum territorial value. */
+    float max_territory;        /* Maximum territorial value. */
+    float randomness_scaling;   /* Increase to randomize this move. */
 
-  int reason[MAX_REASONS]; /* List of reasons for a move. */
-  int move_safety;         /* Whether the move seems safe. */
-  int worthwhile_threat;   /* Play this move as a pure threat. */
-  float random_number;     /* Random number connected to this move. */
+    int reason[MAX_REASONS]; /* List of reasons for a move. */
+    int move_safety;         /* Whether the move seems safe. */
+    int worthwhile_threat;   /* Play this move as a pure threat. */
+    float random_number;     /* Random number connected to this move. */
 };
 
 
 
 /*
- * Some sizes.  
+ * Some sizes.
  *
  * FIXME: Many of these could be optimized more for size (e.g. MAX_EYES)
  */
@@ -160,10 +160,10 @@ extern int semeai_target2[MAX_POTENTIAL_SEMEAI];
 
 /* Unordered sets (currently pairs) of move reasons / targets */
 typedef struct {
-  int reason1;
-  int what1;
-  int reason2;
-  int what2;
+    int reason1;
+    int what1;
+    int reason2;
+    int what2;
 } Reason_set;
 extern Reason_set either_data[MAX_EITHER];
 extern int        next_either;
@@ -188,7 +188,7 @@ extern int current_color;
 
 int find_worm(int str);
 int find_dragon(int str);
-   
+
 int move_reason_known(int pos, int type, int what);
 int attack_move_reason_known(int pos, int what);
 int defense_move_reason_known(int pos, int what);
@@ -202,11 +202,11 @@ int is_antisuji_move(int pos);
 void discard_redundant_move_reasons(int pos);
 
 void mark_changed_dragon(int pos, int color, int affected, int affected2,
-			 int move_reason_type,
-			 signed char safe_stones[BOARDMAX],
-			 float strength[BOARDMAX], float *effective_size);
+                         int move_reason_type,
+                         signed char safe_stones[BOARDMAX],
+                         float strength[BOARDMAX], float *effective_size);
 void mark_changed_string(int affected, signed char changed_stones[BOARDMAX],
-			 float strength[BOARDMAX], signed char new_status);
+                         float strength[BOARDMAX], signed char new_status);
 int adjacent_to_nondead_stone(int pos, int color);
 
 int find_connection(int worm1, int worm2);

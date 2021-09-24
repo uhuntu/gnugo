@@ -48,34 +48,34 @@ typedef unsigned short Intersection_t;
 /* Attribute list. */
 typedef struct attrib
 {
-  int val;
-  int next;
+    int val;
+    int next;
 } attrib_t;
 
 
 /* DFA state. */
 typedef struct state
 {
-  int att;
-  int next[4];
+    int att;
+    int next[4];
 } state_t;
 
 
 /* DFA. */
 typedef struct dfa
 {
-  /* File header. */
-  char name[80];
+    /* File header. */
+    char name[80];
 
-  /* Transition graph. */
-  state_t *states;
-  int max_states;
-  int last_state;
+    /* Transition graph. */
+    state_t *states;
+    int max_states;
+    int last_state;
 
-  /* Attributes sets. */
-  attrib_t *indexes;
-  int max_indexes;
-  int last_index;
+    /* Attributes sets. */
+    attrib_t *indexes;
+    int max_indexes;
+    int last_index;
 } dfa_t;
 
 
@@ -104,7 +104,7 @@ struct pattern;
 
 /* Conversion between a GNU Go pattern struct into a DFA string. */
 void pattern_2_string(struct pattern *pat, struct patval_b *elements,
-		      char *str, int ci, int cj);
+                      char *str, int ci, int cj);
 void dfa_rotate_string(char *strrot, const char *str, int ll);
 
 /* Add a string with attribute `att_val' into a DFA. */
@@ -133,37 +133,37 @@ typedef struct _dfa_node_block	 dfa_node_block;
 typedef struct _dfa_graph	 dfa_graph;
 
 struct _dfa_attrib {
-  dfa_attrib	   *next;
-  int		    string_index;
+    dfa_attrib	   *next;
+    int		    string_index;
 };
 
 struct _dfa_attrib_block {
-  dfa_attrib_block *previous;
-  dfa_attrib	    attrib[DFA_ATTRIB_BLOCK_SIZE];
+    dfa_attrib_block *previous;
+    dfa_attrib	    attrib[DFA_ATTRIB_BLOCK_SIZE];
 };
 
 struct _dfa_attrib_array {
-  dfa_attrib_block *last_block;
-  int		    allocated;
+    dfa_attrib_block *last_block;
+    int		    allocated;
 };
 
 struct _dfa_node {
-  dfa_node	   *branch[4];
-  dfa_attrib	   *attributes;
-  dfa_attrib	   *passing_strings;
+    dfa_node	   *branch[4];
+    dfa_attrib	   *attributes;
+    dfa_attrib	   *passing_strings;
 };
 
 struct _dfa_node_block {
-  dfa_node_block   *previous;
-  dfa_node	    node[DFA_NODE_BLOCK_SIZE];
+    dfa_node_block   *previous;
+    dfa_node	    node[DFA_NODE_BLOCK_SIZE];
 };
 
 struct _dfa_graph {
-  int		    num_nodes;
-  dfa_node	   *root;
-  dfa_node_block   *last_block;
-  int		    allocated;
-  dfa_attrib_array  attributes;
+    int		    num_nodes;
+    dfa_node	   *root;
+    dfa_node_block   *last_block;
+    int		    allocated;
+    dfa_attrib_array  attributes;
 };
 
 
@@ -178,14 +178,14 @@ typedef struct _dfa_hash_entry	 dfa_hash_entry;
 typedef struct _dfa_hash_block	 dfa_hash_block;
 
 struct _dfa_hash_entry {
-  dfa_hash_entry   *next;
-  dfa_attrib	   *key;
-  dfa_node	   *value;
+    dfa_hash_entry   *next;
+    dfa_attrib	   *key;
+    dfa_node	   *value;
 };
 
 struct _dfa_hash_block {
-  dfa_hash_block   *previous;
-  dfa_hash_entry    entry[DFA_HASH_BLOCK_SIZE];
+    dfa_hash_block   *previous;
+    dfa_hash_entry    entry[DFA_HASH_BLOCK_SIZE];
 };
 
 
@@ -193,28 +193,28 @@ typedef struct _dfa_pattern	 dfa_pattern;
 typedef struct _dfa_patterns	 dfa_patterns;
 
 struct _dfa_pattern {
-  dfa_pattern	   *next;
-  int		    num_variations;
-  int		    current_variation;
-  char		   *variation[8];
+    dfa_pattern	   *next;
+    int		    num_variations;
+    int		    current_variation;
+    char		   *variation[8];
 };
 
 struct _dfa_patterns {
-  int		    num_patterns;
-  dfa_pattern	   *patterns;
-  dfa_pattern	   *last_pattern;
-  dfa_graph	    graph;
+    int		    num_patterns;
+    dfa_pattern	   *patterns;
+    dfa_pattern	   *last_pattern;
+    dfa_graph	    graph;
 };
 
 
 void dfa_graph_reset(dfa_graph *graph);
-     
+
 void dfa_patterns_reset(dfa_patterns *patterns);
 void dfa_patterns_clear(dfa_patterns *patterns);
 void dfa_patterns_add_pattern(dfa_patterns *patterns,
-			      const char *string, int index);
+                              const char *string, int index);
 void dfa_patterns_set_last_pattern_variation(dfa_patterns *patterns,
-					     int variation);
+        int variation);
 void dfa_patterns_select_shortest_variation(dfa_patterns *patterns);
 void dfa_patterns_build_graph(dfa_patterns *patterns);
 int *dfa_patterns_optimize_variations(dfa_patterns *patterns, int iterations);

@@ -45,8 +45,8 @@
 
 /* Internal state of the random number generator. */
 struct gg_rand_state {
-  unsigned int x[25];   /* Internal state. */
-  int k;                /* Word counter. */
+    unsigned int x[25];   /* Internal state. */
+    int k;                /* Word counter. */
 };
 
 /* Seed the random number generator. If an unsigned int is larger than

@@ -35,7 +35,7 @@
 /*
  * This file, together with engine/hash.h implements hashing of go positions
  * using a method known as Zobrist hashing.  See the Texinfo documentation
- * (Reading/Hashing) for more information.  
+ * (Reading/Hashing) for more information.
  */
 
 
@@ -59,56 +59,56 @@ static Hash_data goal_hash[BOARDMAX];
 static Hashvalue
 hash_rand(int n)
 {
-  Hashvalue h = 0;
-  static unsigned int random_bits = 0;
-  static int num_random_bits = 0;
-  int k;
+    Hashvalue h = 0;
+    static unsigned int random_bits = 0;
+    static int num_random_bits = 0;
+    int k;
 
-  while (n > 0) {
-    /* Obtain new random bits if the old ones are gone. */
-    if (num_random_bits == 0) {
-      random_bits = gg_urand();
-      num_random_bits = 32;
+    while (n > 0) {
+        /* Obtain new random bits if the old ones are gone. */
+        if (num_random_bits == 0) {
+            random_bits = gg_urand();
+            num_random_bits = 32;
+        }
+
+        /* Decide how many bits to add to the Hashvalue. Either all that are
+         * available or the number remaining in the Hashvalue, whichever
+         * is lower.
+         */
+        if (n >= num_random_bits)
+            k = num_random_bits;
+        else
+            k = n;
+
+        /* Shift in k random bits in the Hashvalue and remove them from
+         * random_bits.
+         */
+        h <<= k;
+        h |= (Hashvalue) (random_bits >> (num_random_bits - k));
+        random_bits &= (1 << (num_random_bits - k)) - 1;
+        n -= k;
+        num_random_bits -= k;
     }
 
-    /* Decide how many bits to add to the Hashvalue. Either all that are
-     * available or the number remaining in the Hashvalue, whichever
-     * is lower.
-     */
-    if (n >= num_random_bits)
-      k = num_random_bits;
-    else
-      k = n;
-
-    /* Shift in k random bits in the Hashvalue and remove them from
-     * random_bits.
-     */
-    h <<= k;
-    h |= (Hashvalue) (random_bits >> (num_random_bits - k));
-    random_bits &= (1 << (num_random_bits - k)) - 1;
-    n -= k;
-    num_random_bits -= k;
-  }
-
-  return h;
+    return h;
 }
 
 /* Fill an array with random numbers for Zobrist hashing. */
 void
 hash_init_zobrist_array(Hash_data *array, int size)
 {
-  int i;
-  for (i = 0; i < size; i++) {
-    int remaining_bits = NUM_HASHBITS;
-    int N = CHAR_BIT * SIZEOF_HASHVALUE;
-    int j = 0;
-    while (remaining_bits >= N) {
-      array[i].hashval[j++] = hash_rand(N);
-      remaining_bits -= N;
+    int i;
+    for (i = 0; i < size; i++) {
+        int remaining_bits = NUM_HASHBITS;
+        int N = CHAR_BIT * SIZEOF_HASHVALUE;
+        int j = 0;
+        while (remaining_bits >= N) {
+            array[i].hashval[j++] = hash_rand(N);
+            remaining_bits -= N;
+        }
+        if (remaining_bits > 0)
+            array[i].hashval[j++] = hash_rand(remaining_bits) << (N - remaining_bits);
     }
-    if (remaining_bits > 0)
-      array[i].hashval[j++] = hash_rand(remaining_bits) << (N - remaining_bits);
-  }
 }
 
 /*
@@ -118,56 +118,56 @@ hash_init_zobrist_array(Hash_data *array, int size)
 void
 hash_init(void)
 {
-  static int is_initialized = 0;
-  if (is_initialized)
-    return;
-  
-  INIT_ZOBRIST_ARRAY(black_hash);
-  INIT_ZOBRIST_ARRAY(white_hash);
-  INIT_ZOBRIST_ARRAY(ko_hash);
-  INIT_ZOBRIST_ARRAY(komaster_hash);
-  INIT_ZOBRIST_ARRAY(kom_pos_hash);
-  INIT_ZOBRIST_ARRAY(goal_hash);
+    static int is_initialized = 0;
+    if (is_initialized)
+        return;
 
-  is_initialized = 1;
+    INIT_ZOBRIST_ARRAY(black_hash);
+    INIT_ZOBRIST_ARRAY(white_hash);
+    INIT_ZOBRIST_ARRAY(ko_hash);
+    INIT_ZOBRIST_ARRAY(komaster_hash);
+    INIT_ZOBRIST_ARRAY(kom_pos_hash);
+    INIT_ZOBRIST_ARRAY(goal_hash);
+
+    is_initialized = 1;
 }
 
 
 /* ---------------------------------------------------------------- */
 
 /* Calculate the hashvalue from scratch. */
-void 
+void
 hashdata_recalc(Hash_data *hd, Intersection *p, int ko_pos)
 {
-  int pos;
+    int pos;
 
-  hashdata_clear(hd);
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (p[pos] == WHITE)
-      hashdata_xor(*hd, white_hash[pos]);
-    else if (p[pos] == BLACK)
-      hashdata_xor(*hd, black_hash[pos]);
-  }
+    hashdata_clear(hd);
 
-  if (ko_pos != 0)
-    hashdata_xor(*hd, ko_hash[ko_pos]);
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        if (p[pos] == WHITE)
+            hashdata_xor(*hd, white_hash[pos]);
+        else if (p[pos] == BLACK)
+            hashdata_xor(*hd, black_hash[pos]);
+    }
+
+    if (ko_pos != 0)
+        hashdata_xor(*hd, ko_hash[ko_pos]);
 }
 
 /* Clear hashdata. */
 void
 hashdata_clear(Hash_data *hd)
 {
-  int i;
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    hd->hashval[i] = 0;
+    int i;
+    for (i = 0; i < NUM_HASHVALUES; i++)
+        hd->hashval[i] = 0;
 }
 
 /* Set or remove ko in the hash value and hash position.  */
 void
 hashdata_invert_ko(Hash_data *hd, int pos)
 {
-  hashdata_xor(*hd, ko_hash[pos]);
+    hashdata_xor(*hd, ko_hash[pos]);
 }
 
 
@@ -175,10 +175,10 @@ hashdata_invert_ko(Hash_data *hd, int pos)
 void
 hashdata_invert_stone(Hash_data *hd, int pos, int color)
 {
-  if (color == BLACK)
-    hashdata_xor(*hd, black_hash[pos]);
-  else if (color == WHITE)
-    hashdata_xor(*hd, white_hash[pos]);
+    if (color == BLACK)
+        hashdata_xor(*hd, black_hash[pos]);
+    else if (color == WHITE)
+        hashdata_xor(*hd, white_hash[pos]);
 }
 
 
@@ -186,55 +186,55 @@ hashdata_invert_stone(Hash_data *hd, int pos, int color)
 void
 hashdata_invert_komaster(Hash_data *hd, int komaster)
 {
-  hashdata_xor(*hd, komaster_hash[komaster]);
+    hashdata_xor(*hd, komaster_hash[komaster]);
 }
 
 /* Set or remove the komaster position in the hash data. */
 void
 hashdata_invert_kom_pos(Hash_data *hd, int kom_pos)
 {
-  hashdata_xor(*hd, kom_pos_hash[kom_pos]);
+    hashdata_xor(*hd, kom_pos_hash[kom_pos]);
 }
 
 /* Calculate a transformation invariant hashvalue. */
-void 
+void
 hashdata_calc_orientation_invariant(Hash_data *hd, Intersection *p, int ko_pos)
 {
-  int pos;
-  int rot;
-  Hash_data hd_rot;
+    int pos;
+    int rot;
+    Hash_data hd_rot;
 
-  for (rot = 0; rot < 8; rot++) {
-    hashdata_clear(&hd_rot);
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (p[pos] == WHITE)
-	hashdata_xor(hd_rot, white_hash[rotate1(pos, rot)]);
-      else if (p[pos] == BLACK)
-	hashdata_xor(hd_rot, black_hash[rotate1(pos, rot)]);
+    for (rot = 0; rot < 8; rot++) {
+        hashdata_clear(&hd_rot);
+        for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+            if (p[pos] == WHITE)
+                hashdata_xor(hd_rot, white_hash[rotate1(pos, rot)]);
+            else if (p[pos] == BLACK)
+                hashdata_xor(hd_rot, black_hash[rotate1(pos, rot)]);
+        }
+
+        if (ko_pos != NO_MOVE)
+            hashdata_xor(hd_rot, ko_hash[rotate1(ko_pos, rot)]);
+
+        if (rot == 0 || hashdata_is_smaller(hd_rot, *hd))
+            *hd = hd_rot;
     }
-    
-    if (ko_pos != NO_MOVE)
-      hashdata_xor(hd_rot, ko_hash[rotate1(ko_pos, rot)]);
-
-    if (rot == 0 || hashdata_is_smaller(hd_rot, *hd))
-      *hd = hd_rot;
-  }
 }
 
 /* Compute hash value to identify the goal area. */
 Hash_data
 goal_to_hashvalue(const signed char *goal)
 {
-  int pos;
-  Hash_data return_value;
-  
-  hashdata_clear(&return_value);
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos) && goal[pos])
-      hashdata_xor(return_value, goal_hash[pos]);
-  
-  return return_value;
+    int pos;
+    Hash_data return_value;
+
+    hashdata_clear(&return_value);
+
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+        if (ON_BOARD(pos) && goal[pos])
+            hashdata_xor(return_value, goal_hash[pos]);
+
+    return return_value;
 }
 
 
@@ -243,43 +243,43 @@ goal_to_hashvalue(const signed char *goal)
 char *
 hashdata_to_string(Hash_data *hashdata)
 {
-  static char buffer[BUFFER_SIZE];
-  int n = 0;
-  int k;
+    static char buffer[BUFFER_SIZE];
+    int n = 0;
+    int k;
 
-  /* Loop backwards for consistency between 32 and 64 bit platforms. */
-  for (k = NUM_HASHVALUES - 1; k >= 0; k--) {
-    n += sprintf(buffer + n, HASHVALUE_PRINT_FORMAT,
-		 HASHVALUE_NUM_DIGITS, hashdata->hashval[k]);
-    gg_assert(n < BUFFER_SIZE);
-  }
+    /* Loop backwards for consistency between 32 and 64 bit platforms. */
+    for (k = NUM_HASHVALUES - 1; k >= 0; k--) {
+        n += sprintf(buffer + n, HASHVALUE_PRINT_FORMAT,
+                     HASHVALUE_NUM_DIGITS, hashdata->hashval[k]);
+        gg_assert(n < BUFFER_SIZE);
+    }
 
-  return buffer;
+    return buffer;
 }
 
 #if NUM_HASHVALUES > 2
 int
 hashdata_is_equal_func(Hash_data *hd1, Hash_data *hd2)
 {
-  int i;
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    if (hd1->hashval[i] != hd2->hashval[i])
-      return 0;
+    int i;
+    for (i = 0; i < NUM_HASHVALUES; i++)
+        if (hd1->hashval[i] != hd2->hashval[i])
+            return 0;
 
-  return 1;
+    return 1;
 }
 
 int
 hashdata_is_smaller_func(Hash_data *hd1, Hash_data *hd2)
 {
-  int i;
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    if (hd1->hashval[i] < hd2->hashval[i])
-      return 1;
-    else if (hd1->hashval[i] > hd2->hashval[i])
-      return 0;
+    int i;
+    for (i = 0; i < NUM_HASHVALUES; i++)
+        if (hd1->hashval[i] < hd2->hashval[i])
+            return 1;
+        else if (hd1->hashval[i] > hd2->hashval[i])
+            return 0;
 
-  return 0;
+    return 0;
 }
 #endif
 

@@ -59,27 +59,27 @@ void build_spiral_order(void);
 /* Attribute list. */
 typedef struct attrib_rt
 {
-  short val;
-  short next;
+    short val;
+    short next;
 } attrib_rt_t;
 
 /* DFA state. */
 typedef struct state_rt
 {
-  short next[4];
-  short att;
+    short next[4];
+    short att;
 } state_rt_t;
 
 typedef struct dfa_rt
 {
-  /* File header. */
-  const char name[80];
+    /* File header. */
+    const char name[80];
 
-  /* Transition graph. */
-  const state_rt_t *states;
+    /* Transition graph. */
+    const state_rt_t *states;
 
-  /* Attributes sets. */
-  const attrib_rt_t *indexes;
+    /* Attributes sets. */
+    const attrib_rt_t *indexes;
 } dfa_rt_t;
 
 

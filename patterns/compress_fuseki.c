@@ -37,107 +37,107 @@ Usage : uncompress_fuseki boardsize filename\n\
 static void
 write_stone(int i, int j)
 {
-  assert(i > 0 && i <= MAX_BOARDSIZE);
-  assert(j > 0 && j <= MAX_BOARDSIZE);
-  printf("%c%c", j + 'a' - 1, i + 'a' - 1);
+    assert(i > 0 && i <= MAX_BOARDSIZE);
+    assert(j > 0 && j <= MAX_BOARDSIZE);
+    printf("%c%c", j + 'a' - 1, i + 'a' - 1);
 }
 
 int
 main(int argc, char *argv[])
 {
-  const char *filename;
-  FILE *input_FILE;
-  char line[BUFSIZE];
-  char name[BUFSIZE];
-  int value;
-  int k;
-  int row = 0;
-  int movei = -1;
-  int movej = -1;
-  int xi[MAX_STONES];
-  int xj[MAX_STONES];
-  int oi[MAX_STONES];
-  int oj[MAX_STONES];
-  int num_x = 0;
-  int num_o = 0;
-  
-  /* Check number of arguments. */
-  if (argc != 2) {
-    fprintf(stderr, USAGE);
-    return EXIT_FAILURE;
-  }
+    const char *filename;
+    FILE *input_FILE;
+    char line[BUFSIZE];
+    char name[BUFSIZE];
+    int value;
+    int k;
+    int row = 0;
+    int movei = -1;
+    int movej = -1;
+    int xi[MAX_STONES];
+    int xj[MAX_STONES];
+    int oi[MAX_STONES];
+    int oj[MAX_STONES];
+    int num_x = 0;
+    int num_o = 0;
 
-  filename = argv[1];
-
-  input_FILE = fopen(filename, "r");
-  if (!input_FILE) {
-    fprintf(stderr, "compress_fuseki: Cannot open file %s\n", filename);
-    return EXIT_FAILURE;
-  }
-  
-  while (fgets(line, BUFSIZE, input_FILE)) {
-    if (sscanf(line, "Pattern %s", name) == 1) {
-      /* A new name has been picked up.
-       * Reset the row counter and the lists of stones.
-       */
-      row = 0;
-      num_x = 0;
-      num_o = 0;
+    /* Check number of arguments. */
+    if (argc != 2) {
+        fprintf(stderr, USAGE);
+        return EXIT_FAILURE;
     }
-    else if (line[0] == ':') {
-      /* The colon line ends the pattern. First get the move value. */
-      if (sscanf(line, ":8,-,value(%d)", &value) != 1) {
-	fprintf(stderr, "compress_fuseki: Misformed colon line \"%s\"\n",
-		line);
-	return EXIT_FAILURE;
-      }
 
-      /* Write the compressed description of this pattern.
-       * Pad the stone list with passes (tt) if unbalanced colors.
-       */
-      printf("%s %d ", name, value);
-      write_stone(movei, movej);
-      while (num_x > 0 || num_o > 0) {
-	if (num_x > 0) {
-	  num_x--;
-	  write_stone(xi[num_x], xj[num_x]);
-	}
-	else if (num_o > 0)
-	  printf("tt");
-	if (num_o > 0) {
-	  num_o--;
-	  write_stone(oi[num_o], oj[num_o]);
-	}
-	else if (num_x > 0)
-	  printf("tt");
-      }
-      printf("\n");
-    }
-    else if (line[0] == '|') {
-      /* Found a diagram line. */
-      row++;
-      for (k = 1; line[k] && line[k] != '|'; k++) {
-	if (line[k] == '*') {
-	  movei = row;
-	  movej = k;
-	}
-	else if (line[k] == 'X') {
-	  xi[num_x] = row;
-	  xj[num_x] = k;
-	  num_x++;
-	  assert(num_x < MAX_STONES);
-	}
-	else if (line[k] == 'O') {
-	  oi[num_o] = row;
-	  oj[num_o] = k;
-	  num_o++;
-	  assert(num_o < MAX_STONES);
-	}
-      }
-    }
-  }
+    filename = argv[1];
 
-  return EXIT_SUCCESS;
+    input_FILE = fopen(filename, "r");
+    if (!input_FILE) {
+        fprintf(stderr, "compress_fuseki: Cannot open file %s\n", filename);
+        return EXIT_FAILURE;
+    }
+
+    while (fgets(line, BUFSIZE, input_FILE)) {
+        if (sscanf(line, "Pattern %s", name) == 1) {
+            /* A new name has been picked up.
+             * Reset the row counter and the lists of stones.
+             */
+            row = 0;
+            num_x = 0;
+            num_o = 0;
+        }
+        else if (line[0] == ':') {
+            /* The colon line ends the pattern. First get the move value. */
+            if (sscanf(line, ":8,-,value(%d)", &value) != 1) {
+                fprintf(stderr, "compress_fuseki: Misformed colon line \"%s\"\n",
+                        line);
+                return EXIT_FAILURE;
+            }
+
+            /* Write the compressed description of this pattern.
+             * Pad the stone list with passes (tt) if unbalanced colors.
+             */
+            printf("%s %d ", name, value);
+            write_stone(movei, movej);
+            while (num_x > 0 || num_o > 0) {
+                if (num_x > 0) {
+                    num_x--;
+                    write_stone(xi[num_x], xj[num_x]);
+                }
+                else if (num_o > 0)
+                    printf("tt");
+                if (num_o > 0) {
+                    num_o--;
+                    write_stone(oi[num_o], oj[num_o]);
+                }
+                else if (num_x > 0)
+                    printf("tt");
+            }
+            printf("\n");
+        }
+        else if (line[0] == '|') {
+            /* Found a diagram line. */
+            row++;
+            for (k = 1; line[k] && line[k] != '|'; k++) {
+                if (line[k] == '*') {
+                    movei = row;
+                    movej = k;
+                }
+                else if (line[k] == 'X') {
+                    xi[num_x] = row;
+                    xj[num_x] = k;
+                    num_x++;
+                    assert(num_x < MAX_STONES);
+                }
+                else if (line[k] == 'O') {
+                    oi[num_o] = row;
+                    oj[num_o] = k;
+                    num_o++;
+                    assert(num_o < MAX_STONES);
+                }
+            }
+        }
+    }
+
+    return EXIT_SUCCESS;
 }
 
 /*

@@ -53,41 +53,41 @@ static int horizontally_symmetric; /* symmetry with respect to K column */
 static int vertically_symmetric;   /* symmetry with respect to 10 row */
 static int diagonally_symmetric;   /* with respect to diagonal from UR to LL */
 
-/* This value must be lower than the value for an ongoing joseki. 
- * (Gets multiplied with board_size / 19.) 
+/* This value must be lower than the value for an ongoing joseki.
+ * (Gets multiplied with board_size / 19.)
  */
 #define EMPTY_CORNER_VALUE 25
 
 /* check if region from i1, j1 to i2, j2 is open */
 
-static int 
+static int
 openregion(int i1, int i2, int j1, int j2)
 {
-  int x, y;
+    int x, y;
 
-  if (i1 > i2)
-    return openregion(i2, i1, j1, j2);
-  if (j1 > j2)
-    return openregion(i1, i2, j2, j1);
+    if (i1 > i2)
+        return openregion(i2, i1, j1, j2);
+    if (j1 > j2)
+        return openregion(i1, i2, j2, j1);
 
-  /* Disregard parts of the region off the board. This is convenient
-   * in order not to have to special-case tiny boards. It also secures
-   * against potential reading outside the board[] array boundaries.
-   */
-  if (i1 < 0)
-    i1 = 0;
-  if (j1 < 0)
-    j1 = 0;
-  if (i2 >= board_size)
-    i2 = board_size - 1;
-  if (j2 >= board_size)
-    j2 = board_size - 1;
-    
-  for (x = i1; x <= i2; x++)
-    for (y = j1; y <= j2; y++)
-      if (BOARD(x, y) != EMPTY)
-	return 0;
-  return 1;
+    /* Disregard parts of the region off the board. This is convenient
+     * in order not to have to special-case tiny boards. It also secures
+     * against potential reading outside the board[] array boundaries.
+     */
+    if (i1 < 0)
+        i1 = 0;
+    if (j1 < 0)
+        j1 = 0;
+    if (i2 >= board_size)
+        i2 = board_size - 1;
+    if (j2 >= board_size)
+        j2 = board_size - 1;
+
+    for (x = i1; x <= i2; x++)
+        for (y = j1; y <= j2; y++)
+            if (BOARD(x, y) != EMPTY)
+                return 0;
+    return 1;
 }
 
 /* This function sets the global variables indicating symmetries of the
@@ -96,36 +96,36 @@ openregion(int i1, int i2, int j1, int j2)
 static void
 set_symmetries(void)
 {
-  int i, j;
-  horizontally_symmetric = 1;
-  vertically_symmetric = 1; 
-  diagonally_symmetric = 1;
-  for (i = 0; i < board_size
-              && (vertically_symmetric || horizontally_symmetric
-		  || diagonally_symmetric); i++)
-    for (j = 0; j < board_size; j++) {
-      if (board[POS(i, j)] != board[POS(i, board_size - 1 - j)])
-	horizontally_symmetric = 0;
-      if (board[POS(i, j)] != board[POS(board_size - 1 - i, j)])
-	vertically_symmetric = 0;
-      if (board[POS(i, j)]
-	  != board[POS(board_size - 1 - j, board_size - 1 - i)])
-	diagonally_symmetric = 0;
-    }
+    int i, j;
+    horizontally_symmetric = 1;
+    vertically_symmetric = 1;
+    diagonally_symmetric = 1;
+    for (i = 0; i < board_size
+            && (vertically_symmetric || horizontally_symmetric
+                || diagonally_symmetric); i++)
+        for (j = 0; j < board_size; j++) {
+            if (board[POS(i, j)] != board[POS(i, board_size - 1 - j)])
+                horizontally_symmetric = 0;
+            if (board[POS(i, j)] != board[POS(board_size - 1 - i, j)])
+                vertically_symmetric = 0;
+            if (board[POS(i, j)]
+                    != board[POS(board_size - 1 - j, board_size - 1 - i)])
+                diagonally_symmetric = 0;
+        }
 }
 
 /* The corner moves. */
 
 static int corners[][2] =
 {
-  {3, 3},
-  {3, 4},
-  {4, 3},
-  {4, 4},
-  {5, 3},
-  {3, 5},
-  {5, 4},
-  {4, 5},
+    {3, 3},
+    {3, 4},
+    {4, 3},
+    {4, 4},
+    {5, 3},
+    {3, 5},
+    {5, 4},
+    {4, 5},
 };
 
 /* Relative weights for different corner moves at different board
@@ -134,88 +134,88 @@ static int corners[][2] =
 /* up to 11x11 */
 static int small_board[] =
 {
-  50,       /* 3-3 */
-  18,       /* 3-4 */
-  17,       /* 4-3 */
-  15,       /* 4-4 */
-  0,        /* 5-3 */
-  0,        /* 3-5 */
-  0,        /* 5-4 */
-  0,        /* 4-5 */
+    50,       /* 3-3 */
+    18,       /* 3-4 */
+    17,       /* 4-3 */
+    15,       /* 4-4 */
+    0,        /* 5-3 */
+    0,        /* 3-5 */
+    0,        /* 5-4 */
+    0,        /* 4-5 */
 };
 
 /* 12x12 to 15x15 */
 static int medium_board[] =
 {
-  30,       /* 3-3 */
-  20,       /* 3-4 */
-  20,       /* 4-3 */
-  22,       /* 4-4 */
-  2,        /* 5-3 */
-  2,        /* 3-5 */
-  2,        /* 5-4 */
-  2,        /* 4-5 */
+    30,       /* 3-3 */
+    20,       /* 3-4 */
+    20,       /* 4-3 */
+    22,       /* 4-4 */
+    2,        /* 5-3 */
+    2,        /* 3-5 */
+    2,        /* 5-4 */
+    2,        /* 4-5 */
 };
 
 /* 16x16 and larger */
 static int large_board[] =
 {
-  15,       /* 3-3 */
-  15,       /* 3-4 */
-  15,       /* 4-3 */
-  35,       /* 4-4 */
-  5,        /* 5-3 */
-  5,        /* 3-5 */
-  5,        /* 5-4 */
-  5,        /* 4-5 */
+    15,       /* 3-3 */
+    15,       /* 3-4 */
+    15,       /* 4-3 */
+    35,       /* 4-4 */
+    5,        /* 5-3 */
+    5,        /* 3-5 */
+    5,        /* 5-4 */
+    5,        /* 4-5 */
 };
 
 static void
 choose_corner_move(int corner, int *m, int *n)
 {
-  int *table = 0;
-  int sum_of_weights = 0;
-  int i;
-  int q;
-  
-  if (board_size <= 11)
-    table = small_board;
-  else if (board_size <= 15)
-    table = medium_board;
-  else 
-    table = large_board;
+    int *table = 0;
+    int sum_of_weights = 0;
+    int i;
+    int q;
 
-  for (i = 0; i < 8; i++)
-    sum_of_weights += table[i];
+    if (board_size <= 11)
+        table = small_board;
+    else if (board_size <= 15)
+        table = medium_board;
+    else
+        table = large_board;
 
-  q = gg_rand() % sum_of_weights;
-  for (i = 0; i < 8; i++) {
-    q -= table[i];
-    if (q < 0)
-      break;
-  }
-  
-  *m = corners[i][0];
-  *n = corners[i][1];
+    for (i = 0; i < 8; i++)
+        sum_of_weights += table[i];
 
-  switch (corner) {
-  case UPPER_LEFT:
-    *m = *m - 1;
-    *n = *n - 1;
-    break;
-  case UPPER_RIGHT:
-    *m = *m - 1;
-    *n = board_size - *n;
-    break;
-  case LOWER_LEFT:
-    *m = board_size - *m;
-    *n = *n - 1;
-    break;
-  case LOWER_RIGHT:
-    *m = board_size - *m;
-    *n = board_size - *n;
-    break;
-  }
+    q = gg_rand() % sum_of_weights;
+    for (i = 0; i < 8; i++) {
+        q -= table[i];
+        if (q < 0)
+            break;
+    }
+
+    *m = corners[i][0];
+    *n = corners[i][1];
+
+    switch (corner) {
+    case UPPER_LEFT:
+        *m = *m - 1;
+        *n = *n - 1;
+        break;
+    case UPPER_RIGHT:
+        *m = *m - 1;
+        *n = board_size - *n;
+        break;
+    case LOWER_LEFT:
+        *m = board_size - *m;
+        *n = *n - 1;
+        break;
+    case LOWER_RIGHT:
+        *m = board_size - *m;
+        *n = board_size - *n;
+        break;
+    }
 }
 
 
@@ -223,37 +223,37 @@ choose_corner_move(int corner, int *m, int *n)
 static void
 announce_move(int move, int value, int color)
 {
-  int i, j;
-  /* This shouldn't happen. */
-  if (board[move] != EMPTY)
-    return;
-  
-  /* Politeness: Black plays in lower right half of upper right corner first.
-   * White plays in upper left half of lower left corner first.
-   * (Not sure whether this is correct for handicap games. Is this an
-   * urgent FIXME? :-) )
-   */
-  if (horizontally_symmetric) {
-    i = I(move);
-    j = J(move);
-    if ((2 * j < board_size - 1) ^ (color == WHITE))
-      move = POS(i, board_size - 1 - j);
-  }
-  if (vertically_symmetric) {
-    i = I(move);
-    j = J(move);
-    if ((2 * i > board_size - 1) ^ (color == WHITE))
-      move = POS(board_size - 1 - i, j);
-  }
-  if (diagonally_symmetric) {
-    i = I(move);
-    j = J(move);
-    if ((board_size - 1 - j > i) ^ (color == WHITE))
-      move = POS(board_size - 1 - j, board_size - 1 - i);
-  }
-  
-  if (set_minimum_move_value(move, value))
-    TRACE("Fuseki Player suggests %1m with value %d\n", move, value);
+    int i, j;
+    /* This shouldn't happen. */
+    if (board[move] != EMPTY)
+        return;
+
+    /* Politeness: Black plays in lower right half of upper right corner first.
+     * White plays in upper left half of lower left corner first.
+     * (Not sure whether this is correct for handicap games. Is this an
+     * urgent FIXME? :-) )
+     */
+    if (horizontally_symmetric) {
+        i = I(move);
+        j = J(move);
+        if ((2 * j < board_size - 1) ^ (color == WHITE))
+            move = POS(i, board_size - 1 - j);
+    }
+    if (vertically_symmetric) {
+        i = I(move);
+        j = J(move);
+        if ((2 * i > board_size - 1) ^ (color == WHITE))
+            move = POS(board_size - 1 - i, j);
+    }
+    if (diagonally_symmetric) {
+        i = I(move);
+        j = J(move);
+        if ((board_size - 1 - j > i) ^ (color == WHITE))
+            move = POS(board_size - 1 - j, board_size - 1 - i);
+    }
+
+    if (set_minimum_move_value(move, value))
+        TRACE("Fuseki Player suggests %1m with value %d\n", move, value);
 }
 
 
@@ -267,14 +267,14 @@ static int fuseki_total_value;
 static void
 fuseki_callback(int move, struct fullboard_pattern *pattern, int ll)
 {
-  TRACE("Fuseki database move at %1m with relative weight %d, pattern %s+%d\n",
-	move, pattern->value, pattern->name, ll);
+    TRACE("Fuseki database move at %1m with relative weight %d, pattern %s+%d\n",
+          move, pattern->value, pattern->name, ll);
 
-  /* Store coordinates and relative weight for the found move. */
-  fuseki_moves[num_fuseki_moves] = move;
-  fuseki_value[num_fuseki_moves] = pattern->value;
-  fuseki_total_value += pattern->value;
-  num_fuseki_moves++;
+    /* Store coordinates and relative weight for the found move. */
+    fuseki_moves[num_fuseki_moves] = move;
+    fuseki_value[num_fuseki_moves] = pattern->value;
+    fuseki_total_value += pattern->value;
+    num_fuseki_moves++;
 }
 
 /* Full board matching in database for fuseki moves. Return 1 if any
@@ -283,122 +283,122 @@ fuseki_callback(int move, struct fullboard_pattern *pattern, int ll)
 static int
 search_fuseki_database(int color)
 {
-  struct fullboard_pattern *database;
-  int q;
-  int k;
+    struct fullboard_pattern *database;
+    int q;
+    int k;
 
-  /* Disable matching after a certain number of stones are placed on
-   * the board.
-   */
-  if (stones_on_board(BLACK | WHITE) > MAX_FUSEKI_DATABASE_STONES)
-    return 0;
+    /* Disable matching after a certain number of stones are placed on
+     * the board.
+     */
+    if (stones_on_board(BLACK | WHITE) > MAX_FUSEKI_DATABASE_STONES)
+        return 0;
 
-  /* We only have databases for 9x9, 13x13 and 19x19. */
-  if (board_size == 9)
-    database = fuseki9;
-  else if (board_size == 13)
-    database = fuseki13;
-  else if (board_size == 19)
-    database = fuseki19;
-  else
-    return 0;
+    /* We only have databases for 9x9, 13x13 and 19x19. */
+    if (board_size == 9)
+        database = fuseki9;
+    else if (board_size == 13)
+        database = fuseki13;
+    else if (board_size == 19)
+        database = fuseki19;
+    else
+        return 0;
 
-  /* Do the matching. */
-  num_fuseki_moves = 0;
-  fuseki_total_value = 0;
-  fullboard_matchpat(fuseki_callback, color, database);
+    /* Do the matching. */
+    num_fuseki_moves = 0;
+    fuseki_total_value = 0;
+    fullboard_matchpat(fuseki_callback, color, database);
 
-  /* No match. */
-  if (num_fuseki_moves == 0)
-    return 0;
+    /* No match. */
+    if (num_fuseki_moves == 0)
+        return 0;
 
-  /* Choose randomly with respect to relative weights for matched moves.
-   */
-  q = gg_rand() % fuseki_total_value;
-  for (k = 0; k < num_fuseki_moves; k++) {
-    q -= fuseki_value[k];
-    if (q < 0)
-      break;
-  }
+    /* Choose randomly with respect to relative weights for matched moves.
+     */
+    q = gg_rand() % fuseki_total_value;
+    for (k = 0; k < num_fuseki_moves; k++) {
+        q -= fuseki_value[k];
+        if (q < 0)
+            break;
+    }
 
-  gg_assert(k < num_fuseki_moves);
-  /* Give this move an arbitrary value of 75. The actual value doesn't
-   * matter much since the intention is that we should play this move
-   * whatever the rest of the analysis thinks.
-   */
-  announce_move(fuseki_moves[k], 75, color);
+    gg_assert(k < num_fuseki_moves);
+    /* Give this move an arbitrary value of 75. The actual value doesn't
+     * matter much since the intention is that we should play this move
+     * whatever the rest of the analysis thinks.
+     */
+    announce_move(fuseki_moves[k], 75, color);
 
-  /* Also make sure the other considered moves can be seen in the
-   * traces and in the output file.
-   */
-  for (k = 0; k < num_fuseki_moves; k++)
-    set_minimum_move_value(fuseki_moves[k], 74);
+    /* Also make sure the other considered moves can be seen in the
+     * traces and in the output file.
+     */
+    for (k = 0; k < num_fuseki_moves; k++)
+        set_minimum_move_value(fuseki_moves[k], 74);
 
-  return 1;
+    return 1;
 }
 
 /* Generate move in empty corner or in middle of small board.*/
 void
 fuseki(int color)
 {
-  int i = -1;
-  int j = -1;
-  int width;  /* Side of the open region required in the corner. */
-  int empty_corner_value = EMPTY_CORNER_VALUE * board_size/19;
+    int i = -1;
+    int j = -1;
+    int width;  /* Side of the open region required in the corner. */
+    int empty_corner_value = EMPTY_CORNER_VALUE * board_size/19;
 
-  /* Return immediately if --disable_fuseki option used. */
-  if (disable_fuseki)
-    return;
-  
-  set_symmetries();
+    /* Return immediately if --disable_fuseki option used. */
+    if (disable_fuseki)
+        return;
 
-  /* Search in fuseki database unless disabled by --nofusekidb option. */
-  if (fusekidb && search_fuseki_database(color))
-    return;
+    set_symmetries();
 
-  /* On 9x9, only play open corners after the first move if nothing
-   * else useful is found.
-   */
-  if (board_size == 9 && stones_on_board(color) > 0)
-    empty_corner_value = 5;
-  
-  if (board_size <= 11) {
-    /* For boards of size 11x11 or smaller we first go for the center point. */
-    int middle = board_size/2;
-    if (openregion(middle-2, middle+2, middle-2, middle+2)) {
-      announce_move(POS(middle, middle), 45, color);
+    /* Search in fuseki database unless disabled by --nofusekidb option. */
+    if (fusekidb && search_fuseki_database(color))
+        return;
+
+    /* On 9x9, only play open corners after the first move if nothing
+     * else useful is found.
+     */
+    if (board_size == 9 && stones_on_board(color) > 0)
+        empty_corner_value = 5;
+
+    if (board_size <= 11) {
+        /* For boards of size 11x11 or smaller we first go for the center point. */
+        int middle = board_size/2;
+        if (openregion(middle-2, middle+2, middle-2, middle+2)) {
+            announce_move(POS(middle, middle), 45, color);
+        }
     }
-  }
 
-  if (board_size < 9)
-    return;
+    if (board_size < 9)
+        return;
 
-  if (board_size >= 18)
-    width = 8;
-  else if (board_size == 9)
-    width = 5;
-  else
-    width = board_size/2;
-  
-  if (openregion(0, width-1, board_size-width, board_size-1)) {
-    choose_corner_move(UPPER_RIGHT, &i, &j);
-    announce_move(POS(i, j), empty_corner_value, color);
-  }
-  
-  if (openregion(board_size-width, board_size-1, 0, width-1)) {
-    choose_corner_move(LOWER_LEFT, &i, &j);
-    announce_move(POS(i, j), empty_corner_value, color);
-  }
-  if (openregion(board_size-width, board_size-1,
-		 board_size-width, board_size-1)) {
-    choose_corner_move(LOWER_RIGHT, &i, &j);
-    announce_move(POS(i, j), empty_corner_value, color);
-  }
-  
-  if (openregion(0, width-1, 0, width-1)) {
-    choose_corner_move(UPPER_LEFT, &i, &j);
-    announce_move(POS(i, j), empty_corner_value, color);
-  }
+    if (board_size >= 18)
+        width = 8;
+    else if (board_size == 9)
+        width = 5;
+    else
+        width = board_size/2;
+
+    if (openregion(0, width-1, board_size-width, board_size-1)) {
+        choose_corner_move(UPPER_RIGHT, &i, &j);
+        announce_move(POS(i, j), empty_corner_value, color);
+    }
+
+    if (openregion(board_size-width, board_size-1, 0, width-1)) {
+        choose_corner_move(LOWER_LEFT, &i, &j);
+        announce_move(POS(i, j), empty_corner_value, color);
+    }
+    if (openregion(board_size-width, board_size-1,
+                   board_size-width, board_size-1)) {
+        choose_corner_move(LOWER_RIGHT, &i, &j);
+        announce_move(POS(i, j), empty_corner_value, color);
+    }
+
+    if (openregion(0, width-1, 0, width-1)) {
+        choose_corner_move(UPPER_LEFT, &i, &j);
+        announce_move(POS(i, j), empty_corner_value, color);
+    }
 }
 
 /*

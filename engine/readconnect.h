@@ -29,7 +29,7 @@ struct connection_data;
  * when spreading connection distances.
  */
 typedef void (*connection_helper_fn_ptr) (struct connection_data *conn,
-					  int color);
+        int color);
 
 /* This heap contains a list of positions where we have delayed a
  * decision whether to "spread a connection distance". The function
@@ -37,10 +37,10 @@ typedef void (*connection_helper_fn_ptr) (struct connection_data *conn,
  * push_connection_heap_entry() for organization of the heap.
  */
 struct heap_entry {
-  int distance;
-  int coming_from;
-  int target;
-  connection_helper_fn_ptr helper;
+    int distance;
+    int coming_from;
+    int target;
+    connection_helper_fn_ptr helper;
 };
 
 /* Fixed-point arithmetic helper macros */
@@ -51,32 +51,32 @@ struct heap_entry {
 #define HUGE_CONNECTION_DISTANCE FP(100.0)
 
 struct connection_data {
-  int distances[BOARDMAX];
-  int deltas[BOARDMAX];
-  int coming_from[BOARDMAX];
-  int vulnerable1[BOARDMAX];
-  int vulnerable2[BOARDMAX];
-  int queue[BOARDMAX];
-  int queue_start;
-  int queue_end;
+    int distances[BOARDMAX];
+    int deltas[BOARDMAX];
+    int coming_from[BOARDMAX];
+    int vulnerable1[BOARDMAX];
+    int vulnerable2[BOARDMAX];
+    int queue[BOARDMAX];
+    int queue_start;
+    int queue_end;
 
-  int heap_data_size;
-  int heap_size;
-  struct heap_entry heap_data[4 * BOARDMAX];
-  struct heap_entry *heap[BOARDMAX];
+    int heap_data_size;
+    int heap_size;
+    struct heap_entry heap_data[4 * BOARDMAX];
+    struct heap_entry *heap[BOARDMAX];
 
-  int target;
-  int cutoff_distance;
-  int speculative;
+    int target;
+    int cutoff_distance;
+    int speculative;
 };
 
 
 void compute_connection_distances(int str, int target, int cutoff,
-				  struct connection_data *conn,
-				  int speculative);
+                                  struct connection_data *conn,
+                                  int speculative);
 void init_connection_data(int color, const signed char goal[BOARDMAX],
-			  int target, int cutoff,
-			  struct connection_data *conn, int speculative);
+                          int target, int cutoff,
+                          struct connection_data *conn, int speculative);
 void spread_connection_distances(int color, struct connection_data *conn);
 void sort_connection_queue_tail(struct connection_data *conn);
 void expand_connection_queue(struct connection_data *conn);

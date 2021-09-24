@@ -34,16 +34,16 @@
  */
 
 struct eye_vertex {
-  signed char marginal;		  /* 1 if marginal vertex, 0 otherwise     */
-  signed char edge;		  /* 0 = center, 1 = edge, 2 = corner	   */
-  /* A corner vertex may only be matched at the corner.
-   * An edge vertex may be matched at the corner or on the edge.
-   * A center vertex may be matched anywhere.
-   */
-  signed char flags;		  /* see the #defines above		   */
+    signed char marginal;		  /* 1 if marginal vertex, 0 otherwise     */
+    signed char edge;		  /* 0 = center, 1 = edge, 2 = corner	   */
+    /* A corner vertex may only be matched at the corner.
+     * An edge vertex may be matched at the corner or on the edge.
+     * A center vertex may be matched anywhere.
+     */
+    signed char flags;		  /* see the #defines above		   */
 
-  signed char neighbors;	  /* number of neighbors                   */
-  signed char n[4];		  /* position in array of vertex neighbors */
+    signed char neighbors;	  /* number of neighbors                   */
+    signed char n[4];		  /* position in array of vertex neighbors */
 };
 
 
@@ -53,14 +53,14 @@ struct eye_vertex {
  */
 
 struct eye_graph {
-  struct eye_vertex *vertex;
-  int patnum;			  /* number of pattern			   */
-  int esize;                      /* number of vertices                    */
-  int msize;                      /* number of marginal vertices           */
-  int ends;                       /* number of vertices with one neighbor  */
-  int two_neighbors;              /* number of vertices with 2 neighbors   */
-  int three_neighbors;            /* number of vertices with 3 neighbors   */
-  struct eyevalue value;          /* eye value                             */
+    struct eye_vertex *vertex;
+    int patnum;			  /* number of pattern			   */
+    int esize;                      /* number of vertices                    */
+    int msize;                      /* number of marginal vertices           */
+    int ends;                       /* number of vertices with one neighbor  */
+    int two_neighbors;              /* number of vertices with 2 neighbors   */
+    int three_neighbors;            /* number of vertices with 3 neighbors   */
+    struct eyevalue value;          /* eye value                             */
 };
 
 extern struct eye_graph graphs[];

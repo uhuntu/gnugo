@@ -25,7 +25,7 @@
   showbord.c -- Show current go board and playing information
 -------------------------------------------------------------*/
 
-/* 
+/*
  * NOTE : this is no longer intended as the main user interface
  * as it was in GNU Go 1.2. It is now a debugging aid, showing
  * the internal state of dragons, and things. But with
@@ -46,7 +46,7 @@
 
 
 /*
- * Stuff to enumerate the dragons 
+ * Stuff to enumerate the dragons
  */
 
 /* Element at origin of each worm stores allocated worm number. */
@@ -70,9 +70,9 @@ static int next_black;
  * avoided.
  */
 static const int colors[3][5] = {
-  {0, 0, 0, 0, 0}, /*not used */
-  {6, 2, 1, 3, 5}, /* WHITE : dead, alive, critical, unknown, unchecked */
-  {6, 2, 1, 3, 5}  /* BLACK : dead, alive, critical, unknown, unchecked */
+    {0, 0, 0, 0, 0}, /*not used */
+    {6, 2, 1, 3, 5}, /* WHITE : dead, alive, critical, unknown, unchecked */
+    {6, 2, 1, 3, 5}  /* BLACK : dead, alive, critical, unknown, unchecked */
 };
 
 static const int domain_colors[4] = {5, 1, 2, 3}; /* gray, black, white, both */
@@ -100,8 +100,8 @@ static const int domain_colors[4] = {5, 1, 2, 3}; /* gray, black, white, both */
 void
 start_draw_board()
 {
-  gg_init_color();
-  draw_letter_coordinates(stderr);
+    gg_init_color();
+    draw_letter_coordinates(stderr);
 }
 
 /* Draw a colored character. If c has the value EMPTY, either a "." or
@@ -112,49 +112,49 @@ start_draw_board()
 void
 draw_color_char(int m, int n, int c, int color)
 {
-  /* Is this the first column? */
-  if (n == 0)
-    fprintf(stderr, "\n%2d", board_size - m);
+    /* Is this the first column? */
+    if (n == 0)
+        fprintf(stderr, "\n%2d", board_size - m);
 
-  /* Do we see a hoshi point? */
-  if (c == EMPTY) {
-    if (is_hoshi_point(m, n))
-      c = '+';
+    /* Do we see a hoshi point? */
+    if (c == EMPTY) {
+        if (is_hoshi_point(m, n))
+            c = '+';
+        else
+            c = '.';
+    }
+
+    /* Use fprintf to draw black characters. This way they'll turn out
+     * white on terminals with black background.
+     */
+    if (color == GG_COLOR_BLACK)
+        fprintf(stderr, " %c", c);
     else
-      c = '.';
-  }
+        write_color_char(color, c);
 
-  /* Use fprintf to draw black characters. This way they'll turn out
-   * white on terminals with black background.
-   */
-  if (color == GG_COLOR_BLACK)
-    fprintf(stderr, " %c", c);
-  else
-    write_color_char(color, c);
-  
-  /* Is this the last column? */
-  if (n == board_size - 1)
-    fprintf(stderr, " %-2d", board_size - m);
+    /* Is this the last column? */
+    if (n == board_size - 1)
+        fprintf(stderr, " %-2d", board_size - m);
 }
 
 /* Draw a black character as specified above. */
 void
 draw_char(int m, int n, int c)
 {
-  draw_color_char(m, n, c, GG_COLOR_BLACK);
+    draw_color_char(m, n, c, GG_COLOR_BLACK);
 }
 
 /* Print a line with coordinate letters under the board. */
 void
 end_draw_board()
 {
-  fprintf(stderr, "\n");
-  draw_letter_coordinates(stderr);
-  fprintf(stderr, "\n");
+    fprintf(stderr, "\n");
+    draw_letter_coordinates(stderr);
+    fprintf(stderr, "\n");
 }
 
 
-/* 
+/*
  * Write one stone. Use 'empty' if the board is empty ('-' or '+')
  * We use capital letters A,B,... for black, lower case a,b,... for white.
  * This allows us to indicate up to 26 dragons uniquely, and more with
@@ -165,87 +165,87 @@ end_draw_board()
  * 3 if displaying owl_status.
  */
 
-static void 
+static void
 showchar(int i, int j, int empty, int xo)
 {
-  struct dragon_data *d;  /* dragon data at (i, j) */
-  struct dragon_data2 *d2;
-  int x;
-  ASSERT_ON_BOARD2(i, j);
-  x = BOARD(i, j);
-  d = &(dragon[POS(i, j)]);
-  d2 = &(dragon2[d->id]);
+    struct dragon_data *d;  /* dragon data at (i, j) */
+    struct dragon_data2 *d2;
+    int x;
+    ASSERT_ON_BOARD2(i, j);
+    x = BOARD(i, j);
+    d = &(dragon[POS(i, j)]);
+    d2 = &(dragon2[d->id]);
 
-  if (x == EMPTY) {
-    if (xo != 2)
-      fprintf(stderr, " %c", empty);
+    if (x == EMPTY) {
+        if (xo != 2)
+            fprintf(stderr, " %c", empty);
+        else {
+            int empty_color;
+            char empty_char;
+
+            if (black_eye[POS(i, j)].color == BLACK) {
+                if (white_eye[POS(i, j)].color == WHITE)
+                    empty_color = domain_colors[3];
+                else
+                    empty_color = domain_colors[1];
+
+                if (black_eye[POS(i, j)].marginal)
+                    empty_char = '!';
+                else
+                    empty_char = 'x';
+            }
+            else if (white_eye[POS(i, j)].color == WHITE) {
+                empty_color = domain_colors[2];
+                if (white_eye[POS(i, j)].marginal)
+                    empty_char = '!';
+                else
+                    empty_char = 'o';
+            }
+            else {
+                empty_color = domain_colors[0];
+                empty_char = '.';
+            }
+
+            write_color_char(empty_color, empty_char);
+        }
+    }
     else {
-      int empty_color;
-      char empty_char;
-      
-      if (black_eye[POS(i, j)].color == BLACK) {
-	if (white_eye[POS(i, j)].color == WHITE)
-	  empty_color = domain_colors[3];
-	else
-	  empty_color = domain_colors[1];
+        int w;
 
-	if (black_eye[POS(i, j)].marginal)
-	  empty_char = '!';
-	else
-	  empty_char = 'x';
-      }
-      else if (white_eye[POS(i, j)].color == WHITE) {
-	empty_color = domain_colors[2];
-	if (white_eye[POS(i, j)].marginal)
-	  empty_char = '!';
-	else
-	  empty_char = 'o';
-      }
-      else {
-	empty_color = domain_colors[0];
-	empty_char = '.';
-      }
+        if (xo == 0 || ! ON_BOARD1(d->origin)) {
+            fprintf(stderr, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
+            return;
+        }
 
-      write_color_char(empty_color, empty_char);
+        /* Figure out ascii character for this dragon. This is the
+         * dragon number allocated to the origin of this worm. */
+
+        w = dragon_num[d->origin];
+        if (!w) {
+            /* Not yet allocated - allocate next one. */
+            /* Count upwards for black, downwards for white to reduce confusion. */
+            if (BOARD(i, j) == BLACK)
+                w = dragon_num[d->origin] = next_black++;
+            else
+                w = dragon_num[d->origin] = next_white--;
+        }
+
+        w = w%26 + (BOARD(i, j) == BLACK ? 'A' : 'a');
+
+        /* Now draw it. */
+        if (xo == 1)
+            write_color_char(colors[BOARD(i, j)][d->crude_status], w);
+        else if (xo == 2) {
+            if (BOARD(i, j) == BLACK)
+                write_color_char(domain_colors[1], 'X');
+            else
+                write_color_char(domain_colors[2], 'O');
+        }
+        else if (xo == 3)
+            write_color_char(colors[BOARD(i, j)][d2->owl_status], w);
+        else if (xo == 4)
+            write_color_char(colors[BOARD(i, j)][d->status], w);
     }
-  }
-  else {
-    int w;
-
-    if (xo == 0 || ! ON_BOARD1(d->origin)) {
-      fprintf(stderr, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
-      return;
-    }
-
-    /* Figure out ascii character for this dragon. This is the
-     * dragon number allocated to the origin of this worm. */
-
-    w = dragon_num[d->origin];
-    if (!w) {
-      /* Not yet allocated - allocate next one. */
-      /* Count upwards for black, downwards for white to reduce confusion. */
-      if (BOARD(i, j) == BLACK)
-	w = dragon_num[d->origin] = next_black++;
-      else
-	w = dragon_num[d->origin] = next_white--; 
-    }
-
-    w = w%26 + (BOARD(i, j) == BLACK ? 'A' : 'a');
-    
-    /* Now draw it. */
-    if (xo == 1)
-      write_color_char(colors[BOARD(i, j)][d->crude_status], w);
-    else if (xo == 2) {
-      if (BOARD(i, j) == BLACK)
-	write_color_char(domain_colors[1], 'X');
-      else
-	write_color_char(domain_colors[2], 'O');
-    }
-    else if (xo == 3)
-      write_color_char(colors[BOARD(i, j)][d2->owl_status], w);
-    else if (xo == 4)
-      write_color_char(colors[BOARD(i, j)][d->status], w);
-  }
 }
 
 
@@ -265,49 +265,49 @@ showchar(int i, int j, int empty, int xo)
 void
 showboard(int xo)
 {
-  int i, j, ii;
-  gg_init_color();
+    int i, j, ii;
+    gg_init_color();
 
-  /* Set all dragon numbers to 0. */
-  memset(dragon_num, 0, sizeof(dragon_num));
-  
-  next_white = (259 - 26);
-  next_black = 26;
-  
-  start_draw_board();
-  
-  for (i = 0; i < board_size; i++) {
-    ii = board_size - i;
-    fprintf(stderr, "\n%2d", ii);
-    
-    for (j = 0; j < board_size; j++)
-      showchar(i, j, is_hoshi_point(i, j) ? '+' : '.', xo);
-    
-    fprintf(stderr, " %d", ii);
-    
-    if (xo == 0 && ((board_size < 10 && i == board_size-2)
-		    || (board_size >= 10 && i == 8)))
-      fprintf(stderr, "     WHITE (O) has captured %d stones", black_captured);
-    
-    if (xo == 0 && ((board_size < 10 && i == board_size-1)
-		    || (board_size >= 10 && i == 9)))
-      fprintf(stderr, "     BLACK (X) has captured %d stones", white_captured);
-    
-    if (xo == 3) {
-      if (i == board_size-5)
-	write_color_string(GG_COLOR_GREEN, "    green=alive");
-      if (i == board_size-4)
-	write_color_string(GG_COLOR_CYAN, "    cyan=dead");
-      if (i == board_size-3)
-	write_color_string(GG_COLOR_RED, "    red=critical");
-      if (i == board_size-2)
-	write_color_string(GG_COLOR_YELLOW, "    yellow=unknown");
-      if (i == board_size-1)
-	write_color_string(GG_COLOR_MAGENTA, "    magenta=unchecked");
+    /* Set all dragon numbers to 0. */
+    memset(dragon_num, 0, sizeof(dragon_num));
+
+    next_white = (259 - 26);
+    next_black = 26;
+
+    start_draw_board();
+
+    for (i = 0; i < board_size; i++) {
+        ii = board_size - i;
+        fprintf(stderr, "\n%2d", ii);
+
+        for (j = 0; j < board_size; j++)
+            showchar(i, j, is_hoshi_point(i, j) ? '+' : '.', xo);
+
+        fprintf(stderr, " %d", ii);
+
+        if (xo == 0 && ((board_size < 10 && i == board_size-2)
+                        || (board_size >= 10 && i == 8)))
+            fprintf(stderr, "     WHITE (O) has captured %d stones", black_captured);
+
+        if (xo == 0 && ((board_size < 10 && i == board_size-1)
+                        || (board_size >= 10 && i == 9)))
+            fprintf(stderr, "     BLACK (X) has captured %d stones", white_captured);
+
+        if (xo == 3) {
+            if (i == board_size-5)
+                write_color_string(GG_COLOR_GREEN, "    green=alive");
+            if (i == board_size-4)
+                write_color_string(GG_COLOR_CYAN, "    cyan=dead");
+            if (i == board_size-3)
+                write_color_string(GG_COLOR_RED, "    red=critical");
+            if (i == board_size-2)
+                write_color_string(GG_COLOR_YELLOW, "    yellow=unknown");
+            if (i == board_size-1)
+                write_color_string(GG_COLOR_MAGENTA, "    magenta=unchecked");
+        }
     }
-  }
 
-  end_draw_board();
+    end_draw_board();
 }
 
 
@@ -316,14 +316,14 @@ showboard(int xo)
  */
 
 static const char *status_names[] = {
-  DRAGON_STATUS_NAMES
+    DRAGON_STATUS_NAMES
 };
 
 /* Convert a status value to a string. */
 const char *
 status_to_string(enum dragon_status status)
 {
-  return status_names[(int) status];
+    return status_names[(int) status];
 }
 
 
@@ -331,16 +331,23 @@ status_to_string(enum dragon_status status)
 const char *
 result_to_string(int result)
 {
-  switch (result) {
-  case 0:             return "0";
-  case KO_B:          return "KO_B";
-  case LOSS:          return "LOSS";
-  case GAIN:          return "GAIN";
-  case KO_A:          return "KO_A";
-  case WIN:           return "WIN";
+    switch (result) {
+    case 0:
+        return "0";
+    case KO_B:
+        return "KO_B";
+    case LOSS:
+        return "LOSS";
+    case GAIN:
+        return "GAIN";
+    case KO_A:
+        return "KO_A";
+    case WIN:
+        return "WIN";
 
-  default:            return "ERROR";
-  }
+    default:
+        return "ERROR";
+    }
 }
 
 
@@ -349,17 +356,17 @@ result_to_string(int result)
 /* See gnugo.h for related TRACE family macro definitions */
 
 /* Always returns 1 to allow use in short-circuit logical expressions. */
-int 
+int
 DEBUG_func(int flag, const char *fmt, ...)
 {
-  if (debug & flag) {
-    va_list ap;
-    va_start(ap, fmt);
-    vgprintf(stderr, fmt, ap);
-    va_end(ap);
-  }
+    if (debug & flag) {
+        va_list ap;
+        va_start(ap, fmt);
+        vgprintf(stderr, fmt, ap);
+        va_end(ap);
+    }
 
-  return 1;
+    return 1;
 }
 
 #endif /*HAVE_VARIADIC_DEFINE*/

@@ -79,83 +79,83 @@ FILE *gtp_output_file = NULL;
 /* Read filehandle gtp_input linewise and interpret as GTP commands. */
 void
 gtp_main_loop(struct gtp_command commands[],
-	      FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands)
+              FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands)
 {
-  char line[GTP_BUFSIZE];
-  char command[GTP_BUFSIZE];
-  char *p;
-  int i;
-  int n;
-  int status = GTP_OK;
+    char line[GTP_BUFSIZE];
+    char command[GTP_BUFSIZE];
+    char *p;
+    int i;
+    int n;
+    int status = GTP_OK;
 
-  gtp_output_file = gtp_output;
+    gtp_output_file = gtp_output;
 
-  while (status == GTP_OK) {
-    /* Read a line from gtp_input. */
-    if (!fgets(line, GTP_BUFSIZE, gtp_input))
-      break; /* EOF or some error */
+    while (status == GTP_OK) {
+        /* Read a line from gtp_input. */
+        if (!fgets(line, GTP_BUFSIZE, gtp_input))
+            break; /* EOF or some error */
 
-    if (gtp_dump_commands) {
-      fputs(line, gtp_dump_commands);
-      fflush(gtp_dump_commands);
-    }    
+        if (gtp_dump_commands) {
+            fputs(line, gtp_dump_commands);
+            fflush(gtp_dump_commands);
+        }
 
-    /* Preprocess the line. */
-    for (i = 0, p = line; line[i]; i++) {
-      char c = line[i];
-      /* Convert HT (9) to SPACE (32). */
-      if (c == 9)
-	*p++ = 32;
-      /* Remove CR (13) and all other control characters except LF (10). */
-      else if ((c > 0 && c <= 9)
-	       || (c >= 11 && c <= 31)
-	       || c == 127)
-	continue;
-      /* Remove comments. */
-      else if (c == '#')
-	break;
-      /* Keep ordinary text. */
-      else
-	*p++ = c;
+        /* Preprocess the line. */
+        for (i = 0, p = line; line[i]; i++) {
+            char c = line[i];
+            /* Convert HT (9) to SPACE (32). */
+            if (c == 9)
+                *p++ = 32;
+            /* Remove CR (13) and all other control characters except LF (10). */
+            else if ((c > 0 && c <= 9)
+                     || (c >= 11 && c <= 31)
+                     || c == 127)
+                continue;
+            /* Remove comments. */
+            else if (c == '#')
+                break;
+            /* Keep ordinary text. */
+            else
+                *p++ = c;
+        }
+        /* Terminate string. */
+        *p = 0;
+
+        p = line;
+
+        /* Look for an identification number. */
+        if (sscanf(p, "%d%n", &current_id, &n) == 1)
+            p += n;
+        else
+            current_id = -1; /* No identification number. */
+
+        /* Look for command name. */
+        if (sscanf(p, " %s %n", command, &n) < 1)
+            continue; /* Whitespace only on this line, ignore. */
+        p += n;
+
+        /* Search the list of commands and call the corresponding function
+         * if it's found.
+         */
+        for (i = 0; commands[i].name != NULL; i++) {
+            if (strcmp(command, commands[i].name) == 0) {
+                status = (*commands[i].function)(p);
+                break;
+            }
+        }
+        if (commands[i].name == NULL)
+            gtp_failure("unknown command");
+
+        if (status == GTP_FATAL)
+            gtp_panic();
     }
-    /* Terminate string. */
-    *p = 0;
-	
-    p = line;
-
-    /* Look for an identification number. */
-    if (sscanf(p, "%d%n", &current_id, &n) == 1)
-      p += n;
-    else
-      current_id = -1; /* No identification number. */
-
-    /* Look for command name. */
-    if (sscanf(p, " %s %n", command, &n) < 1)
-      continue; /* Whitespace only on this line, ignore. */
-    p += n;
-
-    /* Search the list of commands and call the corresponding function
-     * if it's found.
-     */
-    for (i = 0; commands[i].name != NULL; i++) {
-      if (strcmp(command, commands[i].name) == 0) {
-	status = (*commands[i].function)(p);
-	break;
-      }
-    }
-    if (commands[i].name == NULL)
-      gtp_failure("unknown command");
-
-    if (status == GTP_FATAL)
-      gtp_panic();
-  }
 }
 
 /* Set the board size used in coordinate conversions. */
 void
 gtp_internal_set_boardsize(int size)
 {
-  gtp_boardsize = size;
+    gtp_boardsize = size;
 }
 
 /* If you need to transform the coordinates on input or output, use
@@ -166,8 +166,8 @@ gtp_internal_set_boardsize(int size)
 void
 gtp_set_vertex_transform_hooks(gtp_transform_ptr in, gtp_transform_ptr out)
 {
-  vertex_transform_input_hook = in;
-  vertex_transform_output_hook = out;
+    vertex_transform_input_hook = in;
+    vertex_transform_output_hook = out;
 }
 
 /*
@@ -176,68 +176,68 @@ gtp_set_vertex_transform_hooks(gtp_transform_ptr in, gtp_transform_ptr out)
  * But it also accepts %m, which takes two integers and writes a vertex,
  * and %C, which takes a color value and writes a color string.
  */
-void 
+void
 gtp_mprintf(const char *fmt, ...)
 {
-  va_list ap;
-  va_start(ap, fmt);
-  
-  for (; *fmt; ++fmt) {
-    if (*fmt == '%') {
-      switch (*++fmt) {
-      case 'c':
-      {
-	/* rules of promotion => passed as int, not char */
-	int c = va_arg(ap, int);
-	putc(c, gtp_output_file);
-	break;
-      }
-      case 'd':
-      {
-	int d = va_arg(ap, int);
-	fprintf(gtp_output_file, "%d", d);
-	break;
-      }
-      case 'f':
-      {
-	double f = va_arg(ap, double); /* passed as double, not float */
-	fprintf(gtp_output_file, "%f", f);
-	break;
-      }
-      case 's':
-      {
-	char *s = va_arg(ap, char *);
-	fputs(s, gtp_output_file);
-	break;
-      }
-      case 'm':
-      {
-	int m = va_arg(ap, int);
-	int n = va_arg(ap, int);
-        gtp_print_vertex(m, n);
-	break;
-      }
-      case 'C':
-      {
-	int color = va_arg(ap, int);
-	if (color == WHITE)
-	  fputs("white", gtp_output_file);
-	else if (color == BLACK)
-	  fputs("black", gtp_output_file);
-	else
-	  fputs("empty", gtp_output_file);
-	break;
-      }
-      default:
-	/* FIXME: Should go to `stderr' instead? */
-	fprintf(gtp_output_file, "\n\nUnknown format character '%c'\n", *fmt);
-	break;
-      }
+    va_list ap;
+    va_start(ap, fmt);
+
+    for (; *fmt; ++fmt) {
+        if (*fmt == '%') {
+            switch (*++fmt) {
+            case 'c':
+            {
+                /* rules of promotion => passed as int, not char */
+                int c = va_arg(ap, int);
+                putc(c, gtp_output_file);
+                break;
+            }
+            case 'd':
+            {
+                int d = va_arg(ap, int);
+                fprintf(gtp_output_file, "%d", d);
+                break;
+            }
+            case 'f':
+            {
+                double f = va_arg(ap, double); /* passed as double, not float */
+                fprintf(gtp_output_file, "%f", f);
+                break;
+            }
+            case 's':
+            {
+                char *s = va_arg(ap, char *);
+                fputs(s, gtp_output_file);
+                break;
+            }
+            case 'm':
+            {
+                int m = va_arg(ap, int);
+                int n = va_arg(ap, int);
+                gtp_print_vertex(m, n);
+                break;
+            }
+            case 'C':
+            {
+                int color = va_arg(ap, int);
+                if (color == WHITE)
+                    fputs("white", gtp_output_file);
+                else if (color == BLACK)
+                    fputs("black", gtp_output_file);
+                else
+                    fputs("empty", gtp_output_file);
+                break;
+            }
+            default:
+                /* FIXME: Should go to `stderr' instead? */
+                fprintf(gtp_output_file, "\n\nUnknown format character '%c'\n", *fmt);
+                break;
+            }
+        }
+        else
+            putc(*fmt, gtp_output_file);
     }
-    else
-      putc(*fmt, gtp_output_file);
-  }
-  va_end(ap);
+    va_end(ap);
 }
 
 
@@ -245,10 +245,10 @@ gtp_mprintf(const char *fmt, ...)
 void
 gtp_printf(const char *format, ...)
 {
-  va_list ap;
-  va_start(ap, format);
-  vfprintf(gtp_output_file, format, ap);
-  va_end(ap);
+    va_list ap;
+    va_start(ap, format);
+    vfprintf(gtp_output_file, format, ap);
+    va_end(ap);
 }
 
 
@@ -258,15 +258,15 @@ gtp_printf(const char *format, ...)
 void
 gtp_start_response(int status)
 {
-  if (status == GTP_SUCCESS)
-    gtp_printf("=");
-  else
-    gtp_printf("?");
-  
-  if (current_id < 0)
-    gtp_printf(" ");
-  else
-    gtp_printf("%d ", current_id);
+    if (status == GTP_SUCCESS)
+        gtp_printf("=");
+    else
+        gtp_printf("?");
+
+    if (current_id < 0)
+        gtp_printf(" ");
+    else
+        gtp_printf("%d ", current_id);
 }
 
 
@@ -274,8 +274,8 @@ gtp_start_response(int status)
 int
 gtp_finish_response()
 {
-  gtp_printf("\n\n");
-  return GTP_OK;
+    gtp_printf("\n\n");
+    return GTP_OK;
 }
 
 
@@ -285,12 +285,12 @@ gtp_finish_response()
 int
 gtp_success(const char *format, ...)
 {
-  va_list ap;
-  gtp_start_response(GTP_SUCCESS);
-  va_start(ap, format);
-  vfprintf(gtp_output_file, format, ap);
-  va_end(ap);
-  return gtp_finish_response();
+    va_list ap;
+    gtp_start_response(GTP_SUCCESS);
+    va_start(ap, format);
+    vfprintf(gtp_output_file, format, ap);
+    va_end(ap);
+    return gtp_finish_response();
 }
 
 
@@ -298,12 +298,12 @@ gtp_success(const char *format, ...)
 int
 gtp_failure(const char *format, ...)
 {
-  va_list ap;
-  gtp_start_response(GTP_FAILURE);
-  va_start(ap, format);
-  vfprintf(gtp_output_file, format, ap);
-  va_end(ap);
-  return gtp_finish_response();
+    va_list ap;
+    gtp_start_response(GTP_FAILURE);
+    va_start(ap, format);
+    vfprintf(gtp_output_file, format, ap);
+    va_end(ap);
+    return gtp_finish_response();
 }
 
 
@@ -311,7 +311,7 @@ gtp_failure(const char *format, ...)
 void
 gtp_panic()
 {
-  gtp_printf("! panic\n\n");
+    gtp_printf("! panic\n\n");
 }
 
 
@@ -322,28 +322,28 @@ gtp_panic()
 int
 gtp_decode_color(char *s, int *color)
 {
-  char color_string[7];
-  int i;
-  int n;
+    char color_string[7];
+    int i;
+    int n;
 
-  assert(gtp_boardsize > 0);
+    assert(gtp_boardsize > 0);
 
-  if (sscanf(s, "%6s%n", color_string, &n) != 1)
-    return 0;
+    if (sscanf(s, "%6s%n", color_string, &n) != 1)
+        return 0;
 
-  for (i = 0; i < (int) strlen(color_string); i++)
-    color_string[i] = tolower((int) color_string[i]);
+    for (i = 0; i < (int) strlen(color_string); i++)
+        color_string[i] = tolower((int) color_string[i]);
 
-  if (strcmp(color_string, "b") == 0
-      || strcmp(color_string, "black") == 0)
-    *color = BLACK;
-  else if (strcmp(color_string, "w") == 0
-	   || strcmp(color_string, "white") == 0)
-    *color = WHITE;
-  else
-    return 0;
-  
-  return n;
+    if (strcmp(color_string, "b") == 0
+            || strcmp(color_string, "black") == 0)
+        *color = BLACK;
+    else if (strcmp(color_string, "w") == 0
+             || strcmp(color_string, "white") == 0)
+        *color = WHITE;
+    else
+        return 0;
+
+    return n;
 }
 
 
@@ -354,30 +354,30 @@ gtp_decode_color(char *s, int *color)
 int
 gtp_decode_coord(char *s, int *i, int *j)
 {
-  char column;
-  int row;
-  int n;
+    char column;
+    int row;
+    int n;
 
-  assert(gtp_boardsize > 0);
+    assert(gtp_boardsize > 0);
 
-  if (sscanf(s, " %c%d%n", &column, &row, &n) != 2)
-    return 0;
-  
-  if (tolower((int) column) == 'i')
-    return 0;
-  *j = tolower((int) column) - 'a';
-  if (tolower((int) column) > 'i')
-    --*j;
+    if (sscanf(s, " %c%d%n", &column, &row, &n) != 2)
+        return 0;
 
-  *i = gtp_boardsize - row;
+    if (tolower((int) column) == 'i')
+        return 0;
+    *j = tolower((int) column) - 'a';
+    if (tolower((int) column) > 'i')
+        --*j;
 
-  if (*i < 0 || *i >= gtp_boardsize || *j < 0 || *j >= gtp_boardsize)
-    return 0;
+    *i = gtp_boardsize - row;
 
-  if (vertex_transform_input_hook != NULL)
-    (*vertex_transform_input_hook)(*i, *j, i, j);
+    if (*i < 0 || *i >= gtp_boardsize || *j < 0 || *j >= gtp_boardsize)
+        return 0;
 
-  return n;
+    if (vertex_transform_input_hook != NULL)
+        (*vertex_transform_input_hook)(*i, *j, i, j);
+
+    return n;
 }
 
 /* Convert a move, i.e. "b" or "w" followed by a vertex to a color and
@@ -387,29 +387,29 @@ gtp_decode_coord(char *s, int *i, int *j)
 int
 gtp_decode_move(char *s, int *color, int *i, int *j)
 {
-  int n1, n2;
-  int k;
+    int n1, n2;
+    int k;
 
-  assert(gtp_boardsize > 0);
+    assert(gtp_boardsize > 0);
 
-  n1 = gtp_decode_color(s, color);
-  if (n1 == 0)
-    return 0;
+    n1 = gtp_decode_color(s, color);
+    if (n1 == 0)
+        return 0;
 
-  n2 = gtp_decode_coord(s + n1, i, j);
-  if (n2 == 0) {
-    char buf[6];
-    if (sscanf(s + n1, "%5s%n", buf, &n2) != 1)
-      return 0;
-    for (k = 0; k < (int) strlen(buf); k++)
-      buf[k] = tolower((int) buf[k]);
-    if (strcmp(buf, "pass") != 0)
-      return 0;
-    *i = -1;
-    *j = -1;
-  }
-  
-  return n1 + n2;
+    n2 = gtp_decode_coord(s + n1, i, j);
+    if (n2 == 0) {
+        char buf[6];
+        if (sscanf(s + n1, "%5s%n", buf, &n2) != 1)
+            return 0;
+        for (k = 0; k < (int) strlen(buf); k++)
+            buf[k] = tolower((int) buf[k]);
+        if (strcmp(buf, "pass") != 0)
+            return 0;
+        *i = -1;
+        *j = -1;
+    }
+
+    return n1 + n2;
 }
 
 /* This a bubble sort. Given the expected size of the sets to
@@ -419,21 +419,21 @@ gtp_decode_move(char *s, int *color, int *i, int *j)
 static void
 sort_moves(int n, int movei[], int movej[])
 {
-  int b, a;
-  for (b = n-1; b > 0; b--) {
-    for (a = 0; a < b; a++) {
-      if (movei[a] > movei[b]
-	  || (movei[a] == movei[b] && movej[a] > movej[b])) {
-	int tmp;
-	tmp = movei[b];
-	movei[b] = movei[a];
-	movei[a] = tmp;
-	tmp = movej[b];
-	movej[b] = movej[a];
-	movej[a] = tmp;
-      }
+    int b, a;
+    for (b = n-1; b > 0; b--) {
+        for (a = 0; a < b; a++) {
+            if (movei[a] > movei[b]
+                    || (movei[a] == movei[b] && movej[a] > movej[b])) {
+                int tmp;
+                tmp = movei[b];
+                movei[b] = movei[a];
+                movei[a] = tmp;
+                tmp = movej[b];
+                movej[b] = movej[a];
+                movej[a] = tmp;
+            }
+        }
     }
-  }
 }
 
 /* Write a number of space separated vertices. The moves are sorted
@@ -442,37 +442,37 @@ sort_moves(int n, int movei[], int movej[])
 void
 gtp_print_vertices(int n, int movei[], int movej[])
 {
-  int k;
-  int ri, rj;
-  
-  assert(gtp_boardsize > 0);
-  
-  sort_moves(n, movei, movej);
-  for (k = 0; k < n; k++) {
-    if (k > 0)
-      gtp_printf(" ");
-    if (movei[k] == -1 && movej[k] == -1)
-      gtp_printf("PASS");
-    else if (movei[k] < 0 || movei[k] >= gtp_boardsize
-	     || movej[k] < 0 || movej[k] >= gtp_boardsize)
-      gtp_printf("??");
-    else {
-      if (vertex_transform_output_hook != NULL)
-	(*vertex_transform_output_hook)(movei[k], movej[k], &ri, &rj);
-      else {
-	ri = movei[k];
-	rj = movej[k];
-      }
-      gtp_printf("%c%d", 'A' + rj + (rj >= 8), gtp_boardsize - ri);
+    int k;
+    int ri, rj;
+
+    assert(gtp_boardsize > 0);
+
+    sort_moves(n, movei, movej);
+    for (k = 0; k < n; k++) {
+        if (k > 0)
+            gtp_printf(" ");
+        if (movei[k] == -1 && movej[k] == -1)
+            gtp_printf("PASS");
+        else if (movei[k] < 0 || movei[k] >= gtp_boardsize
+                 || movej[k] < 0 || movej[k] >= gtp_boardsize)
+            gtp_printf("??");
+        else {
+            if (vertex_transform_output_hook != NULL)
+                (*vertex_transform_output_hook)(movei[k], movej[k], &ri, &rj);
+            else {
+                ri = movei[k];
+                rj = movej[k];
+            }
+            gtp_printf("%c%d", 'A' + rj + (rj >= 8), gtp_boardsize - ri);
+        }
     }
-  }
 }
 
 /* Write a single move. */
 void
 gtp_print_vertex(int i, int j)
 {
-  gtp_print_vertices(1, &i, &j);
+    gtp_print_vertices(1, &i, &j);
 }
 
 

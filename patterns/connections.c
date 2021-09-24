@@ -32,15 +32,15 @@
 int
 disconnect_helper(int apos, int bpos)
 {
-  int color = board[apos];
-  int move;
-  ASSERT1(color == board[bpos] && IS_STONE(color), apos);
+    int color = board[apos];
+    int move;
+    ASSERT1(color == board[bpos] && IS_STONE(color), apos);
 
-  if (disconnect(apos, bpos, &move)) {
-    add_cut(apos, bpos, move);
-    return 1;
-  }
-  return 0;
+    if (disconnect(apos, bpos, &move)) {
+        add_cut(apos, bpos, move);
+        return 1;
+    }
+    return 0;
 }
 
 /* Try to match all (permutations of) connection patterns at (m,n).
@@ -51,181 +51,181 @@ disconnect_helper(int apos, int bpos)
 
 static void
 cut_connect_callback(int anchor, int color, struct pattern *pattern,
-		     int ll, void *data)
+                     int ll, void *data)
 {
-  int move;
-  int k;
-  int first_dragon  = NO_MOVE;
-  int second_dragon = NO_MOVE;
+    int move;
+    int k;
+    int first_dragon  = NO_MOVE;
+    int second_dragon = NO_MOVE;
 
-  int other = OTHER_COLOR(color);
-  UNUSED(data);
+    int other = OTHER_COLOR(color);
+    UNUSED(data);
 
-  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
-  
-  if ((pattern->class & CLASS_B) && !safe_move(move, other))
-    return;
+    move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
 
-  if (pattern->class & CLASS_C) {
-    /* If C pattern, test if there are more than one dragon in this
-     * pattern so that there is something to connect, before doing any
-     * expensive reading.
+    if ((pattern->class & CLASS_B) && !safe_move(move, other))
+        return;
+
+    if (pattern->class & CLASS_C) {
+        /* If C pattern, test if there are more than one dragon in this
+         * pattern so that there is something to connect, before doing any
+         * expensive reading.
+         */
+
+        for (k = 0; k < pattern->patlen; ++k) { /* match each point */
+            /* transform pattern real coordinate */
+            int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
+
+            /* Look for distinct dragons. */
+            if (pattern->patn[k].att == ATT_O) {
+                if (first_dragon == NO_MOVE)
+                    first_dragon = dragon[pos].origin;
+                else if (second_dragon == NO_MOVE
+                         && dragon[pos].origin != first_dragon) {
+                    second_dragon = dragon[pos].origin;
+                    /* A second dragon found, no need to continue looping. */
+                    break;
+                }
+            }
+        }
+        if (second_dragon == NO_MOVE)
+            return; /* Nothing to amalgamate. */
+    }
+
+    /* If the pattern has a constraint, call the autohelper to see
+     * if the pattern must be rejected.
      */
-
-    for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-      /* transform pattern real coordinate */
-      int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-      
-      /* Look for distinct dragons. */
-      if (pattern->patn[k].att == ATT_O) {
-	if (first_dragon == NO_MOVE)
-	  first_dragon = dragon[pos].origin;
-	else if (second_dragon == NO_MOVE
-		 && dragon[pos].origin != first_dragon) {
-	  second_dragon = dragon[pos].origin;
-	  /* A second dragon found, no need to continue looping. */
-	  break;
-	}
-      }
+    if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
+        if (!pattern->autohelper(ll, move, color, 0))
+            return;
     }
-    if (second_dragon == NO_MOVE)
-      return; /* Nothing to amalgamate. */
-  }
-    
-  /* If the pattern has a constraint, call the autohelper to see
-   * if the pattern must be rejected.
-   */
-  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(ll, move, color, 0))
-      return;
-  }
 
-  /* If the pattern has a helper, call it to see if the pattern must
-   * be rejected.
-   */
-  if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, move, color))
-      return;
-  }
-
-  if ((pattern->class & CLASS_B)
-      && !(pattern->class & CLASS_s)) {
-    /* Require that the X stones in the pattern are tactically safe. */
-    for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-      if (pattern->patn[k].att == ATT_X) {
-	/* transform pattern real coordinate */
-	int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-
-	if (attack(pos, NULL) == WIN
-	    && (move == NO_MOVE
-		|| !does_defend(move, pos)))
-	  return; /* Match failed */
-      }
+    /* If the pattern has a helper, call it to see if the pattern must
+     * be rejected.
+     */
+    if (pattern->helper) {
+        if (!pattern->helper(pattern, ll, move, color))
+            return;
     }
-  }
 
-  /* Get here => Pattern matches. */
-  if (pattern->class & CLASS_B) {
-    DEBUG(DEBUG_DRAGONS, "Cutting pattern %s+%d found at %1m\n",
-	  pattern->name, ll, anchor);
-    DEBUG(DEBUG_DRAGONS, "cutting point %1m\n", move);
-  }
-  else if (pattern->class & CLASS_C)
-    DEBUG(DEBUG_DRAGONS, "Connecting pattern %s+%d found at %1m\n",
-	  pattern->name, ll, anchor);
+    if ((pattern->class & CLASS_B)
+            && !(pattern->class & CLASS_s)) {
+        /* Require that the X stones in the pattern are tactically safe. */
+        for (k = 0; k < pattern->patlen; ++k) { /* match each point */
+            if (pattern->patn[k].att == ATT_X) {
+                /* transform pattern real coordinate */
+                int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
-  /* does the pattern have an action? */
-  if (pattern->autohelper_flag & HAVE_ACTION) {
-    pattern->autohelper(ll, move, color, 1);
-  }
+                if (attack(pos, NULL) == WIN
+                        && (move == NO_MOVE
+                            || !does_defend(move, pos)))
+                    return; /* Match failed */
+            }
+        }
+    }
 
-  /* If it is a B pattern, set cutting point. */
-  
-  if (pattern->class & CLASS_B) {
-    cutting_points[move] |= color;
-  }
-  else if (!(pattern->class & CLASS_C))
-    return; /* Nothing more to do, up to the helper or autohelper
+    /* Get here => Pattern matches. */
+    if (pattern->class & CLASS_B) {
+        DEBUG(DEBUG_DRAGONS, "Cutting pattern %s+%d found at %1m\n",
+              pattern->name, ll, anchor);
+        DEBUG(DEBUG_DRAGONS, "cutting point %1m\n", move);
+    }
+    else if (pattern->class & CLASS_C)
+        DEBUG(DEBUG_DRAGONS, "Connecting pattern %s+%d found at %1m\n",
+              pattern->name, ll, anchor);
+
+    /* does the pattern have an action? */
+    if (pattern->autohelper_flag & HAVE_ACTION) {
+        pattern->autohelper(ll, move, color, 1);
+    }
+
+    /* If it is a B pattern, set cutting point. */
+
+    if (pattern->class & CLASS_B) {
+        cutting_points[move] |= color;
+    }
+    else if (!(pattern->class & CLASS_C))
+        return; /* Nothing more to do, up to the helper or autohelper
 	       to amalgamate dragons or modify eye space. */
 
-  /* If it is a C pattern, find the dragons to connect.
-   * If it is a B pattern, find eye space points to inhibit connection
-   * through.
-   */
-  first_dragon  = NO_MOVE;
-  second_dragon = NO_MOVE;
-  for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-    /* transform pattern real coordinate */
-    int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-
-    /* Look for dragons to amalgamate. Never amalgamate stones which
-     * can be attacked.
+    /* If it is a C pattern, find the dragons to connect.
+     * If it is a B pattern, find eye space points to inhibit connection
+     * through.
      */
-    if ((pattern->class & CLASS_C)
-	&& board[pos] == color
-	&& pattern->patn[k].att == ATT_O
-	&& ((pattern->class & CLASS_s) || attack(pos, NULL) == 0)) {
-      if (first_dragon == NO_MOVE)
-	first_dragon = dragon[pos].origin;
-      else if (second_dragon == NO_MOVE
-	       && dragon[pos].origin != first_dragon) {
-	second_dragon = dragon[pos].origin;
-	/* A second dragon found, we amalgamate them at once. */
-	/* Want this output if verbose or DEBUG_DRAGONS is on. */
-	if (verbose || (debug & DEBUG_DRAGONS))
-	  gprintf("Pattern %s joins %C dragons %1m, %1m\n",
-		  pattern->name, color, first_dragon, second_dragon);
-	join_dragons(second_dragon, first_dragon);
-	/* Now look for another second dragon. */
-	second_dragon = NO_MOVE;
-	first_dragon = dragon[pos].origin;
-      }
-    }
-    
-    /* Inhibit connections */
-    if (pattern->class & CLASS_B) {
-      if (pattern->patn[k].att != ATT_not)
-	break; /* The inhibition points are guaranteed to come first. */
-      cutting_points[pos] |= color;
-      DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
-    }
-  } /* loop over elements */
+    first_dragon  = NO_MOVE;
+    second_dragon = NO_MOVE;
+    for (k = 0; k < pattern->patlen; ++k) { /* match each point */
+        /* transform pattern real coordinate */
+        int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
+
+        /* Look for dragons to amalgamate. Never amalgamate stones which
+         * can be attacked.
+         */
+        if ((pattern->class & CLASS_C)
+                && board[pos] == color
+                && pattern->patn[k].att == ATT_O
+                && ((pattern->class & CLASS_s) || attack(pos, NULL) == 0)) {
+            if (first_dragon == NO_MOVE)
+                first_dragon = dragon[pos].origin;
+            else if (second_dragon == NO_MOVE
+                     && dragon[pos].origin != first_dragon) {
+                second_dragon = dragon[pos].origin;
+                /* A second dragon found, we amalgamate them at once. */
+                /* Want this output if verbose or DEBUG_DRAGONS is on. */
+                if (verbose || (debug & DEBUG_DRAGONS))
+                    gprintf("Pattern %s joins %C dragons %1m, %1m\n",
+                            pattern->name, color, first_dragon, second_dragon);
+                join_dragons(second_dragon, first_dragon);
+                /* Now look for another second dragon. */
+                second_dragon = NO_MOVE;
+                first_dragon = dragon[pos].origin;
+            }
+        }
+
+        /* Inhibit connections */
+        if (pattern->class & CLASS_B) {
+            if (pattern->patn[k].att != ATT_not)
+                break; /* The inhibition points are guaranteed to come first. */
+            cutting_points[pos] |= color;
+            DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
+        }
+    } /* loop over elements */
 }
 
 
 /* Only consider B patterns. */
 static void
 cut_callback(int anchor, int color, struct pattern *pattern, int ll,
-	     void *data)
+             void *data)
 {
-  if (pattern->class & CLASS_B)
-    cut_connect_callback(anchor, color, pattern, ll, data);
+    if (pattern->class & CLASS_B)
+        cut_connect_callback(anchor, color, pattern, ll, data);
 }
-  
+
 
 /* Consider C patterns and those without classification. */
 static void
 conn_callback(int anchor, int color, struct pattern *pattern, int ll,
-	      void *data)
+              void *data)
 {
-  if (!(pattern->class & CLASS_B))
-    cut_connect_callback(anchor, color, pattern, ll, data);
+    if (!(pattern->class & CLASS_B))
+        cut_connect_callback(anchor, color, pattern, ll, data);
 }
-  
+
 /* Find cutting points which should inhibit amalgamations and sever
  * the adjacent eye space.
  */
 void
 find_cuts(void)
 {
-  matchpat(cut_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
+    matchpat(cut_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
 }
 
 /* Find explicit connection patterns and amalgamate the involved dragons. */
 void
 find_connections(void)
 {
-  matchpat(conn_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
+    matchpat(conn_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
 }
 
 

@@ -52,8 +52,8 @@ static int socket_end_of_file = 0;
 void
 winsocket_activate(int _socket_handle)
 {
-  assert(socket_handle == 0);
-  socket_handle = _socket_handle;
+    assert(socket_handle == 0);
+    socket_handle = _socket_handle;
 }
 
 
@@ -62,46 +62,46 @@ winsocket_activate(int _socket_handle)
 void
 winsocket_setbuf(FILE *file, char *buffer)
 {
-  if (file != NULL)
-    setbuf(file, buffer);
-  else
-    assert(socket_handle != 0);
+    if (file != NULL)
+        setbuf(file, buffer);
+    else
+        assert(socket_handle != 0);
 }
 
 
 int
 winsocket_fflush(FILE *file)
 {
-  if (file != NULL)
-    return fflush(file);
-  else {
-    assert(socket_handle != 0);
-    return 0;
-  }
+    if (file != NULL)
+        return fflush(file);
+    else {
+        assert(socket_handle != 0);
+        return 0;
+    }
 }
 
 
 int
 winsocket_feof(FILE *file)
 {
-  if (file != NULL)
-    return feof(file);
-  else {
-    assert(socket_handle != 0);
-    return socket_end_of_file;
-  }
+    if (file != NULL)
+        return feof(file);
+    else {
+        assert(socket_handle != 0);
+        return socket_end_of_file;
+    }
 }
 
 
 int
 winsocket_fclose(FILE *file)
 {
-  if (file != NULL)
-    return fclose(file);
-  else {
-    assert(socket_handle != 0);
-    return 0;
-  }
+    if (file != NULL)
+        return fclose(file);
+    else {
+        assert(socket_handle != 0);
+        return 0;
+    }
 }
 
 
@@ -110,46 +110,46 @@ winsocket_fclose(FILE *file)
 size_t
 winsocket_fread(void *buffer, size_t size, size_t num_items, FILE *file)
 {
-  if (file != NULL)
-    return fread(buffer, size, num_items, file);
-  else {
-    assert(socket_handle != 0);
-    if (recv(socket_handle, (char *) buffer, size * num_items, 0)
-	== size * num_items)
-      return num_items;
+    if (file != NULL)
+        return fread(buffer, size, num_items, file);
     else {
-      socket_end_of_file = 1;
-      return EOF;
+        assert(socket_handle != 0);
+        if (recv(socket_handle, (char *) buffer, size * num_items, 0)
+                == size * num_items)
+            return num_items;
+        else {
+            socket_end_of_file = 1;
+            return EOF;
+        }
     }
-  }
 }
 
 
 char *
 winsocket_fgets(char *buffer, int size, FILE *file)
 {
-  if (file != NULL)
-    return fgets(buffer, size, file);
-  else {
-    /* FIXME: Optimize if reading char-by-char is too slow. */
-    int stored_length;
+    if (file != NULL)
+        return fgets(buffer, size, file);
+    else {
+        /* FIXME: Optimize if reading char-by-char is too slow. */
+        int stored_length;
 
-    for (stored_length = 0; stored_length < size - 1; stored_length) {
-      if (recv(socket_handle, buffer + stored_length, 1, 0) != 1) {
-	socket_end_of_file = 1;
-	break;
-      }
+        for (stored_length = 0; stored_length < size - 1; stored_length) {
+            if (recv(socket_handle, buffer + stored_length, 1, 0) != 1) {
+                socket_end_of_file = 1;
+                break;
+            }
 
-      if (buffer[stored_length++] == '\n')
-	break;
+            if (buffer[stored_length++] == '\n')
+                break;
+        }
+
+        if (stored_length == 0)
+            return NULL;
+
+        buffer[stored_length + 1] = 0;
+        return buffer;
     }
-
-    if (stored_length == 0)
-      return NULL;
-
-    buffer[stored_length + 1] = 0;
-    return buffer;
-  }
 }
 
 
@@ -157,72 +157,72 @@ winsocket_fgets(char *buffer, int size, FILE *file)
 
 size_t
 winsocket_fwrite(const void *buffer, size_t size, size_t num_items,
-		 FILE *file)
+                 FILE *file)
 {
-  if (file != NULL)
-    return fwrite(buffer, size, num_items, file);
-  else {
-    assert(socket_handle != 0);
-    return ((send(socket_handle, (const char *) buffer, size * num_items, 0)
-	     == size * num_items)
-	    ? num_items : EOF);
-  }
+    if (file != NULL)
+        return fwrite(buffer, size, num_items, file);
+    else {
+        assert(socket_handle != 0);
+        return ((send(socket_handle, (const char *) buffer, size * num_items, 0)
+                 == size * num_items)
+                ? num_items : EOF);
+    }
 }
 
 
 int
 winsocket_fputc(int character, FILE *file)
 {
-  if (file != NULL)
-    return fputc(character, file);
-  else {
-    assert(socket_handle != 0);
-    return (send(socket_handle, (const char *) &character, 1, 0) == 1
-	    ? character : EOF);
-  }
+    if (file != NULL)
+        return fputc(character, file);
+    else {
+        assert(socket_handle != 0);
+        return (send(socket_handle, (const char *) &character, 1, 0) == 1
+                ? character : EOF);
+    }
 }
 
 
 int
 winsocket_fputs(const char *string, FILE *file)
 {
-  if (file != NULL)
-    return fputs(string, file);
-  else {
-    int length = strlen(string);
+    if (file != NULL)
+        return fputs(string, file);
+    else {
+        int length = strlen(string);
 
-    assert(socket_handle != 0);
-    return send(socket_handle, string, length, 0) == length ? length : EOF;
-  }
+        assert(socket_handle != 0);
+        return send(socket_handle, string, length, 0) == length ? length : EOF;
+    }
 }
 
 
 int
 winsocket_fprintf(FILE *file, const char *format_string, ...)
 {
-  va_list arguments;
-  int result;
+    va_list arguments;
+    int result;
 
-  va_start(arguments, format_string);
-  result = winsocket_vfprintf(file, format_string, arguments);
-  va_end(arguments);
+    va_start(arguments, format_string);
+    result = winsocket_vfprintf(file, format_string, arguments);
+    va_end(arguments);
 
-  return result;
+    return result;
 }
 
 
 int
 winsocket_vfprintf(FILE *file, const char *format_string, va_list arguments)
 {
-  if (file != NULL)
-    return vfprintf(file, format_string, arguments);
-  else {
-    char buffer[0x1000];
-    int length = _vsnprintf(buffer, sizeof buffer, format_string, arguments);
+    if (file != NULL)
+        return vfprintf(file, format_string, arguments);
+    else {
+        char buffer[0x1000];
+        int length = _vsnprintf(buffer, sizeof buffer, format_string, arguments);
 
-    assert(socket_handle != 0);
-    return send(socket_handle, buffer, length, 0) == length ? length : -1;
-  }
+        assert(socket_handle != 0);
+        return send(socket_handle, buffer, length, 0) == length ? length : -1;
+    }
 }
 
 

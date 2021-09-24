@@ -31,29 +31,37 @@ int transformation[MAX_OFFSET][8];
 
 /* Matrix array for use by TRANSFORM2() macro. */
 const int transformation2[8][2][2] = {
-  { { 1,  0}, 
-    { 0,  1}}, /* a - identity transformation matrix */
+    {   { 1,  0},
+        { 0,  1}
+    }, /* a - identity transformation matrix */
 
-  { { 0,  1}, 
-    {-1,  0}}, /* g - rotate 90 clockwise */
+    {   { 0,  1},
+        {-1,  0}
+    }, /* g - rotate 90 clockwise */
 
-  { {-1,  0}, 
-    { 0, -1}}, /* d - rotate 180 */
-  
-  { { 0, -1}, 
-    { 1,  0}}, /* f - rotate 90 counter-clockwise */
-  
-  { { 0, -1}, 
-    {-1,  0}}, /* h - rotate 90 clockwise and flip on x axis */
-  
-  { {-1,  0}, 
-    { 0,  1}}, /* b - flip on x axis */
-  
-  { { 0,  1}, 
-    { 1,  0}}, /* e - rotate 90 counter-clockwise and flip on x axis */
-  
-  { { 1,  0}, 
-    { 0, -1}}  /* c - flip on y axis */
+    {   {-1,  0},
+        { 0, -1}
+    }, /* d - rotate 180 */
+
+    {   { 0, -1},
+        { 1,  0}
+    }, /* f - rotate 90 counter-clockwise */
+
+    {   { 0, -1},
+        {-1,  0}
+    }, /* h - rotate 90 clockwise and flip on x axis */
+
+    {   {-1,  0},
+        { 0,  1}
+    }, /* b - flip on x axis */
+
+    {   { 0,  1},
+        { 1,  0}
+    }, /* e - rotate 90 counter-clockwise and flip on x axis */
+
+    {   { 1,  0},
+        { 0, -1}
+    }  /* c - flip on y axis */
 };
 
 
@@ -61,21 +69,21 @@ const int transformation2[8][2][2] = {
 void
 transformation_init(void)
 {
-  int k;
-  int dx;
-  int dy;
+    int k;
+    int dx;
+    int dy;
 
-  for (k = 0; k < 8; k++) {
-    for (dy = -MAX_BOARD+1; dy <= MAX_BOARD-1; dy++) {
-      for (dx = -MAX_BOARD+1; dx <= MAX_BOARD-1; dx++) {
-	int tx;
-	int ty;
+    for (k = 0; k < 8; k++) {
+        for (dy = -MAX_BOARD+1; dy <= MAX_BOARD-1; dy++) {
+            for (dx = -MAX_BOARD+1; dx <= MAX_BOARD-1; dx++) {
+                int tx;
+                int ty;
 
-	TRANSFORM2(dx, dy, &tx, &ty, k);
-	transformation[OFFSET(dx, dy)][k] = DELTA(tx, ty);
-      }
+                TRANSFORM2(dx, dy, &tx, &ty, k);
+                transformation[OFFSET(dx, dy)][k] = DELTA(tx, ty);
+            }
+        }
     }
-  }
 }
 /* Spiral orders for DFA matching and building. */
 int spiral[DFA_MAX_ORDER][8];
@@ -107,62 +115,62 @@ int spiral[DFA_MAX_ORDER][8];
 void
 build_spiral_order(void)
 {
-  int i;
-  int j;
-  int k;
-  char mark[2 * DFA_MAX_BOARD + 1][2 * DFA_MAX_BOARD + 1];
-  int queue_i[DFA_MAX_ORDER];
-  int queue_j[DFA_MAX_ORDER];
-  int queue_start = 0;
-  int queue_end = 1;
+    int i;
+    int j;
+    int k;
+    char mark[2 * DFA_MAX_BOARD + 1][2 * DFA_MAX_BOARD + 1];
+    int queue_i[DFA_MAX_ORDER];
+    int queue_j[DFA_MAX_ORDER];
+    int queue_start = 0;
+    int queue_end = 1;
 
-  static const int delta_i[4] = { 1,  0, -1,  0};
-  static const int delta_j[4] = { 0, 1,  0,  -1};
+    static const int delta_i[4] = { 1,  0, -1,  0};
+    static const int delta_j[4] = { 0, 1,  0,  -1};
 
-  /* Initialization. */
-  memset(mark, 1, sizeof(mark));
-  for (i = 1; i < 2 * DFA_MAX_BOARD; i++) {
-    for (j = 1; j < 2 * DFA_MAX_BOARD; j++)
-      mark[i][j] = 0;
-  }
-
-  queue_i[0] = DFA_MAX_BOARD;
-  queue_j[0] = DFA_MAX_BOARD;
-  mark[DFA_MAX_BOARD][DFA_MAX_BOARD] = 1;
-
-  do {
-    int transformation;
-
-    /* Transform queued coordinates and store DFA offsets in spiral[][]. */
-    for (transformation = 0; transformation < 8; transformation++) {
-      TRANSFORM2(queue_i[queue_start] - DFA_MAX_BOARD,
-		 queue_j[queue_start] - DFA_MAX_BOARD,
-		 &i, &j, transformation);
-      spiral[queue_start][transformation] = DFA_BASE * i + j;
+    /* Initialization. */
+    memset(mark, 1, sizeof(mark));
+    for (i = 1; i < 2 * DFA_MAX_BOARD; i++) {
+        for (j = 1; j < 2 * DFA_MAX_BOARD; j++)
+            mark[i][j] = 0;
     }
 
-    for (k = 0; k < 4; k++) {
-      i = queue_i[queue_start] + delta_i[k];
-      j = queue_j[queue_start] + delta_j[k];
+    queue_i[0] = DFA_MAX_BOARD;
+    queue_j[0] = DFA_MAX_BOARD;
+    mark[DFA_MAX_BOARD][DFA_MAX_BOARD] = 1;
 
-      if (!mark[i][j]) {
-	queue_i[queue_end] = i;
-	queue_j[queue_end++] = j;
-	mark[i][j] = 1;
-      }
-    }
-  } while (++queue_start < queue_end);
+    do {
+        int transformation;
 
-  if (0) {
-    int transformation;
-    for (transformation = 0; transformation < 8; transformation++) {
-      fprintf(stderr, "Transformation %d:\n", transformation);
-      for (k = 0; k < 16; k++) {
-	fprintf(stderr, "\t%d(%c); %d\n", k, 'A' + k,
-		spiral[k][transformation]);
-      }
+        /* Transform queued coordinates and store DFA offsets in spiral[][]. */
+        for (transformation = 0; transformation < 8; transformation++) {
+            TRANSFORM2(queue_i[queue_start] - DFA_MAX_BOARD,
+                       queue_j[queue_start] - DFA_MAX_BOARD,
+                       &i, &j, transformation);
+            spiral[queue_start][transformation] = DFA_BASE * i + j;
+        }
+
+        for (k = 0; k < 4; k++) {
+            i = queue_i[queue_start] + delta_i[k];
+            j = queue_j[queue_start] + delta_j[k];
+
+            if (!mark[i][j]) {
+                queue_i[queue_end] = i;
+                queue_j[queue_end++] = j;
+                mark[i][j] = 1;
+            }
+        }
+    } while (++queue_start < queue_end);
+
+    if (0) {
+        int transformation;
+        for (transformation = 0; transformation < 8; transformation++) {
+            fprintf(stderr, "Transformation %d:\n", transformation);
+            for (k = 0; k < 16; k++) {
+                fprintf(stderr, "\t%d(%c); %d\n", k, 'A' + k,
+                        spiral[k][transformation]);
+            }
+        }
     }
-  }
 }
 
 

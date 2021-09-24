@@ -97,28 +97,28 @@ gg_init_color()
 {
 #ifdef TERMINFO
 
-/* compiler is set to make string literals  const char *
- * But system header files dont prototype things correctly.
- * These are equivalent to a non-const string literals
- */
+    /* compiler is set to make string literals  const char *
+     * But system header files dont prototype things correctly.
+     * These are equivalent to a non-const string literals
+     */
 
-  static char setaf_literal[] = "setaf";
-  static char op_literal[] = "op";
-  static char empty_literal[] = "";
+    static char setaf_literal[] = "setaf";
+    static char op_literal[] = "op";
+    static char empty_literal[] = "";
 
-  if (init)
-    return;
-  
-  init = 1;
+    if (init)
+        return;
 
-  setupterm(NULL, 2, NULL);
-  setaf = tigetstr(setaf_literal);
-  if (!setaf)
-    setaf = empty_literal;
-  op = tigetstr(op_literal);
-  if (!op)
-    op = empty_literal;
- 
+    init = 1;
+
+    setupterm(NULL, 2, NULL);
+    setaf = tigetstr(setaf_literal);
+    if (!setaf)
+        setaf = empty_literal;
+    op = tigetstr(op_literal);
+    if (!op)
+        op = empty_literal;
+
 #endif /* TERMINFO */
 }
 
@@ -130,70 +130,70 @@ gg_init_color()
 
 verifyW32(BOOL b)
 {
-  if (!b) {
-    _ASSERTE(0 && "Win32 Error");
-    fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
-  }
+    if (!b) {
+        _ASSERTE(0 && "Win32 Error");
+        fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
+    }
 }
 
 #else
 /* mingw32 lacks crtdbg.h and _ASSERTE */
 verifyW32(BOOL b)
 {
-  if (!b) {
-    fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
-  }
+    if (!b) {
+        fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
+    }
 }
 
 #endif
 
 #endif
 
-void 
+void
 write_color_char_no_space(int c, int x)
 {
 #ifdef TERMINFO
 
-  fprintf(stderr, "%s%c", tparm(setaf, c, 0, 0, 0, 0, 0, 0, 0, 0), x);
-  fputs(tparm(op, 0, 0, 0, 0, 0, 0, 0, 0, 0), stderr);
+    fprintf(stderr, "%s%c", tparm(setaf, c, 0, 0, 0, 0, 0, 0, 0, 0), x);
+    fputs(tparm(op, 0, 0, 0, 0, 0, 0, 0, 0, 0), stderr);
 
 #elif defined(ANSI_COLOR)
 
-  fprintf(stderr, "\033[%dm%c\033[0m", 30+c, x);
+    fprintf(stderr, "\033[%dm%c\033[0m", 30+c, x);
 
 #elif defined(WIN32)
-  
-  static HANDLE hStdErr = 0;
-  DWORD iCharsWritten;
-  BOOL succeed32;
-  CONSOLE_SCREEN_BUFFER_INFO bufInfo;
-  if (!hStdErr) {
-    hStdErr = GetStdHandle(STD_ERROR_HANDLE);
-    if (hStdErr == INVALID_HANDLE_VALUE) {
-      fprintf(stderr, "Unable to open stderr.\n");
-    }
-  }
 
-  /* Red & Blue are switched from what MS-Windows wants:
-   *   FOREGROUND_BLUE      0x0001 // text color contains blue.
-   *   FOREGROUND_GREEN     0x0002 // text color contains green.
-   *   FOREGROUND_RED       0x0004 // text color contains red
-   * This magic switches the bits back:
-   */
-  c = (c & 1) * 4 + (c & 2) + (c & 4) / 4;
-  c += FOREGROUND_INTENSITY;
-  succeed32 = GetConsoleScreenBufferInfo(hStdErr, &bufInfo);
-  if (!succeed32) {  /* Probably redirecting output, just give plain text. */
-    fprintf(stderr, "%c", x);
-    return;
-  }
-  verifyW32(SetConsoleTextAttribute(hStdErr, (WORD) c));
-  verifyW32(WriteConsole(hStdErr, &x, 1, &iCharsWritten, 0));
-  verifyW32(SetConsoleTextAttribute(hStdErr, bufInfo.wAttributes));
+    static HANDLE hStdErr = 0;
+    DWORD iCharsWritten;
+    BOOL succeed32;
+    CONSOLE_SCREEN_BUFFER_INFO bufInfo;
+    if (!hStdErr) {
+        hStdErr = GetStdHandle(STD_ERROR_HANDLE);
+        if (hStdErr == INVALID_HANDLE_VALUE) {
+            fprintf(stderr, "Unable to open stderr.\n");
+        }
+    }
+
+    /* Red & Blue are switched from what MS-Windows wants:
+     *   FOREGROUND_BLUE      0x0001 // text color contains blue.
+     *   FOREGROUND_GREEN     0x0002 // text color contains green.
+     *   FOREGROUND_RED       0x0004 // text color contains red
+     * This magic switches the bits back:
+     */
+    c = (c & 1) * 4 + (c & 2) + (c & 4) / 4;
+    c += FOREGROUND_INTENSITY;
+    succeed32 = GetConsoleScreenBufferInfo(hStdErr, &bufInfo);
+    if (!succeed32) {  /* Probably redirecting output, just give plain text. */
+        fprintf(stderr, "%c", x);
+        return;
+    }
+    verifyW32(SetConsoleTextAttribute(hStdErr, (WORD) c));
+    verifyW32(WriteConsole(hStdErr, &x, 1, &iCharsWritten, 0));
+    verifyW32(SetConsoleTextAttribute(hStdErr, bufInfo.wAttributes));
 
 #else
 
-  fprintf(stderr, "%c", x);
+    fprintf(stderr, "%c", x);
 
 #endif
 }
@@ -201,15 +201,15 @@ write_color_char_no_space(int c, int x)
 void
 write_color_string(int c, const char *str)
 {
-  while (*str)
-    write_color_char_no_space(c, *str++);
+    while (*str)
+        write_color_char_no_space(c, *str++);
 }
 
 void
 write_color_char(int c, int x)
 {
-  fprintf(stderr, " ");
-  write_color_char_no_space(c, x);
+    fprintf(stderr, " ");
+    write_color_char_no_space(c, x);
 }
 
 /*
@@ -219,16 +219,16 @@ write_color_char(int c, int x)
 void
 gg_vsnprintf(char *dest, unsigned long len, const char *fmt, va_list args)
 {
-    
+
 #ifdef HAVE_VSNPRINTF
-  vsnprintf(dest, len, fmt, args);
+    vsnprintf(dest, len, fmt, args);
 #elif HAVE_G_VSNPRINTF
-  g_vsnprintf(dest, len, fmt, args);
+    g_vsnprintf(dest, len, fmt, args);
 #elif HAVE__VSNPRINTF
-  _vsnprintf(dest, len, fmt, args);
+    _vsnprintf(dest, len, fmt, args);
 #else
-  UNUSED(len);
-  vsprintf(dest, fmt, args);
+    UNUSED(len);
+    vsprintf(dest, fmt, args);
 #endif
 
 }
@@ -236,10 +236,10 @@ gg_vsnprintf(char *dest, unsigned long len, const char *fmt, va_list args)
 void
 gg_snprintf(char *dest, unsigned long len, const char *fmt, ...)
 {
-  va_list args;
-  va_start(args, fmt);
-  gg_vsnprintf(dest, len, fmt, args);
-  va_end(args);
+    va_list args;
+    va_start(args, fmt);
+    gg_vsnprintf(dest, len, fmt, args);
+    va_end(args);
 }
 
 /* Get the time of day, calling gettimeofday from sys/time.h
@@ -249,20 +249,20 @@ gg_snprintf(char *dest, unsigned long len, const char *fmt, ...)
 double
 gg_gettimeofday(void)
 {
-  struct timeval tv;
+    struct timeval tv;
 #ifdef HAVE_GETTIMEOFDAY
-  gettimeofday(&tv, NULL);
+    gettimeofday(&tv, NULL);
 #else
-  tv.tv_sec  = time(NULL);
-  tv.tv_usec = 0;
+    tv.tv_sec  = time(NULL);
+    tv.tv_usec = 0;
 #endif
-  return tv.tv_sec + 1.e-6 * tv.tv_usec;
+    return tv.tv_sec + 1.e-6 * tv.tv_usec;
 }
 
 const char *
 gg_version(void)
 {
-  return VERSION;
+    return VERSION;
 }
 
 /* return cputime used in secs */
@@ -274,7 +274,7 @@ gg_cputime(void)
     struct tms t;
     times(&t);
     return (t.tms_utime + t.tms_stime + t.tms_cutime + t.tms_cstime)
-            / ((double) sysconf(_SC_CLK_TCK));
+           / ((double) sysconf(_SC_CLK_TCK));
 #elif defined(WIN32)
     FILETIME creationTime, exitTime, kernelTime, userTime;
     ULARGE_INTEGER uKernelTime, uUserTime, uElapsedTime;
@@ -291,8 +291,8 @@ gg_cputime(void)
 #else
     static int warned = 0;
     if (!warned) {
-      fprintf(stderr, "CPU timing unavailable - returning wall time.");
-      warned = 1;
+        fprintf(stderr, "CPU timing unavailable - returning wall time.");
+        warned = 1;
     }
     /* return wall clock seconds */
     return gg_gettimeofday();
@@ -327,13 +327,13 @@ gg_cputime(void)
 float
 gg_normalize_float(float x, float a)
 {
-  return a * ((int) (0.5 + x / a));
+    return a * ((int) (0.5 + x / a));
 }
 
 int
 gg_normalize_float2int(float x, float a)
 {
-  return ((int) (0.5 + x / a));
+    return ((int) (0.5 + x / a));
 }
 
 /* A sorting algorithm, call-compatible with the libc qsort() function.
@@ -362,29 +362,29 @@ gg_normalize_float2int(float x, float a)
  */
 void
 gg_sort(void *base, size_t nel, size_t width,
-	int (*cmp)(const void *, const void *))
+        int (*cmp)(const void *, const void *))
 {
-  int gap = nel;
-  int swap_made;
-  char *end = (char *) base + width * (nel - 1);
-  do {
-    char *a, *b;
-    swap_made = 0;
-    gap = (10 * gap + 3) / 13;
-    for (a = base, b = a + gap * width; b <= end; a += width, b += width) {
-      if (cmp((void *) a, (void *) b) > 0) {
-	char *c = a;
-	char *d = b;
-	size_t size = width;
-	while (size-- > 0) {
-	  char tmp = *c;
-	  *c++ = *d;
-	  *d++ = tmp;
-	}
-	swap_made = 1;
-      }
-    }
-  } while (gap > 1 || swap_made);
+    int gap = nel;
+    int swap_made;
+    char *end = (char *) base + width * (nel - 1);
+    do {
+        char *a, *b;
+        swap_made = 0;
+        gap = (10 * gap + 3) / 13;
+        for (a = base, b = a + gap * width; b <= end; a += width, b += width) {
+            if (cmp((void *) a, (void *) b) > 0) {
+                char *c = a;
+                char *d = b;
+                size_t size = width;
+                while (size-- > 0) {
+                    char tmp = *c;
+                    *c++ = *d;
+                    *d++ = tmp;
+                }
+                swap_made = 1;
+            }
+        }
+    } while (gap > 1 || swap_made);
 }
 
 
@@ -392,23 +392,23 @@ gg_sort(void *base, size_t nel, size_t width,
 float
 gg_interpolate(struct interpolation_data *f, float x)
 {
-  int i;
-  float ratio;
-  float diff;
-  if (x < f->range_lowerbound)
-    return f->values[0];
-  else if (x > f->range_upperbound)
-    return f->values[f->sections];
-  else {
-    ratio = ((float) f->sections) * (x - f->range_lowerbound)
-              / (f->range_upperbound - f->range_lowerbound);
-    i = (int) ratio;
-    diff = ratio - ((float) i);
-    if (0)
-      fprintf(stderr, "Floating point Ratio: %f, integer: %d, diff %f",
-	      ratio, i, diff);
-    return ((1 - diff) * f->values[i] + diff * f->values[i+1]);
-  }
+    int i;
+    float ratio;
+    float diff;
+    if (x < f->range_lowerbound)
+        return f->values[0];
+    else if (x > f->range_upperbound)
+        return f->values[f->sections];
+    else {
+        ratio = ((float) f->sections) * (x - f->range_lowerbound)
+                / (f->range_upperbound - f->range_lowerbound);
+        i = (int) ratio;
+        diff = ratio - ((float) i);
+        if (0)
+            fprintf(stderr, "Floating point Ratio: %f, integer: %d, diff %f",
+                    ratio, i, diff);
+        return ((1 - diff) * f->values[i] + diff * f->values[i+1]);
+    }
 }
 
 
@@ -418,7 +418,7 @@ gg_interpolate(struct interpolation_data *f, float x)
 float
 soft_cap(float a, float b)
 {
-  return ((a * b) / (a + b));
+    return ((a * b) / (a + b));
 }
 
 
@@ -426,96 +426,96 @@ soft_cap(float a, float b)
 void
 rotate(int i, int j, int *ri, int *rj, int bs, int rot)
 {
-  int bs1;
-  assert(bs > 0);
-  assert(ri != NULL && rj != NULL);
-  assert(rot >= 0 && rot < 8);
-  /* PASS case */
-  if (i == -1 && j == -1) {
-    *ri = i;
-    *rj = j;
-    return;
-  }
+    int bs1;
+    assert(bs > 0);
+    assert(ri != NULL && rj != NULL);
+    assert(rot >= 0 && rot < 8);
+    /* PASS case */
+    if (i == -1 && j == -1) {
+        *ri = i;
+        *rj = j;
+        return;
+    }
 
-  assert(i >= 0 && i < bs);
-  assert(j >= 0 && j < bs);
+    assert(i >= 0 && i < bs);
+    assert(j >= 0 && j < bs);
 
-  bs1 = bs - 1;
-  if (rot == 0) {
-    /* identity map */
-    *ri = i;
-    *rj = j;
-  }
-  else if (rot == 1) {
-    /* rotation over 90 degrees */
-    *ri = bs1 - j;
-    *rj = i;
-  }
-  else if (rot == 2) {
-    /* rotation over 180 degrees */
-    *ri = bs1 - i;
-    *rj = bs1 - j;
-  }
-  else if (rot == 3) {
-    /* rotation over 270 degrees */
-    *ri = j;
-    *rj = bs1 - i;
-  }
-  else if (rot == 4) {
-    /* flip along diagonal */
-    *ri = j;
-    *rj = i;
-  }
-  else if (rot == 5) {
-    /* flip */
-    *ri = bs1 - i;
-    *rj = j;
-  }
-  else if (rot == 6) {
-    /* flip along diagonal */
-    *ri = bs1 - j;
-    *rj = bs1 - i;
-  }
-  else if (rot == 7) {
-    /* flip */
-    *ri = i;
-    *rj = bs1 - j;
-  }
+    bs1 = bs - 1;
+    if (rot == 0) {
+        /* identity map */
+        *ri = i;
+        *rj = j;
+    }
+    else if (rot == 1) {
+        /* rotation over 90 degrees */
+        *ri = bs1 - j;
+        *rj = i;
+    }
+    else if (rot == 2) {
+        /* rotation over 180 degrees */
+        *ri = bs1 - i;
+        *rj = bs1 - j;
+    }
+    else if (rot == 3) {
+        /* rotation over 270 degrees */
+        *ri = j;
+        *rj = bs1 - i;
+    }
+    else if (rot == 4) {
+        /* flip along diagonal */
+        *ri = j;
+        *rj = i;
+    }
+    else if (rot == 5) {
+        /* flip */
+        *ri = bs1 - i;
+        *rj = j;
+    }
+    else if (rot == 6) {
+        /* flip along diagonal */
+        *ri = bs1 - j;
+        *rj = bs1 - i;
+    }
+    else if (rot == 7) {
+        /* flip */
+        *ri = i;
+        *rj = bs1 - j;
+    }
 }
 
 /* inverse reorientation of reorientation rot */
 void
 inv_rotate(int i, int j, int *ri, int *rj, int bs, int rot)
 {
-  /* every reorientation is it's own inverse except rotations
-     over 90 and 270 degrees */
-  if (rot == 1)
-    rotate(i, j, ri, rj, bs, 3);
-  else if (rot == 3)
-    rotate(i, j, ri, rj, bs, 1);
-  else
-    rotate(i, j, ri, rj, bs, rot);
+    /* every reorientation is it's own inverse except rotations
+       over 90 and 270 degrees */
+    if (rot == 1)
+        rotate(i, j, ri, rj, bs, 3);
+    else if (rot == 3)
+        rotate(i, j, ri, rj, bs, 1);
+    else
+        rotate(i, j, ri, rj, bs, rot);
 }
 
 
 /* Intermediate layer to random.c. gg_srand() should only be called via the
  * functions below.
  */
- 
+
 /* Private variable remembering the random seed. */
 static unsigned int random_seed;
 
 unsigned int
 get_random_seed()
 {
-  return random_seed;
+    return random_seed;
 }
 
 void
 set_random_seed(unsigned int seed)
 {
-  random_seed = seed;
-  gg_srand(seed);
+    random_seed = seed;
+    gg_srand(seed);
 }
 
 /* Update the random seed. This should be called at the start of each
@@ -526,15 +526,15 @@ set_random_seed(unsigned int seed)
 void
 update_random_seed(void)
 {
-  gg_srand(random_seed);
-  random_seed = gg_rand();
-  /* Since random seed 0 has a special interpretation when given as
-   * command line argument with the -r option, we make sure to avoid
-   * it.
-   */
-  if (random_seed == 0)
-    random_seed = 1;
-  gg_srand(random_seed);
+    gg_srand(random_seed);
+    random_seed = gg_rand();
+    /* Since random seed 0 has a special interpretation when given as
+     * command line argument with the -r option, we make sure to avoid
+     * it.
+     */
+    if (random_seed == 0)
+        random_seed = 1;
+    gg_srand(random_seed);
 }
 
 
@@ -544,7 +544,7 @@ update_random_seed(void)
 void
 reuse_random_seed()
 {
-  gg_srand(random_seed);
+    gg_srand(random_seed);
 }
 
 

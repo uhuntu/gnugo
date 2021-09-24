@@ -49,35 +49,35 @@
 void
 sgffile_add_debuginfo(SGFNode *node, float value)
 {
-  int pos;
-  char comment[24];
+    int pos;
+    char comment[24];
 
-  if (!outfilename[0])
-    return;
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
-      continue;
-    
-    if (IS_STONE(board[pos]) && (output_flags & OUTPUT_MARKDRAGONS)) {
-      if (dragon[pos].crude_status == DEAD)
-	sgfLabel(node, "X", I(pos), J(pos));
-      else if (dragon[pos].crude_status == CRITICAL)
-	sgfLabel(node, "!", I(pos), J(pos));
+    if (!outfilename[0])
+        return;
+
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        if (!ON_BOARD(pos))
+            continue;
+
+        if (IS_STONE(board[pos]) && (output_flags & OUTPUT_MARKDRAGONS)) {
+            if (dragon[pos].crude_status == DEAD)
+                sgfLabel(node, "X", I(pos), J(pos));
+            else if (dragon[pos].crude_status == CRITICAL)
+                sgfLabel(node, "!", I(pos), J(pos));
+        }
+
+        if (potential_moves[pos] > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
+            if (potential_moves[pos] < 1.0)
+                sgfLabel(node, "<1", I(pos), J(pos));
+            else
+                sgfLabelInt(node, (int) potential_moves[pos], I(pos), J(pos));
+        }
     }
-	
-    if (potential_moves[pos] > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
-      if (potential_moves[pos] < 1.0)
-	sgfLabel(node, "<1", I(pos), J(pos));
-      else
-	sgfLabelInt(node, (int) potential_moves[pos], I(pos), J(pos));
+
+    if (value > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
+        sprintf(comment, "Value of move: %.2f", value);
+        sgfAddComment(node, comment);
     }
-  }
-  
-  if (value > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
-    sprintf(comment, "Value of move: %.2f", value);
-    sgfAddComment(node, comment);
-  }
 }
 
 
@@ -89,12 +89,12 @@ sgffile_add_debuginfo(SGFNode *node, float value)
 void
 sgffile_output(SGFTree *tree)
 {
-  if (outfilename[0])
-    writesgf(tree->root, outfilename);
+    if (outfilename[0])
+        writesgf(tree->root, outfilename);
 }
 
 
-/* ================================================================ 
+/* ================================================================
  * Dumping of information about a position into an sgftree.
  * Used by sgffile_decideposition, etc.
  * ================================================================ */
@@ -112,17 +112,17 @@ sgffile_output(SGFTree *tree)
 void
 sgffile_begindump(SGFTree *tree)
 {
-  static SGFTree local_tree;
-  gg_assert(sgf_dumptree == NULL);
+    static SGFTree local_tree;
+    gg_assert(sgf_dumptree == NULL);
 
-  if (tree == NULL)
-    sgf_dumptree = &local_tree;
-  else 
-    sgf_dumptree = tree;
-  
-  sgftree_clear(sgf_dumptree);
-  sgftreeCreateHeaderNode(sgf_dumptree, board_size, komi, handicap);
-  sgffile_printboard(sgf_dumptree);
+    if (tree == NULL)
+        sgf_dumptree = &local_tree;
+    else
+        sgf_dumptree = tree;
+
+    sgftree_clear(sgf_dumptree);
+    sgftreeCreateHeaderNode(sgf_dumptree, board_size, komi, handicap);
+    sgffile_printboard(sgf_dumptree);
 }
 
 
@@ -130,19 +130,19 @@ sgffile_begindump(SGFTree *tree)
  * sgffile_enddump ends the dump and writes the sgf tree to file.
  */
 
-void 
+void
 sgffile_enddump(const char *filename)
 {
-  /* Check if we have a valid filename and a tree. */
-  if (filename && *filename && sgf_dumptree) {
-    if (writesgf(sgf_dumptree->root, filename)) {
-      /* Only delete the tree if writesgf() succeeds. If it doesn't, one
-       * will most likely wish to save into another (writable) file.
-       */
-      sgfFreeNode(sgf_dumptree->root);
-      sgf_dumptree = NULL;
+    /* Check if we have a valid filename and a tree. */
+    if (filename && *filename && sgf_dumptree) {
+        if (writesgf(sgf_dumptree->root, filename)) {
+            /* Only delete the tree if writesgf() succeeds. If it doesn't, one
+             * will most likely wish to save into another (writable) file.
+             */
+            sgfFreeNode(sgf_dumptree->root);
+            sgf_dumptree = NULL;
+        }
     }
-  }
 }
 
 
@@ -155,36 +155,36 @@ sgffile_enddump(const char *filename)
 void
 sgffile_printsgf(int color_to_play, const char *filename)
 {
-  SGFTree sgftree;
-  int m, n;
-  char pos[3];
-  char str[128];
-  float relative_komi;
+    SGFTree sgftree;
+    int m, n;
+    char pos[3];
+    char str[128];
+    float relative_komi;
 
-  relative_komi = komi + black_captured - white_captured;
-  
-  sgftree_clear(&sgftree);
-  sgftreeCreateHeaderNode(&sgftree, board_size, relative_komi, handicap);
-  sgf_write_header(sgftree.root, 1, get_random_seed(), relative_komi,
-		   handicap, get_level(), chinese_rules);
-  gg_snprintf(str, 128, "GNU Go %s load and print", gg_version());
-  sgfOverwriteProperty(sgftree.root, "GN", str);
-  
-  sgffile_printboard(&sgftree);
-  
-  if (color_to_play != EMPTY) {
-    sgfAddProperty(sgftree.lastnode, "PL",
-		   (color_to_play == WHITE ? "W" : "B"));
+    relative_komi = komi + black_captured - white_captured;
 
-    for (m = 0; m < board_size; ++m)
-      for (n = 0; n < board_size; ++n)
-        if (BOARD(m, n) == EMPTY && !is_legal(POS(m, n), color_to_play)) {
-	  gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
-	  sgfAddProperty(sgftree.lastnode, "IL", pos);
-	}
-  }
-  
-  writesgf(sgftree.root, filename);
+    sgftree_clear(&sgftree);
+    sgftreeCreateHeaderNode(&sgftree, board_size, relative_komi, handicap);
+    sgf_write_header(sgftree.root, 1, get_random_seed(), relative_komi,
+                     handicap, get_level(), chinese_rules);
+    gg_snprintf(str, 128, "GNU Go %s load and print", gg_version());
+    sgfOverwriteProperty(sgftree.root, "GN", str);
+
+    sgffile_printboard(&sgftree);
+
+    if (color_to_play != EMPTY) {
+        sgfAddProperty(sgftree.lastnode, "PL",
+                       (color_to_play == WHITE ? "W" : "B"));
+
+        for (m = 0; m < board_size; ++m)
+            for (n = 0; n < board_size; ++n)
+                if (BOARD(m, n) == EMPTY && !is_legal(POS(m, n), color_to_play)) {
+                    gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
+                    sgfAddProperty(sgftree.lastnode, "IL", pos);
+                }
+    }
+
+    writesgf(sgftree.root, filename);
 }
 
 
@@ -195,49 +195,49 @@ sgffile_printsgf(int color_to_play, const char *filename)
 void
 sgffile_printboard(SGFTree *tree)
 {
-  int i, j;
-  SGFNode *node;
-  
-  gg_assert(tree);
-  node = tree->lastnode;
-  
-  /* Write the white stones to the file. */
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == WHITE)
-	sgfAddStone(node, WHITE, i, j);
-    }
-  }
+    int i, j;
+    SGFNode *node;
 
-  /* Write the black stones to the file. */
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == BLACK)
-	sgfAddStone(node, BLACK, i, j);
-    }
-  }
+    gg_assert(tree);
+    node = tree->lastnode;
 
-  sgftreeSetLastNode(tree, node);
+    /* Write the white stones to the file. */
+    for (i = 0; i < board_size; i++) {
+        for (j = 0; j < board_size; j++) {
+            if (BOARD(i, j) == WHITE)
+                sgfAddStone(node, WHITE, i, j);
+        }
+    }
+
+    /* Write the black stones to the file. */
+    for (i = 0; i < board_size; i++) {
+        for (j = 0; j < board_size; j++) {
+            if (BOARD(i, j) == BLACK)
+                sgfAddStone(node, BLACK, i, j);
+        }
+    }
+
+    sgftreeSetLastNode(tree, node);
 }
 
 
 void
 sgffile_recordboard(SGFNode *node)
 {
-  int i, j;
+    int i, j;
 
-  if (node)
-    for (i = 0; i < board_size; i++)
-      for (j = 0; j < board_size; j++)
-        if (BOARD(i, j) == BLACK)
-          sgfAddStone(node, BLACK, i, j);
+    if (node)
+        for (i = 0; i < board_size; i++)
+            for (j = 0; j < board_size; j++)
+                if (BOARD(i, j) == BLACK)
+                    sgfAddStone(node, BLACK, i, j);
 }
 
 
 int
 get_sgfmove(SGFProperty *property)
 {
-  return POS(get_moveX(property, board_size), get_moveY(property, board_size));
+    return POS(get_moveX(property, board_size), get_moveY(property, board_size));
 }
 
 

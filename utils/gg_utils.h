@@ -57,7 +57,7 @@ void write_color_char(int c, int x);
 void write_color_string(int c, const char *str);
 
 void gg_vsnprintf(char *dest, unsigned long len, const char *fmt,
-		  va_list args);
+                  va_list args);
 void gg_snprintf(char *dest, unsigned long len, const char *fmt, ...);
 
 double gg_gettimeofday(void);
@@ -66,15 +66,15 @@ double gg_cputime(void);
 float gg_normalize_float(float x, float a);
 int gg_normalize_float2int(float x, float a);
 void gg_sort(void *base, size_t nel, size_t width,
-	     int (*compar)(const void *, const void *));
+             int (*compar)(const void *, const void *));
 
 #define MAX_INTERPOLATION_STEPS 20
 struct interpolation_data
 {
-  int sections;
-  float range_lowerbound;
-  float range_upperbound;
-  float values[MAX_INTERPOLATION_STEPS + 1];
+    int sections;
+    float range_lowerbound;
+    float range_upperbound;
+    float values[MAX_INTERPOLATION_STEPS + 1];
 };
 
 float gg_interpolate(struct interpolation_data *f, float x);

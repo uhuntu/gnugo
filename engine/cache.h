@@ -30,7 +30,7 @@
 /*
  * This file, together with engine/hash.c implements hashing of go positions
  * using a method known as Zobrist hashing.  See the Texinfo documentation
- * (Reading/Hashing) for more information.  
+ * (Reading/Hashing) for more information.
  */
 
 
@@ -58,8 +58,8 @@
  *   The last 9 bits together give an index for the total costs.
  */
 typedef struct {
-  Hash_data key;
-  unsigned int data; /* Should be 32 bits, but only wastes 25% if 64 bits. */
+    Hash_data key;
+    unsigned int data; /* Should be 32 bits, but only wastes 25% if 64 bits. */
 } Hashnode;
 
 #define HN_MAX_REMAINING_DEPTH 31
@@ -68,8 +68,8 @@ typedef struct {
 /* Hashentry: an entry, with two nodes of the hash_table
  */
 typedef struct {
-  Hashnode deepest;
-  Hashnode newest;
+    Hashnode deepest;
+    Hashnode newest;
 } Hashentry;
 
 /* Hn is for hash node. */
@@ -90,9 +90,9 @@ typedef struct {
 
 /* Transposition_table: transposition table used for caching. */
 typedef struct {
-  unsigned int num_entries;
-  Hashentry *entries;
-  int is_clean;
+    unsigned int num_entries;
+    Hashentry *entries;
+    int is_clean;
 } Transposition_table;
 
 extern Transposition_table ttable;
@@ -104,13 +104,13 @@ extern Transposition_table ttable;
 
 void tt_free(Transposition_table *table);
 int  tt_get(Transposition_table *table, enum routine_id routine,
-	    int target1, int target2, int remaining_depth,
-	    Hash_data *extra_hash,
-	    int *value1, int *value2, int *move);
+            int target1, int target2, int remaining_depth,
+            Hash_data *extra_hash,
+            int *value1, int *value2, int *move);
 void tt_update(Transposition_table *table, enum routine_id routine,
-	       int target, int target2, int remaining_depth,
-	       Hash_data *extra_hash,
-	       int value1, int value2, int move);
+               int target, int target2, int remaining_depth,
+               Hash_data *extra_hash,
+               int value1, int value2, int move);
 
 
 /* ================================================================ */
@@ -160,13 +160,13 @@ void tt_update(Transposition_table *table, enum routine_id routine,
 
 /* Trace messages in decidestring/decidedragon sgf file. */
 void sgf_trace(const char *func, int str, int move, int result,
-	       const char *message);
+               const char *message);
 /* Trace messages in decideconnection sgf file. */
-void sgf_trace2(const char *func, int str1, int str2, int move, 
-	        const char *result, const char *message);
+void sgf_trace2(const char *func, int str1, int str2, int move,
+                const char *result, const char *message);
 /* Trace messages in decidesemeai sgf file. */
-void sgf_trace_semeai(const char *func, int str1, int str2, int move, 
-		      int result1, int result2, const char *message);
+void sgf_trace_semeai(const char *func, int str1, int str2, int move,
+                      int result1, int result2, const char *message);
 
 /* Macro to hide the call to sgf_trace(). Notice that a little black
  * magic is going on here. Before using this macro, SETUP_TRACE_INFO
@@ -322,7 +322,7 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
 /* This has actually nothing to do with caching, but is useful in
  * the same places where the caching is.
  */
-  
+
 /* Macro to use when saving ko results while continuing to look for an
  * unconditional result. It's assumed that we have tried the move at
  * (move) and then called an attack or defense function giving the
@@ -368,7 +368,7 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
 
 #endif /* _CACHE_H_ */
 
-  
+
 /*
  * Local Variables:
  * tab-width: 8

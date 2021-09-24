@@ -48,19 +48,20 @@
  * established eyespace.
  */
 
-int 
+int
 jump_out_helper(ARGS)
 {
-  int own_eyespace;
+    int own_eyespace;
 
-  UNUSED(trans); UNUSED(pattern);
+    UNUSED(trans);
+    UNUSED(pattern);
 
-  own_eyespace = (white_eye[move].color == color);
-  
-  if (whose_area(OPPOSITE_INFLUENCE(color), move) != color && !own_eyespace)
-    return 1;
-  else
-    return 0;
+    own_eyespace = (white_eye[move].color == color);
+
+    if (whose_area(OPPOSITE_INFLUENCE(color), move) != color && !own_eyespace)
+        return 1;
+    else
+        return 0;
 }
 
 
@@ -69,13 +70,13 @@ jump_out_helper(ARGS)
  * zone of control.
  */
 
-int 
+int
 jump_out_far_helper(ARGS)
 {
-  if (whose_area(OPPOSITE_INFLUENCE(color), move) != OTHER_COLOR(color))
-    return jump_out_helper(pattern, trans, move, color);
-  else
-    return 0;
+    if (whose_area(OPPOSITE_INFLUENCE(color), move) != OTHER_COLOR(color))
+        return jump_out_helper(pattern, trans, move, color);
+    else
+        return 0;
 }
 
 
@@ -85,9 +86,11 @@ jump_out_far_helper(ARGS)
 int
 high_handicap_helper(ARGS)
 {
-  UNUSED(trans); UNUSED(pattern); UNUSED(move);
-  
-  return !doing_scoring && stones_on_board(OTHER_COLOR(color)) == 0;
+    UNUSED(trans);
+    UNUSED(pattern);
+    UNUSED(move);
+
+    return !doing_scoring && stones_on_board(OTHER_COLOR(color)) == 0;
 }
 
 
@@ -100,16 +103,17 @@ high_handicap_helper(ARGS)
 int
 reinforce_helper(ARGS)
 {
-  UNUSED(trans); UNUSED(pattern);
-  
-  return (!doing_scoring
-	  && !lively_dragon_exists(OTHER_COLOR(color)) 
-	  && safe_move(move, color));
+    UNUSED(trans);
+    UNUSED(pattern);
+
+    return (!doing_scoring
+            && !lively_dragon_exists(OTHER_COLOR(color))
+            && safe_move(move, color));
 }
 
 
 /*
- *  
+ *
  *  XXO      XXc            decrease eye space in sente (unless it kills)
  *  .*X      e*a
  *  ---      ---
@@ -137,44 +141,44 @@ reinforce_helper(ARGS)
 int
 throw_in_atari_helper(ARGS)
 {
-  int apos, bpos, cpos, dpos;
-  int success = 0;
-  int other = OTHER_COLOR(color);
-  int libs[2];
-  UNUSED(pattern);
-  
-  apos = OFFSET_BY(0, 1);
-  cpos = OFFSET_BY(-1, 1);
-  dpos = OFFSET_BY(1, 1);
+    int apos, bpos, cpos, dpos;
+    int success = 0;
+    int other = OTHER_COLOR(color);
+    int libs[2];
+    UNUSED(pattern);
 
-  /* Find second liberty of the stone a. */
-  findlib(apos, 2, libs);
-  if (libs[0] != move)
-    bpos = libs[0];
-  else
-    bpos = libs[1];
-  
-  if (TRYMOVE(move, color)) {
-    if (!attack(cpos, NULL) && !(ON_BOARD(dpos) && attack(dpos, NULL))) {
-      if (TRYMOVE(bpos, other)) {
-	if (attack(apos, NULL))
-	  success = 1;
-	popgo();
-      }
-      else {
-	success = 1; /* X move at (bpos) would have been suicide */
-      }
+    apos = OFFSET_BY(0, 1);
+    cpos = OFFSET_BY(-1, 1);
+    dpos = OFFSET_BY(1, 1);
+
+    /* Find second liberty of the stone a. */
+    findlib(apos, 2, libs);
+    if (libs[0] != move)
+        bpos = libs[0];
+    else
+        bpos = libs[1];
+
+    if (TRYMOVE(move, color)) {
+        if (!attack(cpos, NULL) && !(ON_BOARD(dpos) && attack(dpos, NULL))) {
+            if (TRYMOVE(bpos, other)) {
+                if (attack(apos, NULL))
+                    success = 1;
+                popgo();
+            }
+            else {
+                success = 1; /* X move at (bpos) would have been suicide */
+            }
+        }
+        popgo();
     }
-    popgo();
-  }
 
-  /* The followup is to capture the "a" string. Estimate the value to
-   * twice the size.
-   */
-  add_followup_value(move, 2 * worm[apos].effective_size);
-  TRACE("...followup value %f\n", 2 * worm[apos].effective_size);
+    /* The followup is to capture the "a" string. Estimate the value to
+     * twice the size.
+     */
+    add_followup_value(move, 2 * worm[apos].effective_size);
+    TRACE("...followup value %f\n", 2 * worm[apos].effective_size);
 
-  return success;
+    return success;
 }
 
 
@@ -185,19 +189,19 @@ throw_in_atari_helper(ARGS)
  * wouldn't work.
  */
 
-int 
+int
 seki_helper(int str)
 {
-  int r;
-  int adj;
-  int adjs[MAXCHAIN];
-  
-  adj = chainlinks(str, adjs);
-  for (r = 0; r < adj; r++)
-    if (worm[adjs[r]].attack_codes[0] != 0)
-      return 0;
+    int r;
+    int adj;
+    int adjs[MAXCHAIN];
 
-  return 1;
+    adj = chainlinks(str, adjs);
+    for (r = 0; r < adj; r++)
+        if (worm[adjs[r]].attack_codes[0] != 0)
+            return 0;
+
+    return 1;
 }
 
 
@@ -210,41 +214,41 @@ seki_helper(int str)
  * defended. This helper is expected to always return 0.
  */
 
-int 
+int
 cutstone2_helper(ARGS)
 {
-  int apos;
-  int bpos;
-  int cpos;
-  int dpos;
-  UNUSED(pattern);
-  UNUSED(color);
+    int apos;
+    int bpos;
+    int cpos;
+    int dpos;
+    UNUSED(pattern);
+    UNUSED(color);
 
-  if (stackp > 0)
-    return 0;
-  
-  apos = OFFSET_BY(-1, -1);
-  bpos = OFFSET_BY(-1,  0);
-  cpos = OFFSET_BY( 0, -1);
+    if (stackp > 0)
+        return 0;
 
-  if (worm[apos].defense_codes[0] == 0)
-    return 0;
-  
-  dpos = worm[apos].defense_points[0];
+    apos = OFFSET_BY(-1, -1);
+    bpos = OFFSET_BY(-1,  0);
+    cpos = OFFSET_BY( 0, -1);
 
-  if (TRYMOVE(dpos, board[apos])) {
-    if (!board[bpos] || attack(bpos, NULL)
-	|| !board[cpos] || attack(cpos, NULL)
-	|| safe_move(move, board[apos]) != 0) {
-      popgo();
-      worm[worm[apos].origin].cutstone2++;
-      propagate_worm(worm[apos].origin);
-      return 0;
+    if (worm[apos].defense_codes[0] == 0)
+        return 0;
+
+    dpos = worm[apos].defense_points[0];
+
+    if (TRYMOVE(dpos, board[apos])) {
+        if (!board[bpos] || attack(bpos, NULL)
+                || !board[cpos] || attack(cpos, NULL)
+                || safe_move(move, board[apos]) != 0) {
+            popgo();
+            worm[worm[apos].origin].cutstone2++;
+            propagate_worm(worm[apos].origin);
+            return 0;
+        }
+        popgo();
     }
-    popgo();
-  }
 
-  return 0;
+    return 0;
 }
 
 /*
@@ -257,20 +261,20 @@ cutstone2_helper(ARGS)
  * hanes, but it can be used anywhere on the board.
  */
 
-int 
+int
 edge_double_sente_helper(int move, int apos, int bpos, int cpos)
 {
-  int color = board[cpos];
-  int success = 0;
-  ASSERT1((color == BLACK || color == WHITE), move);
-  
-  if (TRYMOVE(move, color)) {
-    ASSERT1(countlib(move) == 2, move);
-    success = connect_and_cut_helper(move, apos, bpos);
-    popgo();
-  }
+    int color = board[cpos];
+    int success = 0;
+    ASSERT1((color == BLACK || color == WHITE), move);
 
-  return success;
+    if (TRYMOVE(move, color)) {
+        ASSERT1(countlib(move) == 2, move);
+        success = connect_and_cut_helper(move, apos, bpos);
+        popgo();
+    }
+
+    return success;
 }
 
 /*
@@ -283,8 +287,8 @@ edge_double_sente_helper(int move, int apos, int bpos, int cpos)
 void
 threaten_to_save_helper(int move, int str)
 {
-  add_followup_value(move, 2.0 + 2.0 * worm[str].effective_size);
-  TRACE("...followup value %f\n", 2.0 + 2.0 * worm[str].effective_size);
+    add_followup_value(move, 2.0 + 2.0 * worm[str].effective_size);
+    TRACE("...followup value %f\n", 2.0 + 2.0 * worm[str].effective_size);
 }
 
 
@@ -296,8 +300,8 @@ threaten_to_save_helper(int move, int str)
 void
 prevent_attack_threat_helper(int move, int str)
 {
-  add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
-  TRACE("...reverse followup value %f\n", 2.0 * worm[str].effective_size);
+    add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
+    TRACE("...reverse followup value %f\n", 2.0 * worm[str].effective_size);
 }
 
 
@@ -326,57 +330,57 @@ prevent_attack_threat_helper(int move, int str)
  * .OXXO.X
  * ..*.X..
  * ..XX...
- * 
+ *
  */
 
 void
 threaten_to_capture_helper(int move, int str)
 {
-  int adj, adjs[MAXCHAIN];
-  int defense_move;
-  int k;
-  
-  adj = chainlinks2(str, adjs, 1);
-  for (k = 0; k < adj; k++)
-    if (worm[adjs[k]].defense_codes[0] != 0
-	&& !does_defend(move, adjs[k]))
-      return;
+    int adj, adjs[MAXCHAIN];
+    int defense_move;
+    int k;
 
-  if (!TRYMOVE(move, OTHER_COLOR(board[str])))
-    return;
-  if (find_defense(str, &defense_move) != 0
-      && defense_move != NO_MOVE
-      && TRYMOVE(defense_move, board[str])) {
-    if (board[move] == EMPTY || attack(move, NULL) != 0) {
-      popgo();
-      popgo();
-      return;
+    adj = chainlinks2(str, adjs, 1);
+    for (k = 0; k < adj; k++)
+        if (worm[adjs[k]].defense_codes[0] != 0
+                && !does_defend(move, adjs[k]))
+            return;
+
+    if (!TRYMOVE(move, OTHER_COLOR(board[str])))
+        return;
+    if (find_defense(str, &defense_move) != 0
+            && defense_move != NO_MOVE
+            && TRYMOVE(defense_move, board[str])) {
+        if (board[move] == EMPTY || attack(move, NULL) != 0) {
+            popgo();
+            popgo();
+            return;
+        }
+        popgo();
     }
+
+    /* In addition to the move found by find_defense(), also try all
+     * chain breaking moves in the same way.
+     */
+    adj = chainlinks2(str, adjs, 1);
+    for (k = 0; k < adj; k++) {
+        int lib;
+        findlib(adjs[k], 1, &lib);
+        if (TRYMOVE(lib, board[str])) {
+            if (!attack(str, NULL)
+                    && (board[move] == EMPTY || attack(move, NULL) != 0)) {
+                popgo();
+                popgo();
+                return;
+            }
+            popgo();
+        }
+    }
+
     popgo();
-  }
 
-  /* In addition to the move found by find_defense(), also try all
-   * chain breaking moves in the same way.
-   */
-  adj = chainlinks2(str, adjs, 1);
-  for (k = 0; k < adj; k++) {
-    int lib;
-    findlib(adjs[k], 1, &lib);
-    if (TRYMOVE(lib, board[str])) {
-      if (!attack(str, NULL)
-	  && (board[move] == EMPTY || attack(move, NULL) != 0)) {
-	popgo();
-	popgo();
-	return;
-      }
-      popgo();
-    }
-  }
-
-  popgo();
-  
-  add_followup_value(move, 2.0 * worm[str].effective_size);
-  TRACE("...followup value %f\n", 2.0 * worm[str].effective_size);
+    add_followup_value(move, 2.0 * worm[str].effective_size);
+    TRACE("...followup value %f\n", 2.0 * worm[str].effective_size);
 }
 
 #endif
@@ -392,27 +396,27 @@ threaten_to_capture_helper(int move, int str)
 void
 defend_against_atari_helper(int move, int str)
 {
-  int adj, adjs[MAXCHAIN];
-  int libs[2];
-  int k;
+    int adj, adjs[MAXCHAIN];
+    int libs[2];
+    int k;
 
-  ASSERT1(countlib(str) == 2, str);
+    ASSERT1(countlib(str) == 2, str);
 
-  /* No value if the string can capture out of atari. */
-  adj = chainlinks2(str, adjs, 1);
-  for (k = 0; k < adj; k++)
-    if (worm[adjs[k]].defense_codes[0] != 0
-	&& !does_defend(move, adjs[k]))
-      return;
+    /* No value if the string can capture out of atari. */
+    adj = chainlinks2(str, adjs, 1);
+    for (k = 0; k < adj; k++)
+        if (worm[adjs[k]].defense_codes[0] != 0
+                && !does_defend(move, adjs[k]))
+            return;
 
-  /* No value if opponent has no safe atari. */
-  findlib(str, 2, libs);
-  if (!safe_move(libs[0], OTHER_COLOR(board[str]))
-      && !safe_move(libs[1], OTHER_COLOR(board[str])))
-    return;
-  
-  TRACE("...reverse followup value %f\n", 2.0 * worm[str].effective_size);
-  add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
+    /* No value if opponent has no safe atari. */
+    findlib(str, 2, libs);
+    if (!safe_move(libs[0], OTHER_COLOR(board[str]))
+            && !safe_move(libs[1], OTHER_COLOR(board[str])))
+        return;
+
+    TRACE("...reverse followup value %f\n", 2.0 * worm[str].effective_size);
+    add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
 }
 
 
@@ -429,12 +433,12 @@ defend_against_atari_helper(int move, int str)
 void
 amalgamate_most_valuable_helper(int apos, int bpos, int cpos)
 {
-  if (!is_same_dragon(apos, bpos) && !is_same_dragon(bpos, cpos)) {
-    if (dragon[apos].effective_size >= dragon[cpos].effective_size)
-      join_dragons(apos, bpos);
-    else
-      join_dragons(bpos, cpos);
-  }
+    if (!is_same_dragon(apos, bpos) && !is_same_dragon(bpos, cpos)) {
+        if (dragon[apos].effective_size >= dragon[cpos].effective_size)
+            join_dragons(apos, bpos);
+        else
+            join_dragons(bpos, cpos);
+    }
 }
 
 
@@ -447,19 +451,19 @@ amalgamate_most_valuable_helper(int apos, int bpos, int cpos)
 int
 finish_ko_helper(int pos)
 {
-  int adj, adjs[MAXCHAIN];
-  int lib;
-  int k;
+    int adj, adjs[MAXCHAIN];
+    int lib;
+    int k;
 
-  adj = chainlinks2(pos, adjs, 1);
-  for (k = 0; k < adj; k++) {
-    if (countstones(adjs[k]) == 1) {
-      findlib(adjs[k], 1, &lib);
-      if (is_ko(lib, board[pos], NULL))
-	return 1;
+    adj = chainlinks2(pos, adjs, 1);
+    for (k = 0; k < adj; k++) {
+        if (countstones(adjs[k]) == 1) {
+            findlib(adjs[k], 1, &lib);
+            if (is_ko(lib, board[pos], NULL))
+                return 1;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 
@@ -472,20 +476,20 @@ finish_ko_helper(int pos)
 int
 squeeze_ko_helper(int pos)
 {
-  int libs[2];
-  int liberties;
-  int k;
+    int libs[2];
+    int liberties;
+    int k;
 
-  liberties = findlib(pos, 2, libs);
-  ASSERT1(liberties == 2, pos);
+    liberties = findlib(pos, 2, libs);
+    ASSERT1(liberties == 2, pos);
 
-  for (k = 0; k < liberties; k++) {
-    int aa = libs[k];
-    if (is_ko(aa, OTHER_COLOR(board[pos]), NULL))
-      return 1;
-  }
+    for (k = 0; k < liberties; k++) {
+        int aa = libs[k];
+        if (is_ko(aa, OTHER_COLOR(board[pos]), NULL))
+            return 1;
+    }
 
-  return 0;
+    return 0;
 }
 
 /*
@@ -499,22 +503,22 @@ squeeze_ko_helper(int pos)
 int
 backfill_helper(int apos, int bpos, int cpos)
 {
-  int color = board[cpos];
-  int other = OTHER_COLOR(color);
-  int dpos  = NO_MOVE;
+    int color = board[cpos];
+    int other = OTHER_COLOR(color);
+    int dpos  = NO_MOVE;
 
-  if (TRYMOVE(apos, color)) {
-    if (TRYMOVE(bpos, other)) {
-      if (attack(cpos, NULL) && find_defense(cpos, &dpos)) {
-	set_minimum_move_value(dpos, 0.1);
-	TRACE("%o...setting min move value of %1m to 0.1\n", dpos);
-      }
-      popgo();
+    if (TRYMOVE(apos, color)) {
+        if (TRYMOVE(bpos, other)) {
+            if (attack(cpos, NULL) && find_defense(cpos, &dpos)) {
+                set_minimum_move_value(dpos, 0.1);
+                TRACE("%o...setting min move value of %1m to 0.1\n", dpos);
+            }
+            popgo();
+        }
+        popgo();
     }
-    popgo();
-  }
 
-  return 0;
+    return 0;
 }
 
 
@@ -523,16 +527,16 @@ backfill_helper(int apos, int bpos, int cpos)
 int
 owl_threatens_attack(int apos, int bpos)
 {
-  if (DRAGON2(bpos).owl_status == CRITICAL
-      && DRAGON2(bpos).owl_attack_point == apos)
-    return 1;
-  
-  if (DRAGON2(bpos).owl_threat_status == CAN_THREATEN_ATTACK)
-    if (DRAGON2(bpos).owl_attack_point == apos
-	|| DRAGON2(bpos).owl_second_attack_point == apos)
-      return 1;
-  
-  return 0;
+    if (DRAGON2(bpos).owl_status == CRITICAL
+            && DRAGON2(bpos).owl_attack_point == apos)
+        return 1;
+
+    if (DRAGON2(bpos).owl_threat_status == CAN_THREATEN_ATTACK)
+        if (DRAGON2(bpos).owl_attack_point == apos
+                || DRAGON2(bpos).owl_second_attack_point == apos)
+            return 1;
+
+    return 0;
 }
 
 
@@ -545,51 +549,51 @@ owl_threatens_attack(int apos, int bpos)
  * |XO	 |Ae
  * |..	 |bc
  */
-   
+
 int
 connect_and_cut_helper(int Apos, int bpos, int cpos)
 {
-  int dpos;
-  int epos = NO_MOVE;
-  int other = board[Apos];
-  int color = OTHER_COLOR(other);
-  int libs[2];
-  int liberties = findlib(Apos, 2, libs);
-  int result = 0;
-  int k;
+    int dpos;
+    int epos = NO_MOVE;
+    int other = board[Apos];
+    int color = OTHER_COLOR(other);
+    int libs[2];
+    int liberties = findlib(Apos, 2, libs);
+    int result = 0;
+    int k;
 
-  gg_assert(IS_STONE(color));
-  gg_assert(liberties == 2);
+    gg_assert(IS_STONE(color));
+    gg_assert(liberties == 2);
 
-  if (libs[0] == bpos)
-    dpos = libs[1];
-  else
-    dpos = libs[0];
+    if (libs[0] == bpos)
+        dpos = libs[1];
+    else
+        dpos = libs[0];
 
-  for (k = 0; k < 4; k++)
-    if (board[cpos + delta[k]] == color
-	&& neighbor_of_string(cpos + delta[k], Apos)) {
-      epos = cpos + delta[k];
-      break;
+    for (k = 0; k < 4; k++)
+        if (board[cpos + delta[k]] == color
+                && neighbor_of_string(cpos + delta[k], Apos)) {
+            epos = cpos + delta[k];
+            break;
+        }
+
+    gg_assert(epos != NO_MOVE);
+
+    if (TRYMOVE(bpos, color)) {
+        if (TRYMOVE(dpos, other)) {
+            if (TRYMOVE(cpos, other)) {
+                if (board[bpos] == EMPTY
+                        || board[epos] == EMPTY
+                        || !defend_both(bpos, epos))
+                    result = 1;
+                popgo();
+            }
+            popgo();
+        }
+        popgo();
     }
 
-  gg_assert(epos != NO_MOVE);
-  
-  if (TRYMOVE(bpos, color)) {
-    if (TRYMOVE(dpos, other)) {
-      if (TRYMOVE(cpos, other)) {
-	if (board[bpos] == EMPTY
-	    || board[epos] == EMPTY
-	    || !defend_both(bpos, epos))
-	  result = 1;
-	popgo();
-      }
-      popgo();
-    }
-    popgo();
-  }
-  
-  return result;
+    return result;
 }
 
 
@@ -604,52 +608,52 @@ connect_and_cut_helper(int Apos, int bpos, int cpos)
  * |.O	 |Ae
  * |..	 |bc
  */
-   
+
 int
 connect_and_cut_helper2(int Apos, int bpos, int cpos, int color)
 {
-  int dpos;
-  int epos = NO_MOVE;
-  int other = OTHER_COLOR(color);
-  int result = 0;
-  int k;
+    int dpos;
+    int epos = NO_MOVE;
+    int other = OTHER_COLOR(color);
+    int result = 0;
+    int k;
 
-  gg_assert(IS_STONE(color));
+    gg_assert(IS_STONE(color));
 
 
-  if (TRYMOVE(Apos, color)) {
-    for (k = 0; k < 4; k++)
-      if (board[cpos + delta[k]] == other
-	  && neighbor_of_string(cpos + delta[k], Apos)) {
-	epos = cpos + delta[k];
-	break;
-      }
+    if (TRYMOVE(Apos, color)) {
+        for (k = 0; k < 4; k++)
+            if (board[cpos + delta[k]] == other
+                    && neighbor_of_string(cpos + delta[k], Apos)) {
+                epos = cpos + delta[k];
+                break;
+            }
 
-    gg_assert(epos != NO_MOVE);
-    
-    if (TRYMOVE(bpos, other)) {
-      if (!find_defense(Apos, &dpos) || dpos == NO_MOVE) {
-	popgo();
-	popgo();
-	return 0;
-      }
-      
-      if (TRYMOVE(dpos, color)) {
-	if (TRYMOVE(cpos, color)) {
-	  if (board[bpos] == EMPTY
-	      || board[epos] == EMPTY
-	      || !defend_both(bpos, epos))
-	    result = 1;
-	  popgo();
-	}
-	popgo();
-      }
-      popgo();
+        gg_assert(epos != NO_MOVE);
+
+        if (TRYMOVE(bpos, other)) {
+            if (!find_defense(Apos, &dpos) || dpos == NO_MOVE) {
+                popgo();
+                popgo();
+                return 0;
+            }
+
+            if (TRYMOVE(dpos, color)) {
+                if (TRYMOVE(cpos, color)) {
+                    if (board[bpos] == EMPTY
+                            || board[epos] == EMPTY
+                            || !defend_both(bpos, epos))
+                        result = 1;
+                    popgo();
+                }
+                popgo();
+            }
+            popgo();
+        }
+        popgo();
     }
-    popgo();
-  }
-  
-  return result;
+
+    return result;
 }
 
 
@@ -657,39 +661,38 @@ connect_and_cut_helper2(int Apos, int bpos, int cpos, int color)
 void
 test_attack_either_move(int move, int color, int worma, int wormb)
 {
-  ASSERT_ON_BOARD1(move);
-  ASSERT1(board[move] == EMPTY, move);
-  ASSERT1(board[worma] == OTHER_COLOR(color)
-          && board[wormb] == OTHER_COLOR(color), move);
+    ASSERT_ON_BOARD1(move);
+    ASSERT1(board[move] == EMPTY, move);
+    ASSERT1(board[worma] == OTHER_COLOR(color)
+            && board[wormb] == OTHER_COLOR(color), move);
 
-  if (!defend_both(worma, wormb)) {
-    if (0)
-      gprintf("%1m: Reject attack_either_move for %1m, %1m (can't defend both)\n",
-	      move, worma, wormb);
-    return;
-  }
-  if (trymove(move, color, "test_attack_either_move", worma)) {
-    if (board[worma] == OTHER_COLOR(color)
-	&& board[wormb] == OTHER_COLOR(color)) {
-      if (!find_defense(worma, NULL) || !find_defense(wormb, NULL)) {
-	if (0)
-	  gprintf("%1m: Rej. attack_either_move for %1m & %1m (regular attack)\n",
-		  move, worma, wormb);
-      }
-      else if (!defend_both(worma, wormb))
-        add_either_move(move, ATTACK_STRING, worma, ATTACK_STRING, wormb);
-      else {
-	if (0)
-	  gprintf("%1m: Rej. attack_either_move for %1m & %1m (doesn't work)\n",
-		  move, worma, wormb);
-      }
+    if (!defend_both(worma, wormb)) {
+        if (0)
+            gprintf("%1m: Reject attack_either_move for %1m, %1m (can't defend both)\n",
+                    move, worma, wormb);
+        return;
     }
-    else
-      if (0)
-	gprintf("%1m: Rej. attack_either_move for %1m & %1m (captured directly)\n",
-		move, worma, wormb);
-    popgo();
-  }
+    if (trymove(move, color, "test_attack_either_move", worma)) {
+        if (board[worma] == OTHER_COLOR(color)
+                && board[wormb] == OTHER_COLOR(color)) {
+            if (!find_defense(worma, NULL) || !find_defense(wormb, NULL)) {
+                if (0)
+                    gprintf("%1m: Rej. attack_either_move for %1m & %1m (regular attack)\n",
+                            move, worma, wormb);
+            }
+            else if (!defend_both(worma, wormb))
+                add_either_move(move, ATTACK_STRING, worma, ATTACK_STRING, wormb);
+            else {
+                if (0)
+                    gprintf("%1m: Rej. attack_either_move for %1m & %1m (doesn't work)\n",
+                            move, worma, wormb);
+            }
+        }
+        else if (0)
+            gprintf("%1m: Rej. attack_either_move for %1m & %1m (captured directly)\n",
+                    move, worma, wormb);
+        popgo();
+    }
 }
 
 /* True if str is adjacent to a stone in atari, which is tactically
@@ -698,16 +701,16 @@ test_attack_either_move(int move, int color, int worma, int wormb)
 int
 adjacent_to_stone_in_atari(int str)
 {
-  int adj;
-  int adjs[MAXCHAIN];
-  int k;
+    int adj;
+    int adjs[MAXCHAIN];
+    int k;
 
-  adj = chainlinks2(str, adjs, 1);
-  for (k = 0; k < adj; k++)
-    if (attack(adjs[k], NULL))
-      return 1;
-  
-  return 0;
+    adj = chainlinks2(str, adjs, 1);
+    for (k = 0; k < adj; k++)
+        if (attack(adjs[k], NULL))
+            return 1;
+
+    return 0;
 }
 
 
@@ -717,32 +720,32 @@ adjacent_to_stone_in_atari(int str)
 int
 adjacent_to_defendable_stone_in_atari(int str)
 {
-  int adj;
-  int adjs[MAXCHAIN];
-  int k;
+    int adj;
+    int adjs[MAXCHAIN];
+    int k;
 
-  adj = chainlinks2(str, adjs, 1);
-  for (k = 0; k < adj; k++)
-    if (attack_and_defend(adjs[k], NULL, NULL, NULL, NULL))
-      return 1;
-  
-  return 0;
+    adj = chainlinks2(str, adjs, 1);
+    for (k = 0; k < adj; k++)
+        if (attack_and_defend(adjs[k], NULL, NULL, NULL, NULL))
+            return 1;
+
+    return 0;
 }
 
 void
 backfill_replace(int move, int str)
 {
-  int defense_move = NO_MOVE;
+    int defense_move = NO_MOVE;
 
-  if (TRYMOVE(move, OTHER_COLOR(board[str]))) {
-    if (attack_and_defend(str, NULL, NULL, NULL, &defense_move)) {
-      /* Must undo the trymove before adding the replacement move. */
-      popgo();
-      add_replacement_move(move, defense_move, board[str]);
+    if (TRYMOVE(move, OTHER_COLOR(board[str]))) {
+        if (attack_and_defend(str, NULL, NULL, NULL, &defense_move)) {
+            /* Must undo the trymove before adding the replacement move. */
+            popgo();
+            add_replacement_move(move, defense_move, board[str]);
+        }
+        else
+            popgo();
     }
-    else
-      popgo();
-  }
 }
 
 
@@ -756,26 +759,26 @@ backfill_replace(int move, int str)
  * in high handicap games, instead of passing because it looks like no
  * stones can live.
  */
-int 
+int
 thrash_around_helper(ARGS)
 {
-  UNUSED(pattern);
-  UNUSED(trans);
-  UNUSED(move);
+    UNUSED(pattern);
+    UNUSED(trans);
+    UNUSED(move);
 
-  /* Do not generate these moves when doing scoring or if fuseki move
-   * generation is disabled (typically used when solving life and
-   * death problems embedded on a big board).
-   */
-  if (doing_scoring
-      || disable_fuseki
-      || (stones_on_board(BLACK | WHITE) > board_size * board_size * 2 / 5
-	  && stones_on_board(WHITE) > board_size * board_size / 5)
-      || color == BLACK
-      || lively_dragon_exists(WHITE))
-    return 0;
+    /* Do not generate these moves when doing scoring or if fuseki move
+     * generation is disabled (typically used when solving life and
+     * death problems embedded on a big board).
+     */
+    if (doing_scoring
+            || disable_fuseki
+            || (stones_on_board(BLACK | WHITE) > board_size * board_size * 2 / 5
+                && stones_on_board(WHITE) > board_size * board_size / 5)
+            || color == BLACK
+            || lively_dragon_exists(WHITE))
+        return 0;
 
-  return 1;
+    return 1;
 }
 
 
@@ -795,16 +798,16 @@ thrash_around_helper(ARGS)
 int
 break_mirror_helper(int str, int color)
 {
-  if (board_size % 2 == 1
-      && color == WHITE
-      && komi <= 0.0
-      && I(str) == (board_size - 1) / 2
-      && J(str) == (board_size - 1) / 2
-      && stones_on_board(BLACK | WHITE) > 10
-      && test_symmetry_after_move(PASS_MOVE, EMPTY, 1))
-    return 1;
+    if (board_size % 2 == 1
+            && color == WHITE
+            && komi <= 0.0
+            && I(str) == (board_size - 1) / 2
+            && J(str) == (board_size - 1) / 2
+            && stones_on_board(BLACK | WHITE) > 10
+            && test_symmetry_after_move(PASS_MOVE, EMPTY, 1))
+        return 1;
 
-  return 0;
+    return 0;
 }
 
 
@@ -831,54 +834,54 @@ break_mirror_helper(int str, int color)
  */
 int distrust_tactics_helper(int str)
 {
-  int color = board[str];
-  int adj;
-  int adjs[MAXCHAIN];
-  int k;
-  int r;
-  int s;
-  int lib = countlib(str);
+    int color = board[str];
+    int adj;
+    int adjs[MAXCHAIN];
+    int k;
+    int r;
+    int s;
+    int lib = countlib(str);
 
-  ASSERT1(IS_STONE(board[str]), str);
-  
-  if (lib > 2)
-    return 1;
-  else if (lib == 1)
-    return 0;
-  
-  adj = chainlinks3(str, adjs, lib);
-  for (r = 0; r < adj; r++) {
-    int nakade = 1;
-    int adjlib;
-    int adjlibs[3];
-    if (countstones(adjs[r]) < 3)
-      continue;
-    adjlib = findlib(adjs[r], 3, adjlibs);
-    for (s = 0; s < adjlib; s++) {
-      int str_found = 0;
-      for (k = 0; k < 4; k++) {
-	int pos = adjlibs[s] + delta[k];
-	if (board[pos] == EMPTY
-	    && !liberty_of_string(pos, adjs[r]))
-	  nakade = 0;
-	else if (board[pos] == color) {
-	  if (same_string(pos, str))
-	    str_found = 1;
-	  else
-	    nakade = 0;
-	}
-	else if (board[pos] == OTHER_COLOR(color)
-		 && !same_string(pos, adjs[r]))
-	  nakade = 0;
-      }
-      if (!str_found)
-	nakade = 0;
+    ASSERT1(IS_STONE(board[str]), str);
+
+    if (lib > 2)
+        return 1;
+    else if (lib == 1)
+        return 0;
+
+    adj = chainlinks3(str, adjs, lib);
+    for (r = 0; r < adj; r++) {
+        int nakade = 1;
+        int adjlib;
+        int adjlibs[3];
+        if (countstones(adjs[r]) < 3)
+            continue;
+        adjlib = findlib(adjs[r], 3, adjlibs);
+        for (s = 0; s < adjlib; s++) {
+            int str_found = 0;
+            for (k = 0; k < 4; k++) {
+                int pos = adjlibs[s] + delta[k];
+                if (board[pos] == EMPTY
+                        && !liberty_of_string(pos, adjs[r]))
+                    nakade = 0;
+                else if (board[pos] == color) {
+                    if (same_string(pos, str))
+                        str_found = 1;
+                    else
+                        nakade = 0;
+                }
+                else if (board[pos] == OTHER_COLOR(color)
+                         && !same_string(pos, adjs[r]))
+                    nakade = 0;
+            }
+            if (!str_found)
+                nakade = 0;
+        }
+        if (nakade)
+            return 1;
     }
-    if (nakade)
-      return 1;
-  }
-  
-  return 0;
+
+    return 0;
 }
 
 
@@ -896,34 +899,34 @@ int distrust_tactics_helper(int str)
 int
 bent_four_helper(int str)
 {
-  int stones[4];
-  int good_corner_found = 0;
-  int color = board[str];
-  int k;
+    int stones[4];
+    int good_corner_found = 0;
+    int color = board[str];
+    int k;
 
-  if (!IS_STONE(color))
-    return 0;
+    if (!IS_STONE(color))
+        return 0;
 
-  if (findstones(str, 4, stones) != 4)
-    return 0;
+    if (findstones(str, 4, stones) != 4)
+        return 0;
 
-  /* All stones must be on the edge. Also detect the presence of a
-   * corner stone.
-   */
-  for (k = 0; k < 4; k++) {
-    if (!is_edge_vertex(stones[k]))
-      return 0;
-    if (is_corner_vertex(stones[k])) {
-      int corner = stones[k];
-      if ((board[EAST(corner)] == color)
-	  + (board[SOUTH(corner)] == color)
-	  + (board[WEST(corner)] == color)
-	  + (board[NORTH(corner)] == color) == 2)
-	good_corner_found = 1;
+    /* All stones must be on the edge. Also detect the presence of a
+     * corner stone.
+     */
+    for (k = 0; k < 4; k++) {
+        if (!is_edge_vertex(stones[k]))
+            return 0;
+        if (is_corner_vertex(stones[k])) {
+            int corner = stones[k];
+            if ((board[EAST(corner)] == color)
+                    + (board[SOUTH(corner)] == color)
+                    + (board[WEST(corner)] == color)
+                    + (board[NORTH(corner)] == color) == 2)
+                good_corner_found = 1;
+        }
     }
-  }
 
-  return good_corner_found;
+    return good_corner_found;
 }
 
 

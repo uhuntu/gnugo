@@ -29,7 +29,7 @@
 #include "liberty.h"
 #include "config.h"
 
-/* 
+/*
  * Define all global variables used within the engine.
  */
 
@@ -58,24 +58,24 @@ int semeai_branch_depth2;
 int semeai_node_limit;
 int connect_depth;	/* Used by Tristan Cazenave's connection reader. */
 int connect_depth2;     /* Used by alternater connection reader. */
-int connection_node_limit; 
+int connection_node_limit;
 int breakin_node_limit; /* Reading limits for break_in/block_off reading */
-int breakin_depth;    
+int breakin_depth;
 /* Mandated values for deep reading cutoffs. */
-int mandated_depth = -1;   
+int mandated_depth = -1;
 int mandated_backfill_depth = -1;
 int mandated_backfill2_depth = -1;
 int mandated_break_chain_depth = -1;
 int mandated_superstring_depth = -1;
-int mandated_fourlib_depth = -1;   
-int mandated_ko_depth = -1;       
-int mandated_branch_depth = -1;  
+int mandated_fourlib_depth = -1;
+int mandated_ko_depth = -1;
+int mandated_branch_depth = -1;
 int mandated_aa_depth = -1;
-int mandated_owl_distrust_depth = -1;  
-int mandated_owl_branch_depth = -1;  
-int mandated_owl_reading_depth = -1; 
-int mandated_owl_node_limit = -1;    
-int mandated_semeai_node_limit = -1;    
+int mandated_owl_distrust_depth = -1;
+int mandated_owl_branch_depth = -1;
+int mandated_owl_reading_depth = -1;
+int mandated_owl_node_limit = -1;
+int mandated_semeai_node_limit = -1;
 
 
 /* Miscellaneous. */
@@ -109,7 +109,7 @@ int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 /* use alternate connection reading algorithm */
 int alternate_connections = ALTERNATE_CONNECTIONS;
 /* compute owl threats */
-int owl_threats = OWL_THREATS; 
+int owl_threats = OWL_THREATS;
 /* use experimental owl extension (GAIN/LOSS) */
 int experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
 /* use experimental territory break-in module */

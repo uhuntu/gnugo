@@ -30,7 +30,7 @@
 /*
  * This file, together with engine/hash.c implements hashing of go positions
  * using a method known as Zobrist hashing.  See the Texinfo documentation
- * (Reading/Hashing) for more information.  
+ * (Reading/Hashing) for more information.
  */
 
 /* Hash values and the compact board representation should use the
@@ -80,7 +80,7 @@ typedef unsigned long Hashvalue;
  */
 
 typedef struct {
-  Hashvalue hashval[NUM_HASHVALUES];
+    Hashvalue hashval[NUM_HASHVALUES];
 } Hash_data;
 
 extern Hash_data board_hash;
@@ -99,7 +99,7 @@ void hashdata_invert_stone(Hash_data *hd, int pos, int color);
 void hashdata_invert_komaster(Hash_data *hd, int komaster);
 void hashdata_invert_kom_pos(Hash_data *hd, int kom_pos);
 void hashdata_calc_orientation_invariant(Hash_data *hd, Intersection *board,
-					 int ko_pos);
+        int ko_pos);
 
 char *hashdata_to_string(Hash_data *hashdata);
 

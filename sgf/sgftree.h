@@ -35,7 +35,7 @@
  *       are using. In this case they are defined in engine/gnugo.h.
  *
  * The reason that we put them here within the #ifndef clause is because
- * we want to decouple the GNU Go engine from SGF library, but we don't 
+ * we want to decouple the GNU Go engine from SGF library, but we don't
  * want to redefine these symbols if we include this file into board.h.
  */
 
@@ -53,17 +53,17 @@ void *xalloc(unsigned int);
  */
 
 typedef struct SGFProperty_t {
-  struct SGFProperty_t *next;
-  short name;
-  char *value;
+    struct SGFProperty_t *next;
+    short name;
+    char *value;
 } SGFProperty;
 
-    
+
 typedef struct SGFNode_t {
-  SGFProperty *props;
-  struct SGFNode_t *parent;
-  struct SGFNode_t *child;
-  struct SGFNode_t *next;
+    SGFProperty *props;
+    struct SGFNode_t *parent;
+    struct SGFNode_t *child;
+    struct SGFNode_t *next;
 } SGFNode;
 
 
@@ -84,7 +84,7 @@ void sgfOverwritePropertyFloat(SGFNode *node, const char *name, float val);
 void sgfOverwritePropertyInt(SGFNode *node, const char *name, int val);
 void *xrealloc(void *pt, unsigned int size);
 SGFProperty *sgfMkProperty(const char *name, const  char *value,
-			   SGFNode *node, SGFProperty *last);
+                           SGFNode *node, SGFProperty *last);
 void sgfFreeProperty(SGFProperty *prop);
 
 SGFNode *sgfAddStone(SGFNode *node, int color, int movex, int movey);
@@ -93,7 +93,7 @@ SGFNode *sgfAddPlayLast(SGFNode *node, int who, int movex, int movey);
 
 void sgfWriteResult(SGFNode *node, float score, int overwrite);
 void sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
-		      int handicap, int level, int rules);
+                      int handicap, int level, int rules);
 
 SGFNode *sgfLabel(SGFNode *node, const char *label, int i, int j);
 SGFNode *sgfLabelInt(SGFNode *node, int num, int i, int j);
@@ -126,8 +126,8 @@ int writesgf(SGFNode *root, const char *filename);
 
 
 typedef struct SGFTree_t {
-  SGFNode *root;
-  SGFNode *lastnode;
+    SGFNode *root;
+    SGFNode *lastnode;
 } SGFTree;
 
 
@@ -142,7 +142,7 @@ void sgftreeAddPlayLast(SGFTree *tree, int color, int movex, int movey);
 void sgftreeAddStone(SGFTree *tree, int color, int movex, int movey);
 void sgftreeWriteResult(SGFTree *tree, float score, int overwrite);
 SGFNode *sgftreeNodeCheck(SGFTree *tree);
-	 
+
 void sgftreeCircle(SGFTree *tree, int i, int j);
 void sgftreeSquare(SGFTree *tree, int i, int j);
 void sgftreeTriangle(SGFTree *tree, int i, int j);
@@ -154,7 +154,7 @@ void sgftreeBoardNumber(SGFTree *tree, int i, int j, int number);
 void sgftreeStartVariant(SGFTree *tree);
 void sgftreeStartVariantFirst(SGFTree *tree);
 void sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi,
-			     int handicap);
+                             int handicap);
 void sgftreeSetLastNode(SGFTree *tree, SGFNode *lastnode);
 
 

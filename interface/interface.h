@@ -32,17 +32,17 @@
 #include "gnugo.h"
 #include "sgftree.h"
 
-void play_ascii(SGFTree *tree, Gameinfo *gameinfo, 
-		char *filename, char *until);
+void play_ascii(SGFTree *tree, Gameinfo *gameinfo,
+                char *filename, char *until);
 void play_gtp(FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands,
-	      int gtp_initial_orientation);
+              int gtp_initial_orientation);
 void play_gmp(Gameinfo *gameinfo, int simplified);
 void play_solo(Gameinfo *gameinfo, int benchmark);
 void play_replay(SGFTree *tree, int color_to_test);
 
 void load_and_analyze_sgf_file(Gameinfo *gameinfo);
 void load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
-			     const char *scoringmode);
+                             const char *scoringmode);
 
 
 #endif

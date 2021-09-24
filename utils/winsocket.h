@@ -79,16 +79,16 @@ int		winsocket_feof(FILE *file);
 int		winsocket_fclose(FILE *file);
 
 size_t		winsocket_fread(void *buffer,
-				size_t size, size_t num_items, FILE *file);
+                            size_t size, size_t num_items, FILE *file);
 char *		winsocket_fgets(char *buffer, int size, FILE *file);
 
 size_t		winsocket_fwrite(const void *buffer,
-				 size_t size, size_t num_items, FILE *file);
+                             size_t size, size_t num_items, FILE *file);
 int		winsocket_fputc(int character, FILE *file);
 int		winsocket_fputs(const char *string, FILE *file);
 int		winsocket_fprintf(FILE *file, const char *format_string, ...);
 int		winsocket_vfprintf(FILE *file, const char *format_string,
-				   va_list arguments);
+                           va_list arguments);
 
 
 #endif	/* USE_WINDOWS_SOCKET_CLUDGE */

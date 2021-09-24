@@ -72,11 +72,11 @@ static int rand_initialized = 0;
 static void
 iterate_tgfsr(void)
 {
-  int i;
-  for (i = 0; i < N - m; i++)
-    x[i] = x[i + m]   ^  (x[i] >> 1)  ^  ((x[i] & 1) ? a : 0);
-  for (; i < N; i++)
-    x[i] = x[i + m - N] ^  (x[i] >> 1)  ^  ((x[i] & 1) ? a : 0);
+    int i;
+    for (i = 0; i < N - m; i++)
+        x[i] = x[i + m]   ^  (x[i] >> 1)  ^  ((x[i] & 1) ? a : 0);
+    for (; i < N; i++)
+        x[i] = x[i + m - N] ^  (x[i] >> 1)  ^  ((x[i] & 1) ? a : 0);
 }
 
 
@@ -86,21 +86,21 @@ iterate_tgfsr(void)
 static unsigned int
 next_rand(void)
 {
-  int y;
-  if (!rand_initialized) {
-    assert(rand_initialized); /* Abort. */
-    gg_srand(1);              /* Initialize silently if assertions disabled. */
-  }
-  if (++k == N) {
-    iterate_tgfsr();
-    k = 0;
-  }
-  y = x[k] ^ ((x[k] << s) & b);
-  y ^= ((y << t) & c);
+    int y;
+    if (!rand_initialized) {
+        assert(rand_initialized); /* Abort. */
+        gg_srand(1);              /* Initialize silently if assertions disabled. */
+    }
+    if (++k == N) {
+        iterate_tgfsr();
+        k = 0;
+    }
+    y = x[k] ^ ((x[k] << s) & b);
+    y ^= ((y << t) & c);
 #if BIG_UINT
-  y &= 0xffffffffU;
+    y &= 0xffffffffU;
 #endif
-  return y;
+    return y;
 }
 
 
@@ -118,17 +118,17 @@ next_rand(void)
 void
 gg_srand(unsigned int seed)
 {
-  int i;
-  for (i = 0; i < N; i++) {
+    int i;
+    for (i = 0; i < N; i++) {
 #if BIG_UINT
-    seed &= 0xffffffffU;
+        seed &= 0xffffffffU;
 #endif
-    x[i] = seed;
-    seed *= 1313;
-    seed += 88897;
-  }
-  k = N-1; /* Force an immediate iteration of the TGFSR. */
-  rand_initialized = 1;
+        x[i] = seed;
+        seed *= 1313;
+        seed += 88897;
+    }
+    k = N-1; /* Force an immediate iteration of the TGFSR. */
+    rand_initialized = 1;
 }
 
 
@@ -138,7 +138,7 @@ gg_srand(unsigned int seed)
 int
 gg_rand(void)
 {
-  return (int) (next_rand() & 0x7fffffff);
+    return (int) (next_rand() & 0x7fffffff);
 }
 
 
@@ -148,7 +148,7 @@ gg_rand(void)
 unsigned int
 gg_urand(void)
 {
-  return next_rand();
+    return next_rand();
 }
 
 
@@ -163,7 +163,7 @@ gg_urand(void)
 double
 gg_drand(void)
 {
-  return next_rand() * 2.328306436538696e-10;
+    return next_rand() * 2.328306436538696e-10;
 }
 
 
@@ -173,10 +173,10 @@ gg_drand(void)
 void
 gg_get_rand_state(struct gg_rand_state *state)
 {
-  int i;
-  for (i = 0; i < N; i++)
-    state->x[i] = x[i];
-  state->k = k;
+    int i;
+    for (i = 0; i < N; i++)
+        state->x[i] = x[i];
+    state->k = k;
 }
 
 
@@ -186,10 +186,10 @@ gg_get_rand_state(struct gg_rand_state *state)
 void
 gg_set_rand_state(struct gg_rand_state *state)
 {
-  int i;
-  for (i = 0; i < N; i++)
-    x[i] = state->x[i];
-  k = state->k;
+    int i;
+    for (i = 0; i < N; i++)
+        x[i] = state->x[i];
+    k = state->k;
 }
 
 

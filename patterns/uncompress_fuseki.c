@@ -100,11 +100,11 @@ uncompress_fuseki boardsize filename db\n\
 
 #define C_HEADER "struct fullboard_pattern fuseki%d[] = {\n"
 #define C_FOOTER "};\n"
-  
+
 static const char *const db_output_strings[3] =
-  {DB_PREAMBLE, DB_HEADER, DB_FOOTER};
+{DB_PREAMBLE, DB_HEADER, DB_FOOTER};
 static const char *const c_output_strings[3] =
-  {C_PREAMBLE, C_HEADER, C_FOOTER};
+{C_PREAMBLE, C_HEADER, C_FOOTER};
 
 #define PREAMBLE 	0
 #define HEADER 		1
@@ -116,37 +116,37 @@ static const char *const c_output_strings[3] =
  */
 static int
 set_boards(char board[MAX_BOARD + 2][MAX_BOARD + 2],
-	   Intersection board1d[BOARDSIZE],
-	   char *stones, char color, int boardsize)
+           Intersection board1d[BOARDSIZE],
+           char *stones, char color, int boardsize)
 {
-  int i = stones[1] - 'a' + 1;
-  int j = stones[0] - 'a' + 1;
-  if (stones[0] != 't') {
-    assert(i > 0 && i < boardsize + 2);
-    board[i][j] = color;
-    if (color == 'O')
-      board1d[POS(i - 1, j - 1)] = WHITE;
-    else if (color == 'X')
-      board1d[POS(i - 1, j - 1)] = BLACK;
-    return POS(i - 1, j - 1);
-  }
-  else 
-    return NO_MOVE;
+    int i = stones[1] - 'a' + 1;
+    int j = stones[0] - 'a' + 1;
+    if (stones[0] != 't') {
+        assert(i > 0 && i < boardsize + 2);
+        board[i][j] = color;
+        if (color == 'O')
+            board1d[POS(i - 1, j - 1)] = WHITE;
+        else if (color == 'X')
+            board1d[POS(i - 1, j - 1)] = BLACK;
+        return POS(i - 1, j - 1);
+    }
+    else
+        return NO_MOVE;
 }
 
 static void
 write_pattern(char *name, char board[MAX_BOARD + 2][MAX_BOARD + 2],
-	      int value, int boardsize)
+              int value, int boardsize)
 {
-  int i, j;
-  /* Output the uncompressed pattern. */
-  printf("Pattern %s\n\n", name);
-  for (i = 0; i <= boardsize + 1; i++) {
-    for (j = 0; j <= boardsize + 1; j++)
-      printf("%c", board[i][j]);
-    printf("\n");
-  }
-  printf("\n:8,-,value(%d)\n\n\n", value);
+    int i, j;
+    /* Output the uncompressed pattern. */
+    printf("Pattern %s\n\n", name);
+    for (i = 0; i <= boardsize + 1; i++) {
+        for (j = 0; j <= boardsize + 1; j++)
+            printf("%c", board[i][j]);
+        printf("\n");
+    }
+    printf("\n:8,-,value(%d)\n\n\n", value);
 }
 
 
@@ -167,67 +167,67 @@ write_pattern(char *name, char board[MAX_BOARD + 2][MAX_BOARD + 2],
 static void
 write_hash_value(Hash_data *pattern_hash)
 {
-  if (!CROSS_COMPILING
-      || (SIZEOF_LONG == TARGET_SIZEOF_LONG
-	  && CHAR_BIT == TARGET_CHAR_BIT)) {
-    int k;
-    for (k = 0; k < NUM_HASHVALUES; k++) {
-      printf("0x%lx", pattern_hash->hashval[k]);
-      if (k < NUM_HASHVALUES - 1)
-	printf(",");
+    if (!CROSS_COMPILING
+            || (SIZEOF_LONG == TARGET_SIZEOF_LONG
+                && CHAR_BIT == TARGET_CHAR_BIT)) {
+        int k;
+        for (k = 0; k < NUM_HASHVALUES; k++) {
+            printf("0x%lx", pattern_hash->hashval[k]);
+            if (k < NUM_HASHVALUES - 1)
+                printf(",");
+        }
     }
-  }
-  else {
-    int k;
-    int j = 0;
-    int bits_in_hashvalue = CHAR_BIT * SIZEOF_LONG;
-    int bits_in_target_hashvalue = TARGET_CHAR_BIT * TARGET_SIZEOF_LONG;
-    Hashvalue h = 0;
-    int available_source_bits = 0;
-    unsigned int target_bits = 0;
-    int remaining_target_bits_in_current_hashvalue = bits_in_target_hashvalue;
-    printf("0x");
-    for (k = 0; k < NUM_HASHBITS
-	        || remaining_target_bits_in_current_hashvalue > 0; k++) {
-      if (available_source_bits == 0 && k < NUM_HASHBITS) {
-	h = pattern_hash->hashval[j++];
-	available_source_bits = bits_in_hashvalue;
-      }
-      available_source_bits--;
-      target_bits <<= 1;
-      if (k < NUM_HASHBITS)
-	target_bits |= (h >> available_source_bits) & 1;
-      remaining_target_bits_in_current_hashvalue--;
-      if (remaining_target_bits_in_current_hashvalue % 4 == 0) {
-	printf("%x", target_bits);
-	target_bits = 0;
-      }
-      if (remaining_target_bits_in_current_hashvalue == 0
-	  && k < NUM_HASHBITS - 1) {
-	printf(",0x");
-	remaining_target_bits_in_current_hashvalue = bits_in_target_hashvalue;
-      }
+    else {
+        int k;
+        int j = 0;
+        int bits_in_hashvalue = CHAR_BIT * SIZEOF_LONG;
+        int bits_in_target_hashvalue = TARGET_CHAR_BIT * TARGET_SIZEOF_LONG;
+        Hashvalue h = 0;
+        int available_source_bits = 0;
+        unsigned int target_bits = 0;
+        int remaining_target_bits_in_current_hashvalue = bits_in_target_hashvalue;
+        printf("0x");
+        for (k = 0; k < NUM_HASHBITS
+                || remaining_target_bits_in_current_hashvalue > 0; k++) {
+            if (available_source_bits == 0 && k < NUM_HASHBITS) {
+                h = pattern_hash->hashval[j++];
+                available_source_bits = bits_in_hashvalue;
+            }
+            available_source_bits--;
+            target_bits <<= 1;
+            if (k < NUM_HASHBITS)
+                target_bits |= (h >> available_source_bits) & 1;
+            remaining_target_bits_in_current_hashvalue--;
+            if (remaining_target_bits_in_current_hashvalue % 4 == 0) {
+                printf("%x", target_bits);
+                target_bits = 0;
+            }
+            if (remaining_target_bits_in_current_hashvalue == 0
+                    && k < NUM_HASHBITS - 1) {
+                printf(",0x");
+                remaining_target_bits_in_current_hashvalue = bits_in_target_hashvalue;
+            }
+        }
     }
-  }
 }
 
 static void
 write_pattern_c_code(char *name, Intersection board1d[BOARDSIZE],
-		     int move_pos, int value, int boardsize, int patlen)
+                     int move_pos, int value, int boardsize, int patlen)
 {
-  Hash_data pattern_hash;
+    Hash_data pattern_hash;
 
-  /* Compute hash. */
-  hashdata_recalc(&pattern_hash, board1d, NO_MOVE);
-  printf("  {{{");
-  write_hash_value(&pattern_hash);
-  if (name)
-    printf("}},%d,\"%s\",%d,%d},\n", patlen, name,
-	   OFFSET(I(move_pos) - (boardsize-1)/2,
-		  J(move_pos) - (boardsize-1)/2),
-	   value);
-  else
-    printf("}},-1,NULL,0,0},\n");
+    /* Compute hash. */
+    hashdata_recalc(&pattern_hash, board1d, NO_MOVE);
+    printf("  {{{");
+    write_hash_value(&pattern_hash);
+    if (name)
+        printf("}},%d,\"%s\",%d,%d},\n", patlen, name,
+               OFFSET(I(move_pos) - (boardsize-1)/2,
+                      J(move_pos) - (boardsize-1)/2),
+               value);
+    else
+        printf("}},-1,NULL,0,0},\n");
 }
 
 
@@ -238,134 +238,134 @@ write_pattern_c_code(char *name, Intersection board1d[BOARDSIZE],
 int
 main(int argc, char *argv[])
 {
-  const char *filename;
-  FILE *input_FILE;
-  const char *const *output_strings;
-  int mode;
-  int move_pos;
-  char line[BUFSIZE];
-  char name[BUFSIZE];
-  char stones[BUFSIZE];
-  int value;
-  char board[MAX_BOARD + 2][MAX_BOARD + 2];
-  Intersection board1d[BOARDSIZE];
-  int boardsize;
-  int i, j, k;
-  int pos;
-  char color;
+    const char *filename;
+    FILE *input_FILE;
+    const char *const *output_strings;
+    int mode;
+    int move_pos;
+    char line[BUFSIZE];
+    char name[BUFSIZE];
+    char stones[BUFSIZE];
+    int value;
+    char board[MAX_BOARD + 2][MAX_BOARD + 2];
+    Intersection board1d[BOARDSIZE];
+    int boardsize;
+    int i, j, k;
+    int pos;
+    char color;
 
-  /* Check number of arguments. */
-  if (argc != 4) {
-    fprintf(stderr, USAGE);
-    return EXIT_FAILURE;
-  }
-
-  boardsize = atoi(argv[1]);
-  filename = argv[2];
-  if (strncmp(argv[3], "c", 2) == 0) {
-    mode = C_OUTPUT;
-    output_strings = c_output_strings;
-    set_random_seed(HASH_RANDOM_SEED);
-    hash_init();
-  }
-  else if (strncmp(argv[3], "db", 3) == 0) {
-    mode = DB_OUTPUT;
-    output_strings = db_output_strings;
-  }
-  else {
-    fprintf(stderr, USAGE);
-    return EXIT_FAILURE;
-  }
-
-  assert(boardsize > 0);
-  if (boardsize > MAX_BOARD) {
-    printf(output_strings[PREAMBLE]);
-    printf(output_strings[HEADER], boardsize);
-    printf(output_strings[FOOTER]);
-    return EXIT_SUCCESS;
-  }
-  
-  
-  input_FILE = fopen(filename, "r");
-  if (!input_FILE) {
-    fprintf(stderr, "uncompress_fuseki: Cannot open file %s\n", filename);
-    return EXIT_FAILURE;
-  }
-  
-  /* Initialize the corners of the internal board description. */
-  board[0][0] = '+';
-  board[0][boardsize + 1] = '+';
-  board[boardsize + 1][0] = '+';
-  board[boardsize + 1][boardsize + 1] = '+';
-
-  /* Initialize the sides of the internal board description. */
-  for (k = 1; k <= boardsize; k++) {
-    board[0][k] = '-';
-    board[boardsize + 1][k] = '-';
-    board[k][0] = '|';
-    board[k][boardsize + 1] = '|';
-  }
-
-  printf(output_strings[PREAMBLE]);
-  printf(output_strings[HEADER], boardsize);
-  
-
-  /* Loop over the lines of the compressed database.
-   * Each line is one pattern.
-   */
-  while (fgets(line, BUFSIZE, input_FILE)) {
-    int num_stones = 0;
-    /* Clear the internal board. */
-    for (i = 1; i <= boardsize; i++)
-      for (j = 1; j <= boardsize; j++)
-	board[i][j] = '.';
-
-    /* Initialize private 1D-board. */
-    for (pos = 0; pos < BOARDSIZE; pos++)
-      if (I(pos) >= 0 && I(pos) < boardsize
-          && J(pos) >= 0 && J(pos) < boardsize)
-	board1d[pos] = EMPTY;
-      else
-	board1d[pos] = GRAY;
-
-    /* Assume a line from copyright notice if misformed and
-     * silently ignore it.
-     */
-    if (sscanf(line, "%s %d %s", name, &value, stones) != 3)
-      continue;
-
-    /* The first point in the stones list is the move to be played. */
-    move_pos = set_boards(board, board1d, stones, '*', boardsize);
-
-    /* Then follows alternating X and O stones. */
-    color = 'X';
-    for (k = 2; k < (int) strlen(stones); k += 2) {
-      pos = set_boards(board, board1d, stones + k, color, boardsize);
-      if (I(pos) >= 0 && I(pos) < boardsize
-          && J(pos) >= 0 && J(pos) < boardsize)
-	num_stones++;
-      if (color == 'X')
-	color = 'O';
-      else
-	color = 'X';
+    /* Check number of arguments. */
+    if (argc != 4) {
+        fprintf(stderr, USAGE);
+        return EXIT_FAILURE;
     }
 
-    if (mode == DB_OUTPUT)
-      write_pattern(name, board, value, boardsize);
-    else
-      write_pattern_c_code(name, board1d, move_pos, value, boardsize,
-		           num_stones);
-  }
+    boardsize = atoi(argv[1]);
+    filename = argv[2];
+    if (strncmp(argv[3], "c", 2) == 0) {
+        mode = C_OUTPUT;
+        output_strings = c_output_strings;
+        set_random_seed(HASH_RANDOM_SEED);
+        hash_init();
+    }
+    else if (strncmp(argv[3], "db", 3) == 0) {
+        mode = DB_OUTPUT;
+        output_strings = db_output_strings;
+    }
+    else {
+        fprintf(stderr, USAGE);
+        return EXIT_FAILURE;
+    }
 
-  /* Add a dummy pattern to mark the end of the array. This can't be
-   * done statically in the footer since NUM_HASHVALUES may vary.
-   */
-  if (mode == C_OUTPUT)
-    write_pattern_c_code(NULL, board1d, NO_MOVE, 0, boardsize, -1);
-  
-  printf(output_strings[FOOTER]);
+    assert(boardsize > 0);
+    if (boardsize > MAX_BOARD) {
+        printf(output_strings[PREAMBLE]);
+        printf(output_strings[HEADER], boardsize);
+        printf(output_strings[FOOTER]);
+        return EXIT_SUCCESS;
+    }
 
-  return EXIT_SUCCESS;
+
+    input_FILE = fopen(filename, "r");
+    if (!input_FILE) {
+        fprintf(stderr, "uncompress_fuseki: Cannot open file %s\n", filename);
+        return EXIT_FAILURE;
+    }
+
+    /* Initialize the corners of the internal board description. */
+    board[0][0] = '+';
+    board[0][boardsize + 1] = '+';
+    board[boardsize + 1][0] = '+';
+    board[boardsize + 1][boardsize + 1] = '+';
+
+    /* Initialize the sides of the internal board description. */
+    for (k = 1; k <= boardsize; k++) {
+        board[0][k] = '-';
+        board[boardsize + 1][k] = '-';
+        board[k][0] = '|';
+        board[k][boardsize + 1] = '|';
+    }
+
+    printf(output_strings[PREAMBLE]);
+    printf(output_strings[HEADER], boardsize);
+
+
+    /* Loop over the lines of the compressed database.
+     * Each line is one pattern.
+     */
+    while (fgets(line, BUFSIZE, input_FILE)) {
+        int num_stones = 0;
+        /* Clear the internal board. */
+        for (i = 1; i <= boardsize; i++)
+            for (j = 1; j <= boardsize; j++)
+                board[i][j] = '.';
+
+        /* Initialize private 1D-board. */
+        for (pos = 0; pos < BOARDSIZE; pos++)
+            if (I(pos) >= 0 && I(pos) < boardsize
+                    && J(pos) >= 0 && J(pos) < boardsize)
+                board1d[pos] = EMPTY;
+            else
+                board1d[pos] = GRAY;
+
+        /* Assume a line from copyright notice if misformed and
+         * silently ignore it.
+         */
+        if (sscanf(line, "%s %d %s", name, &value, stones) != 3)
+            continue;
+
+        /* The first point in the stones list is the move to be played. */
+        move_pos = set_boards(board, board1d, stones, '*', boardsize);
+
+        /* Then follows alternating X and O stones. */
+        color = 'X';
+        for (k = 2; k < (int) strlen(stones); k += 2) {
+            pos = set_boards(board, board1d, stones + k, color, boardsize);
+            if (I(pos) >= 0 && I(pos) < boardsize
+                    && J(pos) >= 0 && J(pos) < boardsize)
+                num_stones++;
+            if (color == 'X')
+                color = 'O';
+            else
+                color = 'X';
+        }
+
+        if (mode == DB_OUTPUT)
+            write_pattern(name, board, value, boardsize);
+        else
+            write_pattern_c_code(name, board1d, move_pos, value, boardsize,
+                                 num_stones);
+    }
+
+    /* Add a dummy pattern to mark the end of the array. This can't be
+     * done statically in the footer since NUM_HASHVALUES may vary.
+     */
+    if (mode == C_OUTPUT)
+        write_pattern_c_code(NULL, board1d, NO_MOVE, 0, boardsize, -1);
+
+    printf(output_strings[FOOTER]);
+
+    return EXIT_SUCCESS;
 }
 
 

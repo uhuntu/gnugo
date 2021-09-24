@@ -38,77 +38,77 @@
  */
 static int
 capture_non_invincible_strings(int color, int exceptions[BOARDMAX],
-			       int *none_invincible)
+                               int *none_invincible)
 {
-  int other = OTHER_COLOR(color);
-  int something_captured = 1; /* To get into the first turn of the loop. */
-  int string_found = 0;
-  int moves_played = 0;
-  int save_moves;
-  int libs[MAXLIBS];
-  int liberties;
-  int pos;
-  int k;
-  
-  while (something_captured) {
-    /* Nothing captured so far in this turn of the loop. */
-    something_captured = 0;
+    int other = OTHER_COLOR(color);
+    int something_captured = 1; /* To get into the first turn of the loop. */
+    int string_found = 0;
+    int moves_played = 0;
+    int save_moves;
+    int libs[MAXLIBS];
+    int liberties;
+    int pos;
+    int k;
 
-    /* Is there something left to try to capture? */
-    string_found = 0;
-    
-    /* Visit all friendly strings on the board. */
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (board[pos] != color || find_origin(pos) != pos)
-	continue;
+    while (something_captured) {
+        /* Nothing captured so far in this turn of the loop. */
+        something_captured = 0;
 
-      if (exceptions && exceptions[pos])
-	continue;
+        /* Is there something left to try to capture? */
+        string_found = 0;
 
-      string_found = 1;
-      
-      /* Try to capture the string at pos. */
-      liberties = findlib(pos, MAXLIBS, libs);
-      save_moves = moves_played;
-      for (k = 0; k < liberties; k++) {
-	if (trymove(libs[k], other, "unconditional_life", pos))
-	  moves_played++;
-      }
-      
-      /* Successful if already captured or a single liberty remains.
-       * Otherwise we must rewind and take back the last batch of moves.
-       */
-      if (board[pos] == EMPTY)
-	something_captured = 1;
-      else if (findlib(pos, 2, libs) == 1) {
-	/* Need to use tryko as a defense against the extreme case
-	 * when the only opponent liberty that is not suicide is an
-	 * illegal ko capture, like in this 5x5 position:
-	 * +-----+
-	 * |.XO.O|
-	 * |XXOO.|
-	 * |X.XOO|
-	 * |XXOO.|
-	 * |.XO.O|
-	 * +-----+
-	 */
-	int success = tryko(libs[0], other, "unconditional_life");
-	gg_assert(success);
-	moves_played++;
-	something_captured = 1;
-      }
-      else
-	while (moves_played > save_moves) {
-	  popgo();
-	  moves_played--;
-	}
+        /* Visit all friendly strings on the board. */
+        for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+            if (board[pos] != color || find_origin(pos) != pos)
+                continue;
+
+            if (exceptions && exceptions[pos])
+                continue;
+
+            string_found = 1;
+
+            /* Try to capture the string at pos. */
+            liberties = findlib(pos, MAXLIBS, libs);
+            save_moves = moves_played;
+            for (k = 0; k < liberties; k++) {
+                if (trymove(libs[k], other, "unconditional_life", pos))
+                    moves_played++;
+            }
+
+            /* Successful if already captured or a single liberty remains.
+             * Otherwise we must rewind and take back the last batch of moves.
+             */
+            if (board[pos] == EMPTY)
+                something_captured = 1;
+            else if (findlib(pos, 2, libs) == 1) {
+                /* Need to use tryko as a defense against the extreme case
+                 * when the only opponent liberty that is not suicide is an
+                 * illegal ko capture, like in this 5x5 position:
+                 * +-----+
+                 * |.XO.O|
+                 * |XXOO.|
+                 * |X.XOO|
+                 * |XXOO.|
+                 * |.XO.O|
+                 * +-----+
+                 */
+                int success = tryko(libs[0], other, "unconditional_life");
+                gg_assert(success);
+                moves_played++;
+                something_captured = 1;
+            }
+            else
+                while (moves_played > save_moves) {
+                    popgo();
+                    moves_played--;
+                }
+        }
     }
-  }
 
-  if (none_invincible)
-    *none_invincible = !string_found;
-  
-  return moves_played;
+    if (none_invincible)
+        *none_invincible = !string_found;
+
+    return moves_played;
 }
 
 /* Find those worms of the given color that can never be captured,
@@ -314,232 +314,232 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX],
 void
 unconditional_life(int unconditional_territory[BOARDMAX], int color)
 {
-  int found_one;
-  int other = OTHER_COLOR(color);
-  int libs[MAXLIBS];
-  int liberties;
-  int pos;
-  int k, r;
-  int moves_played;
-  int potential_sekis[BOARDMAX];
-  int none_invincible;
+    int found_one;
+    int other = OTHER_COLOR(color);
+    int libs[MAXLIBS];
+    int liberties;
+    int pos;
+    int k, r;
+    int moves_played;
+    int potential_sekis[BOARDMAX];
+    int none_invincible;
 
-  /* Initialize unconditional_territory array. */
-  memset(unconditional_territory, 0,
-	 sizeof(unconditional_territory[0]) * BOARDMAX);
-  
-  /* Find isolated two-stone strings which might be involved in the
-   * kind of seki described in the comments.
-   */
-  memset(potential_sekis, 0, sizeof(potential_sekis));
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int isolated = 1;
-    int stones[2];
-    int pos2;
-    
-    if (board[pos] != color
-	|| find_origin(pos) != pos
-	|| countstones(pos) != 2)
-      continue;
-    
-    findstones(pos, 2, stones);
-    for (k = 0; k < 2 && isolated; k++) {
-      for (r = 0; r < 8 && isolated; r++) {
-	pos2 = stones[k] + delta[r];
-	if (!ON_BOARD(pos2)
-	    || (board[pos2] == color
-		&& !same_string(pos, pos2)))
-	  isolated = 0;
-      }
+    /* Initialize unconditional_territory array. */
+    memset(unconditional_territory, 0,
+           sizeof(unconditional_territory[0]) * BOARDMAX);
+
+    /* Find isolated two-stone strings which might be involved in the
+     * kind of seki described in the comments.
+     */
+    memset(potential_sekis, 0, sizeof(potential_sekis));
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        int isolated = 1;
+        int stones[2];
+        int pos2;
+
+        if (board[pos] != color
+                || find_origin(pos) != pos
+                || countstones(pos) != 2)
+            continue;
+
+        findstones(pos, 2, stones);
+        for (k = 0; k < 2 && isolated; k++) {
+            for (r = 0; r < 8 && isolated; r++) {
+                pos2 = stones[k] + delta[r];
+                if (!ON_BOARD(pos2)
+                        || (board[pos2] == color
+                            && !same_string(pos, pos2)))
+                    isolated = 0;
+            }
+        }
+
+        if (isolated) {
+            potential_sekis[stones[0]] = 1;
+            potential_sekis[stones[1]] = 1;
+        }
     }
 
-    if (isolated) {
-      potential_sekis[stones[0]] = 1;
-      potential_sekis[stones[1]] = 1;
-    }
-  }
-  
-  moves_played = capture_non_invincible_strings(color, potential_sekis,
-						&none_invincible);
+    moves_played = capture_non_invincible_strings(color, potential_sekis,
+                   &none_invincible);
 
-  /* If there are no invincible strings, nothing can be unconditionally
-   * settled.
-   */
-  if (none_invincible) {
-    /* Take back all moves. */
-    while (moves_played > 0) {
-      popgo();
-      moves_played--;
+    /* If there are no invincible strings, nothing can be unconditionally
+     * settled.
+     */
+    if (none_invincible) {
+        /* Take back all moves. */
+        while (moves_played > 0) {
+            popgo();
+            moves_played--;
+        }
+        return;
     }
-    return;
-  }
-  
-  /* The strings still remaining except those marked in
-   * potential_sekis[] are uncapturable. Now see which opponent
-   * strings can survive.
-   *
-   * 1. Play opponent stones on all liberties of the unconditionally
-   *    alive strings except where illegal.
-   */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] != color || potential_sekis[pos] || find_origin(pos) != pos)
-      continue;
-      
-    /* Play as many liberties as we can. */
-    liberties = findlib(pos, MAXLIBS, libs);
-    for (k = 0; k < liberties; k++) {
-      if (trymove(libs[k], other, "unconditional_life", pos))
-	moves_played++;
-    }
-  }
 
-  /* 2. Recursively extend opponent strings in atari, except where this
-   *    would be suicide.
-   */
-  found_one = 1;
-  while (found_one) {
-    /* Nothing found so far in this turn of the loop. */
-    found_one = 0;
+    /* The strings still remaining except those marked in
+     * potential_sekis[] are uncapturable. Now see which opponent
+     * strings can survive.
+     *
+     * 1. Play opponent stones on all liberties of the unconditionally
+     *    alive strings except where illegal.
+     */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        if (board[pos] != color || potential_sekis[pos] || find_origin(pos) != pos)
+            continue;
+
+        /* Play as many liberties as we can. */
+        liberties = findlib(pos, MAXLIBS, libs);
+        for (k = 0; k < liberties; k++) {
+            if (trymove(libs[k], other, "unconditional_life", pos))
+                moves_played++;
+        }
+    }
+
+    /* 2. Recursively extend opponent strings in atari, except where this
+     *    would be suicide.
+     */
+    found_one = 1;
+    while (found_one) {
+        /* Nothing found so far in this turn of the loop. */
+        found_one = 0;
+
+        for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+            if (board[pos] != other || countlib(pos) > 1)
+                continue;
+
+            /* Try to extend the string at (m, n). */
+            findlib(pos, 1, libs);
+            if (trymove(libs[0], other, "unconditional_life", pos)) {
+                moves_played++;
+                found_one = 1;
+            }
+        }
+    }
+
+    /* Now see whether there are any significant sekis on the board. */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        if (!potential_sekis[pos]
+                || board[pos] == EMPTY
+                || find_origin(pos) != pos)
+            continue;
+        for (r = 0; r < 4; r++) {
+            int up = delta[r];
+            int right = delta[(r + 1) % 4];
+            int locally_played_moves = 0;
+            if (board[pos + up] != color
+                    || board[pos + up + up] != EMPTY
+                    || board[pos - up] != EMPTY)
+                continue;
+            for (k = 0; k < 2; k++) {
+                if (k == 1)
+                    right = -right;
+                if (board[pos + right] != EMPTY || board[pos + up - right] != EMPTY)
+                    continue;
+                if (board[pos - right] == EMPTY
+                        && trymove(pos - right, other, "unconditional_life", pos))
+                    locally_played_moves++;
+                if (board[pos + up + right] == EMPTY
+                        && trymove(pos + up + right, other, "unconditional_life", pos))
+                    locally_played_moves++;
+                if (board[pos - right] == other && board[pos + up + right] == other
+                        && same_string(pos - right, pos + up + right)) {
+                    /* This is a critical seki. Extend the string with one stone
+                         * in an arbitrary direction to break the seki.
+                     */
+                    while (locally_played_moves > 0) {
+                        popgo();
+                        locally_played_moves--;
+                    }
+                    trymove(pos - up, color, "unconditional_life", pos);
+                    moves_played++;
+                    break;
+                }
+                else {
+                    while (locally_played_moves > 0) {
+                        popgo();
+                        locally_played_moves--;
+                    }
+                }
+            }
+            if (countstones(pos) > 2)
+                break;
+        }
+    }
+
+    /* Capture the strings involved in potential sekis. */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        if (!potential_sekis[pos] || board[pos] == EMPTY)
+            continue;
+        /* Play as many liberties as we can. */
+        liberties = findlib(pos, MAXLIBS, libs);
+        for (k = 0; k < liberties; k++) {
+            if (trymove(libs[k], other, "unconditional_life", pos))
+                moves_played++;
+        }
+    }
+
 
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (board[pos] != other || countlib(pos) > 1)
-	continue;
-	
-      /* Try to extend the string at (m, n). */
-      findlib(pos, 1, libs);
-      if (trymove(libs[0], other, "unconditional_life", pos)) {
-	moves_played++;
-	found_one = 1;
-      }
-    }
-  }
+        int apos;
+        int bpos;
+        int aopen, bopen;
+        int alib, blib;
+        if (board[pos] != other || countlib(pos) != 2)
+            continue;
+        findlib(pos, 2, libs);
+        apos = libs[0];
+        bpos = libs[1];
+        if (abs(I(apos) - I(bpos)) + abs(J(apos) - J(bpos)) != 1)
+            continue;
 
-  /* Now see whether there are any significant sekis on the board. */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!potential_sekis[pos]
-	|| board[pos] == EMPTY
-	|| find_origin(pos) != pos)
-      continue;
-    for (r = 0; r < 4; r++) {
-      int up = delta[r];
-      int right = delta[(r + 1) % 4];
-      int locally_played_moves = 0;
-      if (board[pos + up] != color
-	  || board[pos + up + up] != EMPTY
-	  || board[pos - up] != EMPTY)
-	continue;
-      for (k = 0; k < 2; k++) {
-	if (k == 1)
-	  right = -right;
-	if (board[pos + right] != EMPTY || board[pos + up - right] != EMPTY)
-	  continue;
-	if (board[pos - right] == EMPTY
-	    && trymove(pos - right, other, "unconditional_life", pos))
-	  locally_played_moves++;
-	if (board[pos + up + right] == EMPTY
-	    && trymove(pos + up + right, other, "unconditional_life", pos))
-	  locally_played_moves++;
-	if (board[pos - right] == other && board[pos + up + right] == other
-	    && same_string(pos - right, pos + up + right)) {
-	  /* This is a critical seki. Extend the string with one stone
-           * in an arbitrary direction to break the seki.
-	   */
-	  while (locally_played_moves > 0) {
-	    popgo();
-	    locally_played_moves--;
-	  }
-	  trymove(pos - up, color, "unconditional_life", pos);
-	  moves_played++;
-	  break;
-	}
-	else {
-	  while (locally_played_moves > 0) {
-	    popgo();
-	    locally_played_moves--;
-	  }
-	}
-      }
-      if (countstones(pos) > 2)
-	break;
-    }
-  }
+        /* Only two liberties and these are adjacent. Play one. We want
+         * to maximize the number of open liberties. In this particular
+         * situation we can count this with approxlib for the opposite
+         * color. If the number of open liberties is the same, we
+         * maximize the total number of obtained liberties.
+         * Two relevant positions:
+         *
+         * |XXX.
+         * |OOXX    |XXXXXXX
+         * |O.OX    |OOXOOOX
+         * |..OX    |..OO.OX
+         * +----    +-------
+         */
+        aopen = approxlib(apos, color, 4, NULL);
+        bopen = approxlib(bpos, color, 4, NULL);
+        alib  = approxlib(apos, other, 4, NULL);
+        blib  = approxlib(bpos, other, 4, NULL);
 
-  /* Capture the strings involved in potential sekis. */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!potential_sekis[pos] || board[pos] == EMPTY)
-      continue;
-    /* Play as many liberties as we can. */
-    liberties = findlib(pos, MAXLIBS, libs);
-    for (k = 0; k < liberties; k++) {
-      if (trymove(libs[k], other, "unconditional_life", pos))
-	moves_played++;
+        if (aopen > bopen || (aopen == bopen && alib >= blib)) {
+            trymove(apos, other, "unconditional_life", pos);
+            moves_played++;
+        }
+        else {
+            trymove(bpos, other, "unconditional_life", pos);
+            moves_played++;
+        }
     }
-  }
-    
 
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int apos;
-    int bpos;
-    int aopen, bopen;
-    int alib, blib;
-    if (board[pos] != other || countlib(pos) != 2)
-      continue;
-    findlib(pos, 2, libs);
-    apos = libs[0];
-    bpos = libs[1];
-    if (abs(I(apos) - I(bpos)) + abs(J(apos) - J(bpos)) != 1)
-      continue;
-    
-    /* Only two liberties and these are adjacent. Play one. We want
-     * to maximize the number of open liberties. In this particular
-     * situation we can count this with approxlib for the opposite
-     * color. If the number of open liberties is the same, we
-     * maximize the total number of obtained liberties.
-     * Two relevant positions:
-     *
-     * |XXX. 
-     * |OOXX    |XXXXXXX
-     * |O.OX    |OOXOOOX
-     * |..OX    |..OO.OX
-     * +----    +-------
-     */
-    aopen = approxlib(apos, color, 4, NULL);
-    bopen = approxlib(bpos, color, 4, NULL);
-    alib  = approxlib(apos, other, 4, NULL);
-    blib  = approxlib(bpos, other, 4, NULL);
-    
-    if (aopen > bopen || (aopen == bopen && alib >= blib)) {
-      trymove(apos, other, "unconditional_life", pos);
-      moves_played++;
+    /* Identify unconditionally alive stones and unconditional territory. */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        if (board[pos] == color && !potential_sekis[pos]) {
+            unconditional_territory[pos] = 1;
+            if (find_origin(pos) == pos) {
+                liberties = findlib(pos, MAXLIBS, libs);
+                for (k = 0; k < liberties; k++)
+                    unconditional_territory[libs[k]] = 2;
+            }
+        }
+        else if (board[pos] == other && countlib(pos) == 1) {
+            unconditional_territory[pos] = 2;
+            findlib(pos, 1, libs);
+            unconditional_territory[libs[0]] = 2;
+        }
     }
-    else {
-      trymove(bpos, other, "unconditional_life", pos);
-      moves_played++;
+
+    /* Take back all moves. */
+    while (moves_played > 0) {
+        popgo();
+        moves_played--;
     }
-  }
-  
-  /* Identify unconditionally alive stones and unconditional territory. */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == color && !potential_sekis[pos]) {
-      unconditional_territory[pos] = 1;
-      if (find_origin(pos) == pos) {
-	liberties = findlib(pos, MAXLIBS, libs);
-	for (k = 0; k < liberties; k++)
-	  unconditional_territory[libs[k]] = 2;
-      }
-    }
-    else if (board[pos] == other && countlib(pos) == 1) {
-      unconditional_territory[pos] = 2;
-      findlib(pos, 1, libs);
-      unconditional_territory[libs[0]] = 2;
-    }
-  }
-  
-  /* Take back all moves. */
-  while (moves_played > 0) {
-    popgo();
-    moves_played--;
-  }
 }
 
 
@@ -574,72 +574,72 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
  */
 void
 find_unconditionally_meaningless_moves(int unconditional_territory[BOARDMAX],
-				       int color)
+                                       int color)
 {
-  int *meaningless_moves;
-  int other = OTHER_COLOR(color);
-  int friendly_unconditional[BOARDMAX];
-  int opponent_unconditional[BOARDMAX];
-  int pos;
-  int pos2;
+    int *meaningless_moves;
+    int other = OTHER_COLOR(color);
+    int friendly_unconditional[BOARDMAX];
+    int opponent_unconditional[BOARDMAX];
+    int pos;
+    int pos2;
 
-  gg_assert(color == BLACK || color == WHITE);
+    gg_assert(color == BLACK || color == WHITE);
 
-  if (color == BLACK)
-    meaningless_moves = meaningless_black_moves;
-  else
-    meaningless_moves = meaningless_white_moves;
+    if (color == BLACK)
+        meaningless_moves = meaningless_black_moves;
+    else
+        meaningless_moves = meaningless_white_moves;
 
-  /* Initialize meaningless_moves and detect moves of category 1, but
-   * only for own unconditional territory.
-   *
-   * FIXME: We would save some time by detecting all category 1 moves
-   * here but then we would need to have the initial unconditional
-   * territory for the opponent as well. This can of course be done,
-   * the question is how we get it in the nicest way.
-   */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (board[pos] == EMPTY) {
-      if (unconditional_territory[pos])
-	meaningless_moves[pos] = NO_MOVE;
-      else
-	meaningless_moves[pos] = -1;
+    /* Initialize meaningless_moves and detect moves of category 1, but
+     * only for own unconditional territory.
+     *
+     * FIXME: We would save some time by detecting all category 1 moves
+     * here but then we would need to have the initial unconditional
+     * territory for the opponent as well. This can of course be done,
+     * the question is how we get it in the nicest way.
+     */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+        if (board[pos] == EMPTY) {
+            if (unconditional_territory[pos])
+                meaningless_moves[pos] = NO_MOVE;
+            else
+                meaningless_moves[pos] = -1;
+        }
+
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+        if (board[pos] != EMPTY || meaningless_moves[pos] != -1)
+            continue;
+
+        if (!tryko(pos, color, "find_unconditionally_meaningless_moves"))
+            continue;
+
+        unconditional_life(opponent_unconditional, other);
+        if (opponent_unconditional[pos]) {
+            /* Move of category 1 or 2. */
+            meaningless_moves[pos] = NO_MOVE;
+        }
+        else {
+            unconditional_life(friendly_unconditional, color);
+            if (friendly_unconditional[pos])
+                for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
+                    if (board[pos2] == EMPTY
+                            && meaningless_moves[pos2] == -1
+                            && friendly_unconditional[pos2]) {
+                        /* Move of category 3. */
+                        meaningless_moves[pos2] = pos;
+                    }
+        }
+
+        popgo();
     }
 
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] != EMPTY || meaningless_moves[pos] != -1)
-      continue;
-
-    if (!tryko(pos, color, "find_unconditionally_meaningless_moves"))
-      continue;
-
-    unconditional_life(opponent_unconditional, other);
-    if (opponent_unconditional[pos]) {
-      /* Move of category 1 or 2. */
-      meaningless_moves[pos] = NO_MOVE;
-    }
-    else {
-      unconditional_life(friendly_unconditional, color);
-      if (friendly_unconditional[pos])
-	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
-	  if (board[pos2] == EMPTY
-	      && meaningless_moves[pos2] == -1
-	      && friendly_unconditional[pos2]) {
-	    /* Move of category 3. */
-	    meaningless_moves[pos2] = pos;
-	  }
-    }
-
-    popgo();
-  }
-
-  /* Meaningless moves of category 3 may have been found in multiple
-   * steps. Normalize to the final replacement move.
-   */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (board[pos] == EMPTY && meaningless_moves[pos] > 0)
-      while (meaningless_moves[meaningless_moves[pos]] > 0)
-	meaningless_moves[pos] = meaningless_moves[meaningless_moves[pos]];
+    /* Meaningless moves of category 3 may have been found in multiple
+     * steps. Normalize to the final replacement move.
+     */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+        if (board[pos] == EMPTY && meaningless_moves[pos] > 0)
+            while (meaningless_moves[meaningless_moves[pos]] > 0)
+                meaningless_moves[pos] = meaningless_moves[meaningless_moves[pos]];
 }
 
 /* Returns 1 if the move at pos by color is meaningless and 0
@@ -650,28 +650,28 @@ find_unconditionally_meaningless_moves(int unconditional_territory[BOARDMAX],
 int
 unconditionally_meaningless_move(int pos, int color, int *replacement_move)
 {
-  if (color == WHITE && meaningless_white_moves[pos] != -1) {
-    *replacement_move = meaningless_white_moves[pos];
-    return 1;
-  }
-  if (color == BLACK && meaningless_black_moves[pos] != -1) {
-    *replacement_move = meaningless_black_moves[pos];
-    return 1;
-  }
+    if (color == WHITE && meaningless_white_moves[pos] != -1) {
+        *replacement_move = meaningless_white_moves[pos];
+        return 1;
+    }
+    if (color == BLACK && meaningless_black_moves[pos] != -1) {
+        *replacement_move = meaningless_black_moves[pos];
+        return 1;
+    }
 
-  return 0;
+    return 0;
 }
 
 void
 clear_unconditionally_meaningless_moves()
 {
-  int pos;
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)) {
-      meaningless_black_moves[pos] = -1;
-      meaningless_white_moves[pos] = -1;
-    }
+    int pos;
+
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+        if (ON_BOARD(pos)) {
+            meaningless_black_moves[pos] = -1;
+            meaningless_white_moves[pos] = -1;
+        }
 }
 
 /* Pick up antisuji and replacement move reasons found by analysis
@@ -680,21 +680,21 @@ clear_unconditionally_meaningless_moves()
 void
 unconditional_move_reasons(int color)
 {
-  int replacement_move;
-  int pos;
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (board[pos] == EMPTY
-	&& unconditionally_meaningless_move(pos, color, &replacement_move)) {
-      if (replacement_move == NO_MOVE) {
-	TRACE("%1m unconditional antisuji.\n", pos);
-	add_antisuji_move(pos);
-      }
-      else {
-	TRACE("%1m unconditionally replaced to %1m.\n", pos, replacement_move);
-	add_replacement_move(pos, replacement_move, color);
-      }
-    }
+    int replacement_move;
+    int pos;
+
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+        if (board[pos] == EMPTY
+                && unconditionally_meaningless_move(pos, color, &replacement_move)) {
+            if (replacement_move == NO_MOVE) {
+                TRACE("%1m unconditional antisuji.\n", pos);
+                add_antisuji_move(pos);
+            }
+            else {
+                TRACE("%1m unconditionally replaced to %1m.\n", pos, replacement_move);
+                add_replacement_move(pos, replacement_move, color);
+            }
+        }
 }
 
 /*

@@ -29,7 +29,7 @@
 /* initialization and activation */
 void clock_settings(int maintime, int byotime, int byostones);
 void init_timers(void);
- 
+
 /* main access */
 void clock_push_button(int color);
 void update_time_left(int color, int time_left, int stones);

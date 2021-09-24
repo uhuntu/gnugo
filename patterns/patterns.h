@@ -41,7 +41,7 @@
 #define gg_max(a, b) ((a)<(b) ? (b) : (a))
 
 /* This tells Alpha OSF/1 not to define a getopt prototype in <stdio.h>.
- * Ditto for AIX 3.2 and <stdlib.h>. 
+ * Ditto for AIX 3.2 and <stdlib.h>.
  */
 #ifndef _NO_PROTO
 #define _NO_PROTO
@@ -67,7 +67,7 @@
 
 /* this trick forces a compile error if ints are not at least 32-bit */
 struct _unused_patterns_h {
-  int unused[sizeof(unsigned int) >= 4 ? 1 : -1];
+    int unused[sizeof(unsigned int) >= 4 ? 1 : -1];
 };
 
 
@@ -82,14 +82,14 @@ struct pattern; /* forward reference to keep gcc happy */
  *   pattern and rotation are the current pattern being considered
  *   ti, tj: IN = posn of the 7, 8 or 9 marker
  *           OUT = recommended move
- * return value : weight of move, or 0 if match failed            
+ * return value : weight of move, or 0 if match failed
  */
- 
+
 typedef int (*pattern_helper_fn_ptr)(struct pattern *, int rotation,
-				     int move, int color);
+                                     int move, int color);
 
 typedef int (*autohelper_fn_ptr)(int rotation, int move,
-				 int color, int action);
+                                 int color, int action);
 
 
 /* each pattern is compiled into a sequence of these elements.
@@ -127,8 +127,8 @@ typedef int (*autohelper_fn_ptr)(int rotation, int move,
 #define CLASS_n     0x0020   /* X could also make this move if we do not */
 #define CLASS_D     0x0040   /* defense pattern */
 #define CLASS_C     0x0080   /* move connects two worms */
-#define CLASS_c     0x0100   /* move weakly connects two worms */ 
-			     /* for owl databases: combinable pattern */
+#define CLASS_c     0x0100   /* move weakly connects two worms */
+/* for owl databases: combinable pattern */
 #define CLASS_B     0x0200   /* move breaks connection between enemy worms */
 #define CLASS_A     0x0400   /* attack pattern */
 #define CLASS_b     0x0800   /* move is intended to block opponent */
@@ -171,57 +171,57 @@ typedef int (*autohelper_fn_ptr)(int rotation, int move,
 
 
 typedef struct patval {
-  short offset;
-  unsigned char att;
+    short offset;
+    unsigned char att;
 } Patval;
 
 /* Build-time version of patval structure. */
 typedef struct patval_b {
-  int x;
-  int y;
-  int att;
+    int x;
+    int y;
+    int att;
 } Patval_b;
 
 
 enum attribute_type {
-  MIN_VALUE,
-  MAX_VALUE,
-  MIN_TERRITORY,
-  MAX_TERRITORY,
-  SHAPE,
-  FOLLOWUP,
-  REVERSE_FOLLOWUP,
+    MIN_VALUE,
+    MAX_VALUE,
+    MIN_TERRITORY,
+    MAX_TERRITORY,
+    SHAPE,
+    FOLLOWUP,
+    REVERSE_FOLLOWUP,
 
-  /* For `mkpat'. */
-  FIRST_OFFSET_ATTRIBUTE,
+    /* For `mkpat'. */
+    FIRST_OFFSET_ATTRIBUTE,
 
-  THREATENS_TO_CAPTURE = FIRST_OFFSET_ATTRIBUTE,
-  THREATENS_EYE,
-  REVERSE_SENTE,
+    THREATENS_TO_CAPTURE = FIRST_OFFSET_ATTRIBUTE,
+    THREATENS_EYE,
+    REVERSE_SENTE,
 
-  NUM_ATTRIBUTES,
-  LAST_ATTRIBUTE = NUM_ATTRIBUTES
+    NUM_ATTRIBUTES,
+    LAST_ATTRIBUTE = NUM_ATTRIBUTES
 };
 
 
 #ifdef HAVE_TRANSPARENT_UNIONS
 
 struct pattern_attribute {
-  enum attribute_type type;
+    enum attribute_type type;
 
-  /* GCC allows unnamed (and transparent) unions. */
-  union {
-    float value;
-    int offset;
-  };
+    /* GCC allows unnamed (and transparent) unions. */
+    union {
+        float value;
+        int offset;
+    };
 };
 
 #else
 
 struct pattern_attribute {
-  enum attribute_type type;
-  float value;
-  int offset;
+    enum attribute_type type;
+    float value;
+    int offset;
 };
 
 #endif
@@ -231,72 +231,72 @@ struct pattern_attribute {
  * Each pattern as a whole is compiled to an instance of this structure.
  */
 struct pattern {
-  struct patval *patn;  /* array of elements */
-  int patlen;           /* number of elements */
-  int trfno;            /* number of transformations (rotations and reflections) */
-  const char *name;     /* short description of pattern (optional) */
+    struct patval *patn;  /* array of elements */
+    int patlen;           /* number of elements */
+    int trfno;            /* number of transformations (rotations and reflections) */
+    const char *name;     /* short description of pattern (optional) */
 
-  int mini, minj;       /* min and max (relative to anchor) extent of ... */
-  int maxi, maxj;       /* ...the pattern */
-  int height, width;    /* differences between max and min extents */
-  unsigned int edge_constraints; /* and combinations of NORTH, EAST etc.
+    int mini, minj;       /* min and max (relative to anchor) extent of ... */
+    int maxi, maxj;       /* ...the pattern */
+    int height, width;    /* differences between max and min extents */
+    unsigned int edge_constraints; /* and combinations of NORTH, EAST etc.
 				  * for edges */
 
-  int move_offset;      /* offset of the suggested move (relative to anchor) */
+    int move_offset;      /* offset of the suggested move (relative to anchor) */
 
 #if GRID_OPT
-  unsigned int and_mask[8]; /* for each rotation, masks for a */
-  unsigned int val_mask[8]; /* 4x4 grid around anchor */
+    unsigned int and_mask[8]; /* for each rotation, masks for a */
+    unsigned int val_mask[8]; /* 4x4 grid around anchor */
 #endif
 
-  unsigned int class;   /* classification of pattern */
+    unsigned int class;   /* classification of pattern */
 
-  /* Value (owl-style, used for pattern sorting) is not stored as an
-   * attribute, because it is very common.
-   */
-  float value;
+    /* Value (owl-style, used for pattern sorting) is not stored as an
+     * attribute, because it is very common.
+     */
+    float value;
 
-  /* Pattern attributes like shape, followup etc. */
-  struct pattern_attribute *attributes;
+    /* Pattern attributes like shape, followup etc. */
+    struct pattern_attribute *attributes;
 
-  int autohelper_flag;  /* whether autohelper has constraint and/or action */
-  pattern_helper_fn_ptr helper;  /* helper function, or NULL */
-  autohelper_fn_ptr autohelper;  /* automatically generated helper */
-                                 /* function, or NULL */
+    int autohelper_flag;  /* whether autohelper has constraint and/or action */
+    pattern_helper_fn_ptr helper;  /* helper function, or NULL */
+    autohelper_fn_ptr autohelper;  /* automatically generated helper */
+    /* function, or NULL */
 
-  int anchored_at_X;    /* 3 if the pattern has 'X' at the anchor posn */
+    int anchored_at_X;    /* 3 if the pattern has 'X' at the anchor posn */
 
-  float constraint_cost; /* mkpat's estimate of the constraint complexity.*/
+    float constraint_cost; /* mkpat's estimate of the constraint complexity.*/
 
 #if PROFILE_PATTERNS
-  int hits;
-  int dfa_hits;
-  int reading_nodes;
+    int hits;
+    int dfa_hits;
+    int reading_nodes;
 #endif
 };
 
 
 struct pattern_db {
-  int fixed_for_size;
-  const int fixed_anchor;
-  struct pattern *patterns;
-  struct dfa_rt *pdfa;
+    int fixed_for_size;
+    const int fixed_anchor;
+    struct pattern *patterns;
+    struct dfa_rt *pdfa;
 };
 
 
 struct fullboard_pattern {
-  Hash_data fullboard_hash;	/* Hash of the full board position. */	
-  int number_of_stones;		/* Number of stones on board. */
-  const char *name;		/* Pattern identifier. */
-  int move_offset;      	/* position of the move relative to tengen */
-  int value;			/* value for pattern, if matched */
+    Hash_data fullboard_hash;	/* Hash of the full board position. */
+    int number_of_stones;		/* Number of stones on board. */
+    const char *name;		/* Pattern identifier. */
+    int move_offset;      	/* position of the move relative to tengen */
+    int value;			/* value for pattern, if matched */
 };
 
 
 /* Monte Carlo local patterns. */
 struct mc_pattern_database {
-  const char *name;
-  const unsigned int *values;
+    const char *name;
+    const unsigned int *values;
 };
 
 
@@ -365,52 +365,52 @@ struct corner_variation;
 struct corner_pattern;
 
 struct corner_db {
-  int max_width;	/* Largest possible width and... */
-  int max_height;	/* ... largest possible height of database patterns. */
+    int max_width;	/* Largest possible width and... */
+    int max_height;	/* ... largest possible height of database patterns. */
 
-  unsigned char num_top_variations; /* Number of top level variations. */
-  struct corner_variation *top_variations;
+    unsigned char num_top_variations; /* Number of top level variations. */
+    struct corner_variation *top_variations;
 };
 
 struct corner_variation {
-  int move_offset;	    /* Offset of the move in this variation. */
-  signed char xor_att;      /* 0 - the same color as the first matched stone,
+    int move_offset;	    /* Offset of the move in this variation. */
+    signed char xor_att;      /* 0 - the same color as the first matched stone,
 			     * 3 - the opposite color.
 			     */
-  unsigned char num_stones; /* Number of stones in the `move_offset' rectangle. */
+    unsigned char num_stones; /* Number of stones in the `move_offset' rectangle. */
 
-  unsigned char num_variations; /* Number of subvariations. */
-  struct corner_variation *variations; /* Pointer to subvariation array. */
+    unsigned char num_variations; /* Number of subvariations. */
+    struct corner_variation *variations; /* Pointer to subvariation array. */
 
-  struct corner_pattern *pattern; /* Address of matched pattern (if any). */
+    struct corner_pattern *pattern; /* Address of matched pattern (if any). */
 };
 
 struct corner_pattern {
-  int second_corner_offset; /* Offset of pattern's second corner. */
-  int symmetric;	/* If the pattern is symmetric ('/' symmetry). */
+    int second_corner_offset; /* Offset of pattern's second corner. */
+    int symmetric;	/* If the pattern is symmetric ('/' symmetry). */
 
-  unsigned int class;	/* Pattern class. */
-  const char *name;	/* Pattern name (optional). */
+    unsigned int class;	/* Pattern class. */
+    const char *name;	/* Pattern name (optional). */
 
-  /* Pattern attributes like shape (the only one used currently). */
-  struct pattern_attribute *attributes;
+    /* Pattern attributes like shape (the only one used currently). */
+    struct pattern_attribute *attributes;
 
-  int autohelper_flag;	/* Whether autohelper has constraint and/or action. */
-  autohelper_fn_ptr autohelper; /* Automatically generated helper (or NULL). */
+    int autohelper_flag;	/* Whether autohelper has constraint and/or action. */
+    autohelper_fn_ptr autohelper; /* Automatically generated helper (or NULL). */
 };
 
 /* Build time version of corner_variation structure. */
 struct corner_variation_b {
-  int move_offset;
-  signed char xor_att;
-  unsigned char num_stones;
+    int move_offset;
+    signed char xor_att;
+    unsigned char num_stones;
 
-  unsigned char num_variations;
-  struct corner_variation_b *next;
-  struct corner_variation_b *child;
-  int child_num;
+    unsigned char num_variations;
+    struct corner_variation_b *next;
+    struct corner_variation_b *child;
+    int child_num;
 
-  int pattern_num;
+    int pattern_num;
 };
 
 

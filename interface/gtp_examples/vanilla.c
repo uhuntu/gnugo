@@ -29,7 +29,7 @@
  * This program in and of itself is not useful but it
  * can be the basis of useful programs. Example: hack
  * in gmp.c and get a gtp / gmp mediator.
- * 
+ *
  * Pipe a: client --> gnugo
  * Pipe b: gnugo --> client
  */
@@ -48,80 +48,80 @@ void error(const char *msg);
 int
 main()
 {
-  int pfd_a[2];
-  int pfd_b[2];
-  char gnugo_line[128], client_line[128];
-  int length = 0;
-  int verbose = 1;
-  FILE *to_gnugo_stream, *from_gnugo_stream;
-
-  if (pipe(pfd_a) == -1)
-    error("can't open pipe a");
-  if (pipe(pfd_b) == -1)
-    error("can't open pipe b");
-  switch (fork()) {
-  case -1:
-    error("fork failed (try chopsticks)");
-  case 0:
-    /* Attach pipe a to stdin */
-    if (dup2(pfd_a[0], 0) == -1) 
-      error("dup pfd_a[0] failed");
-    /* attach pipe b to stdout" */
-    if (dup2(pfd_b[1], 1) == -1)
-      error("dup pfd_b[1] failed");
-    execlp("gnugo", "gnugo", "--mode", "gtp", "--quiet", NULL);
-    error("execlp failed");
-  }
-  /* We use stderr to communicate with the client since stdout is needed. */
-  /* Attach pipe a to to_gnugo_stream  */
-  to_gnugo_stream = fdopen(pfd_a[1], "w");
-  /* Attach pipe b to from_gnugo_stream */
-  from_gnugo_stream = fdopen(pfd_b[0], "r");
-
-  while (1) {
+    int pfd_a[2];
+    int pfd_b[2];
+    char gnugo_line[128], client_line[128];
     int length = 0;
-    if (!fgets(client_line, 128, stdin) 
-	|| !strncmp(client_line, "quit", 4)) {
-      TELL_GNUGO("quit\n");
-      return 1;
-    }
-    if (!strncmp(client_line, "genmove_black", 13)) {
-      char *token;
-      const char delimiters[] = " \t\r\n";
-      float value1, value2;
+    int verbose = 1;
+    FILE *to_gnugo_stream, *from_gnugo_stream;
 
-      TELL_GNUGO("top_moves_black\n");
-      ASK_GNUGO(gnugo_line);
-      token = strtok(gnugo_line, delimiters);
-      token = strtok(NULL, delimiters);
-      TELL_GNUGO("black ");
-      TELL_GNUGO(token);
-      TELL_GNUGO("\n");
-      ASK_GNUGO(gnugo_line);
-      while (length != 1) {
-	ASK_GNUGO(gnugo_line);
-	length = strlen(gnugo_line);
-	printf(gnugo_line);
-	fflush(stdout);
-      }
+    if (pipe(pfd_a) == -1)
+        error("can't open pipe a");
+    if (pipe(pfd_b) == -1)
+        error("can't open pipe b");
+    switch (fork()) {
+    case -1:
+        error("fork failed (try chopsticks)");
+    case 0:
+        /* Attach pipe a to stdin */
+        if (dup2(pfd_a[0], 0) == -1)
+            error("dup pfd_a[0] failed");
+        /* attach pipe b to stdout" */
+        if (dup2(pfd_b[1], 1) == -1)
+            error("dup pfd_b[1] failed");
+        execlp("gnugo", "gnugo", "--mode", "gtp", "--quiet", NULL);
+        error("execlp failed");
     }
-    else {
-      TELL_GNUGO(client_line);
-      while (length != 1) {
-	ASK_GNUGO(gnugo_line);
-	length = strlen(gnugo_line);
-	printf(gnugo_line);
-	fflush(stdout);
-      }
+    /* We use stderr to communicate with the client since stdout is needed. */
+    /* Attach pipe a to to_gnugo_stream  */
+    to_gnugo_stream = fdopen(pfd_a[1], "w");
+    /* Attach pipe b to from_gnugo_stream */
+    from_gnugo_stream = fdopen(pfd_b[0], "r");
+
+    while (1) {
+        int length = 0;
+        if (!fgets(client_line, 128, stdin)
+                || !strncmp(client_line, "quit", 4)) {
+            TELL_GNUGO("quit\n");
+            return 1;
+        }
+        if (!strncmp(client_line, "genmove_black", 13)) {
+            char *token;
+            const char delimiters[] = " \t\r\n";
+            float value1, value2;
+
+            TELL_GNUGO("top_moves_black\n");
+            ASK_GNUGO(gnugo_line);
+            token = strtok(gnugo_line, delimiters);
+            token = strtok(NULL, delimiters);
+            TELL_GNUGO("black ");
+            TELL_GNUGO(token);
+            TELL_GNUGO("\n");
+            ASK_GNUGO(gnugo_line);
+            while (length != 1) {
+                ASK_GNUGO(gnugo_line);
+                length = strlen(gnugo_line);
+                printf(gnugo_line);
+                fflush(stdout);
+            }
+        }
+        else {
+            TELL_GNUGO(client_line);
+            while (length != 1) {
+                ASK_GNUGO(gnugo_line);
+                length = strlen(gnugo_line);
+                printf(gnugo_line);
+                fflush(stdout);
+            }
+        }
     }
-  }
 }
 
 void
-error(const char *msg)      
+error(const char *msg)
 {
-  fprintf(stderr, "vanilla: %s\n", msg);
-  abort();
+    fprintf(stderr, "vanilla: %s\n", msg);
+    abort();
 }
 
 
